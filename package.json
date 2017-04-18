@@ -3,20 +3,30 @@
 	"version": "0.0.1",
 	"private": true,
 	"scripts": {
-		"start": "node node_modules/react-native/local-cli/cli.js start",
-		"test": "jest"
+		"start": "concurrently \"tsc --project tsconfig.json --watch --pretty\" \"./node_modules/.bin/react-native start --skipflow\" ",
+		"test": "yarn build && jest",
+		"build": "tsc --project tsconfig.json",
+		"ios": "react-native run-ios --no-packager && yarn start"
 	},
 	"dependencies": {
+		"@types/react": "^15.0.22",
+		"@types/react-native": "^0.43.3",
 		"react": "16.0.0-alpha.6",
 		"react-native": "0.43.3"
 	},
 	"devDependencies": {
+		"@types/jest": "^19.2.2",
 		"babel-jest": "19.0.0",
 		"babel-preset-react-native": "1.9.1",
+		"concurrently": "^3.4.0",
 		"jest": "19.0.2",
-		"react-test-renderer": "16.0.0-alpha.6"
+		"react-test-renderer": "16.0.0-alpha.6",
+		"typescript": "^2.2.2"
 	},
 	"jest": {
 		"preset": "react-native"
+	},
+	"babel": {
+		"presets": "react-native"
 	}
 }
