@@ -3,7 +3,7 @@
 	"version": "0.0.1",
 	"private": true,
 	"scripts": {
-		"start": "concurrently \"tsc --project tsconfig.json --watch --pretty\" \"./node_modules/.bin/react-native start --skipflow\" ",
+		"start": "concurrently \"tsc --project tsconfig.json --watch --pretty\" \"react-native start --skipflow\" ",
 		"test": "yarn build && jest",
 		"build": "tsc --project tsconfig.json",
 		"ios": "react-native run-ios --no-packager && yarn start"
