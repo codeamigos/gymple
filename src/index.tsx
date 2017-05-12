@@ -1,6 +1,43 @@
 import * as React from 'react';
 import * as RN from 'react-native';
 
+
+interface Exercise {
+  title: string,
+  restSeconds: number,
+  attempts: [{
+    weight: number,
+    repititions: number,
+  }],
+}
+
+type Training = NotStartedTraining | OngoingTraining | FinishedTraining;
+
+interface NotStartedTraining {
+  title: string,
+  plannedExercises: [Exercise],
+}
+
+interface OngoingTraining {
+  title: string,
+  startedAt: Date,
+  plannedExercises: [Exercise],
+  currentExerciseIndex: number | null,
+  completedExercises: [Exercise],
+}
+
+interface FinishedTraining {
+  title: string,
+  startedAt: Date,
+  finishedAt: Date,
+  completedExercises: [Exercise],
+}
+
+interface Profile {
+  active: NotStartedTraining | OngoingTraining | null,
+  history: [FinishedTraining],
+}
+
 class Test extends React.Component<void, void> {
   render() {
     return (
