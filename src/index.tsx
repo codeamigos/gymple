@@ -45,10 +45,10 @@ interface FinishedTraining {
 interface Exercise {
   title: string,
   restSeconds: number,
-  attempts: {
+  attempts: Array<{
     weight: number,
     repititions: number,
-  }[],
+  }>,
 }
 
 
@@ -67,7 +67,7 @@ class TrainingScreen extends React.PureComponent<void, TrainingScreenState> {
         title: 'Untitled',
         plannedExercises: [
           { title: 'Жим лежа', restSeconds: 60, attempts: [] },
-          { title: 'Присед', restSeconds: 60, attempts: [] }
+          { title: 'Присед', restSeconds: 60, attempts: [] },
         ],
       },
       isModalOpened: false,
@@ -92,7 +92,7 @@ class TrainingScreen extends React.PureComponent<void, TrainingScreenState> {
             <RN.Text>
               {exercise.title}
             </RN.Text>
-          </RN.View>
+          </RN.View>,
         )}
         <RN.TouchableHighlight style={trainingSceneStyles.addBtn} onPress={() => this.setState({ isModalOpened: true })}>
           <RN.Text style={trainingSceneStyles.addBtnText}>
