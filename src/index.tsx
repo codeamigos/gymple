@@ -7,8 +7,9 @@ import 'intl';
 import localizations from './localizations';
 
 const en = require('react-intl/locale-data/en');
+const ru = require('react-intl/locale-data/ru');
 
-ReactIntl.addLocaleData([...en]);
+ReactIntl.addLocaleData([...en, ...ru]);
 
 
 interface Exercise {
@@ -60,7 +61,7 @@ interface TrainingScreneState {
   exercises: Exercise[],
 }
 
-class TrainingScrene extends React.Component<TrainingScreenProps, TrainingScreneState> {
+class TrainingScrene extends React.PureComponent<TrainingScreenProps, TrainingScreneState> {
   constructor() {
     super();
 
@@ -150,18 +151,21 @@ function AddExerciseScene() {
 } 
 
 
-const Navigator = StackNavigator({
+const Navigator: any = StackNavigator({
   Training: { screen: TrainingScrene },
   AddExercise: { screen: AddExerciseScene },
 });
 
+const { intl } = new ReactIntl
+  .IntlProvider({ locale: 'en', messages: localizations.en }, {})
+  .getChildContext();
 
-function App() {
-  return (
-    <Navigator screenProps={{
-      intl: new ReactIntl.IntlProvider({ locale: 'en', messages: localizations.en }, {}).getChildContext().intl
-    }} />
-  );
+class App extends React.Component<void, void> {
+  render() {
+    return (
+      <Navigator screenProps={{ intl }} />
+    );
+  }
 }
 
 RN.AppRegistry.registerComponent('Gymple', () => App);
