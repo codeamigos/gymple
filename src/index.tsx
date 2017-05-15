@@ -1,34 +1,31 @@
 import * as React from 'react';
 import * as RN from 'react-native';
-import * as ReactIntl from 'react-intl';
-import { StackNavigator } from 'react-navigation';
-import 'intl';
+// import * as ReactIntl from 'react-intl';
+// import 'intl';
 
-import localizations from './localizations';
+// import localizations from './localizations';
 
+/*
 const en = require('react-intl/locale-data/en');
 const ru = require('react-intl/locale-data/ru');
 
 ReactIntl.addLocaleData([...en, ...ru]);
 
 
-interface Exercise {
-  title: string,
-  restSeconds: number,
-  attempts: {
-    weight: number,
-    repititions: number,
-  }[],
+interface Profile {
+  active: NotStartedTraining | OngoingTraining | null,
+  history: FinishedTraining[],
 }
 
-/*
 type Training = NotStartedTraining | OngoingTraining | FinishedTraining;
+*/
 
 interface NotStartedTraining {
   title: string,
   plannedExercises: Exercise[],
 }
 
+/*
 interface OngoingTraining {
   title: string,
   startedAt: Date,
@@ -43,70 +40,82 @@ interface FinishedTraining {
   finishedAt: Date,
   completedExercises: Exercise[],
 }
-
-interface Profile {
-  active: NotStartedTraining | OngoingTraining | null,
-  history: FinishedTraining[],
-}
 */
 
-interface TrainingScreenProps {
-  navigation: any,
-  screenProps: {
-    intl: ReactIntl.InjectedIntl,
-  },
+interface Exercise {
+  title: string,
+  restSeconds: number,
+  attempts: {
+    weight: number,
+    repititions: number,
+  }[],
 }
 
-interface TrainingScreneState {
-  exercises: Exercise[],
+
+
+interface TrainingScreenState {
+  training: NotStartedTraining,
+  isModalOpened: boolean,
 }
 
-class TrainingScrene extends React.PureComponent<TrainingScreenProps, TrainingScreneState> {
-  constructor() {
-    super();
+class TrainingScreen extends React.PureComponent<void, TrainingScreenState> {
+  constructor(props: void) {
+    super(props);
 
     this.state = {
-      exercises: [
-        { title: 'Жим лежа', restSeconds: 60, attempts: [] },
-        { title: 'Присед', restSeconds: 60, attempts: [] }
-      ],
+      training: {
+        title: 'Untitled',
+        plannedExercises: [
+          { title: 'Жим лежа', restSeconds: 60, attempts: [] },
+          { title: 'Присед', restSeconds: 60, attempts: [] }
+        ],
+      },
+      isModalOpened: false,
     };
   }
 
   render() {
-    const { intl } = this.props.screenProps;
-    const { navigate } = this.props.navigation;
-    const { exercises } = this.state;
+    const { training, isModalOpened } = this.state;
 
     return (
-      <RN.ScrollView contentContainerStyle={trainingSceneStyles.container}>
+      <RN.ScrollView contentContainerStyle={trainingSceneStyles.screen}>
         <RN.View style={trainingSceneStyles.header}>
           <RN.Text style={trainingSceneStyles.title}>
-            Тренировка
+            {training.title}
           </RN.Text>
           <RN.Text style={trainingSceneStyles.date}>
-            {intl.formatMessage({ id: 'test' })}
+            Сегодня
           </RN.Text>
         </RN.View>
-        {exercises.map(exercise =>
+        {training.plannedExercises.map(exercise =>
           <RN.View key={exercise.title} style={trainingSceneStyles.exercise}>
             <RN.Text>
               {exercise.title}
             </RN.Text>
           </RN.View>
         )}
-        <RN.TouchableHighlight style={trainingSceneStyles.addBtn} onPress={() => navigate('AddExercise')}>
+        <RN.TouchableHighlight style={trainingSceneStyles.addBtn} onPress={() => this.setState({ isModalOpened: true })}>
           <RN.Text style={trainingSceneStyles.addBtnText}>
             Добавить упражнение
           </RN.Text>
         </RN.TouchableHighlight>
+        <RN.Modal
+          animationType="slide"
+          transparent={false}
+          visible={isModalOpened}
+          onRequestClose={() => this.setState({ isModalOpened: false })}
+        >
+          <RN.View style={trainingSceneStyles.modal}>
+            <RN.Text>Add exercise</RN.Text>
+          </RN.View>
+        </RN.Modal>
       </RN.ScrollView>
     );
   }
 }
 
 const trainingSceneStyles = RN.StyleSheet.create({
-  container: {
+  screen: {
     flex: 1,
     alignItems: 'stretch',
     backgroundColor: '#F5FCFF',
@@ -139,21 +148,17 @@ const trainingSceneStyles = RN.StyleSheet.create({
   addBtnText: {
     color: 'white',
   } as RN.TextStyle,
+
+  modal: {
+    flexGrow: 1,
+    backgroundColor: 'blue',
+  } as RN.ViewStyle,
 });
 
 
-function AddExerciseScene() {
-  return (
-    <RN.View>
-      <RN.Text>Add exercise</RN.Text>
-    </RN.View>
-  );
-} 
-
-
+/*
 const Navigator: any = StackNavigator({
-  Training: { screen: TrainingScrene },
-  AddExercise: { screen: AddExerciseScene },
+  Training: { screen: TrainingScreen },
 });
 
 const { intl } = new ReactIntl
@@ -167,5 +172,6 @@ class App extends React.Component<void, void> {
     );
   }
 }
+*/
 
-RN.AppRegistry.registerComponent('Gymple', () => App);
+RN.AppRegistry.registerComponent('Gymple', () => TrainingScreen);
