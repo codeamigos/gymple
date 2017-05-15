@@ -6,13 +6,19 @@
 		"start": "concurrently \"tsc --project tsconfig.json --watch --pretty\" \"react-native start --skipflow\" ",
 		"test": "yarn build && jest",
 		"build": "tsc --project tsconfig.json",
-		"ios": "react-native run-ios --no-packager && yarn start"
+		"ios": "react-native run-ios --no-packager && yarn start",
+    "postinstall": "rm -f node_modules/intl/.babelrc"
 	},
 	"dependencies": {
 		"@types/react": "^15.0.24",
+		"@types/react-intl": "^2.2.7",
 		"@types/react-native": "^0.44.0",
+		"@types/react-navigation": "^1.0.1",
+		"intl": "^1.2.5",
 		"react": "16.0.0-alpha.6",
-		"react-native": "0.44.0"
+		"react-intl": "^2.3.0",
+		"react-native": "0.44.0",
+		"react-navigation": "^1.0.0-beta.9"
 	},
 	"devDependencies": {
 		"@types/jest": "^19.2.3",
