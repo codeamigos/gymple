@@ -49,8 +49,13 @@ interface Exercise {
     weight: number,
     repititions: number,
   }>,
+  targetMuscles: Muscle[]
 }
 
+interface Muscle {
+  id: number,
+  title: string,
+}
 
 
 interface TrainingScreenState {
