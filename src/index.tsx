@@ -119,7 +119,7 @@ class TrainingScreen extends React.PureComponent<void, TrainingScreenState> {
               {defaultExcercises.map(ecercise =>
                 <RN.View key={ecercise.title}>
                   <RN.Text>{ecercise.title}</RN.Text>
-                  <RN.Text>{ecercise.targetMuscles.join(', ')}</RN.Text>
+                  <RN.Text>{ecercise.targetMuscles.map(({title}) => title).join(', ')}</RN.Text>
                 </RN.View>,
               )}
             </RN.ScrollView>
@@ -171,7 +171,7 @@ const trainingSceneStyles = RN.StyleSheet.create({
 
   availableExcerciseFilter: {
     height: 44,
-    alignContent: 'center',
+    justifyContent: 'center',
     borderRadius: 3,
     backgroundColor: 'rgba(255, 255, 255, 1)',
   } as RN.ViewStyle,
