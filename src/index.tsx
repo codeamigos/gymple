@@ -1,5 +1,8 @@
 import * as React from 'react';
 import * as RN from 'react-native';
+import excerscisesData, {ExcerciseData} from './excercises';
+import musclesData, {MuscleData} from './muscles';
+
 // import * as ReactIntl from 'react-intl';
 // import 'intl';
 
@@ -49,8 +52,13 @@ interface Exercise {
     weight: number,
     repititions: number,
   }>,
+  targetMuscles: Muscle[]
 }
 
+interface Muscle {
+  id: number,
+  title: string,
+}
 
 
 interface TrainingScreenState {
@@ -65,10 +73,7 @@ class TrainingScreen extends React.PureComponent<void, TrainingScreenState> {
     this.state = {
       training: {
         title: 'Untitled',
-        plannedExercises: [
-          { title: 'Жим лежа', restSeconds: 60, attempts: [] },
-          { title: 'Присед', restSeconds: 60, attempts: [] },
-        ],
+        plannedExercises: [],
       },
       isModalOpened: false,
     };
@@ -76,6 +81,8 @@ class TrainingScreen extends React.PureComponent<void, TrainingScreenState> {
 
   render() {
     const { training, isModalOpened } = this.state;
+
+    const defaultExcercises = generateDefaultExcersices(excerscisesData, musclesData);
 
     return (
       <RN.ScrollView contentContainerStyle={trainingSceneStyles.screen}>
@@ -107,6 +114,15 @@ class TrainingScreen extends React.PureComponent<void, TrainingScreenState> {
         >
           <RN.View style={trainingSceneStyles.modal}>
             <RN.Text>Add exercise</RN.Text>
+            <RN.TextInput style={trainingSceneStyles.availableExcerciseFilter} placeholder="Filter" />
+            <RN.ScrollView style={trainingSceneStyles.availableExcerciseList}>
+              {defaultExcercises.map(ecercise =>
+                <RN.View key={ecercise.title}>
+                  <RN.Text>{ecercise.title}</RN.Text>
+                  <RN.Text>{ecercise.targetMuscles.map(({title}) => title).join(', ')}</RN.Text>
+                </RN.View>,
+              )}
+            </RN.ScrollView>
           </RN.View>
         </RN.Modal>
       </RN.ScrollView>
@@ -149,29 +165,43 @@ const trainingSceneStyles = RN.StyleSheet.create({
     color: 'white',
   } as RN.TextStyle,
 
+  availableExcerciseList: {
+    flex: 1,
+  } as RN.ViewStyle,
+
+  availableExcerciseFilter: {
+    height: 44,
+    justifyContent: 'center',
+    borderRadius: 3,
+    backgroundColor: 'rgba(255, 255, 255, 1)',
+  } as RN.ViewStyle,
+
   modal: {
     flexGrow: 1,
     backgroundColor: 'blue',
   } as RN.ViewStyle,
 });
 
+function generateDefaultExcersices(
+    excerscsesData: ExcerciseData[],
+    musclesData: MuscleData[],
+  ): Exercise[] {
 
-/*
-const Navigator: any = StackNavigator({
-  Training: { screen: TrainingScreen },
-});
+ return excerscsesData.map(({title, targetMusclesIds, additionalMusclesIds}) => {
+    const targetMuscles = [...targetMusclesIds, ...additionalMusclesIds]
+      .reduce((acc, muscleId) => {
+        const muscleData = musclesData.find(muscle => muscle.id === muscleId);
+        if (muscleData) { return [...acc, muscleData]; }
+        return acc;
+      }, [] as MuscleData[]);
 
-const { intl } = new ReactIntl
-  .IntlProvider({ locale: 'en', messages: localizations.en }, {})
-  .getChildContext();
-
-class App extends React.Component<void, void> {
-  render() {
-    return (
-      <Navigator screenProps={{ intl }} />
-    );
-  }
+    return {
+      title,
+      restSeconds: 90,
+      attempts: [],
+      targetMuscles,
+    };
+  });
 }
-*/
 
 RN.AppRegistry.registerComponent('Gymple', () => TrainingScreen);
