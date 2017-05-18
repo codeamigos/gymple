@@ -193,7 +193,7 @@ function generateDefaultExcersices(
         const muscleData = musclesData.find(muscle => muscle.id === muscleId);
         if (muscleData) { return [...acc, muscleData]; }
         return acc;
-      }, []);
+      }, [] as MuscleData[]);
 
     return {
       title,
