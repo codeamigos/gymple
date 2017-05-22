@@ -1,7 +1,7 @@
 import * as React from 'react';
 import * as RN from 'react-native';
-import excerscisesData, {ExcerciseData} from './excercises';
-import musclesData, {MuscleData} from './muscles';
+import excerscisesData, { ExcerciseData } from './excercises';
+import musclesData, { MuscleData } from './muscles';
 
 // import * as ReactIntl from 'react-intl';
 // import 'intl';
@@ -64,6 +64,7 @@ interface Muscle {
 interface TrainingScreenState {
   training: NotStartedTraining,
   isModalOpened: boolean,
+  filter: string | null,
 }
 
 class TrainingScreen extends React.PureComponent<void, TrainingScreenState> {
@@ -76,11 +77,25 @@ class TrainingScreen extends React.PureComponent<void, TrainingScreenState> {
         plannedExercises: [],
       },
       isModalOpened: false,
+      filter: null,
     };
   }
 
+  addExercise = (exercise: Exercise) => {
+    const { training } = this.state;
+
+    this.setState({
+      training: {
+        ...training,
+        plannedExercises: training.plannedExercises.concat(exercise),
+      },
+      isModalOpened: false,
+      filter: null,
+    });
+  }
+
   render() {
-    const { training, isModalOpened } = this.state;
+    const { training, isModalOpened, filter } = this.state;
 
     const defaultExcercises = generateDefaultExcersices(excerscisesData, musclesData);
 
@@ -113,15 +128,36 @@ class TrainingScreen extends React.PureComponent<void, TrainingScreenState> {
           onRequestClose={() => this.setState({ isModalOpened: false })}
         >
           <RN.View style={trainingSceneStyles.modal}>
-            <RN.Text>Add exercise</RN.Text>
-            <RN.TextInput style={trainingSceneStyles.availableExcerciseFilter} placeholder="Filter" />
-            <RN.ScrollView style={trainingSceneStyles.availableExcerciseList}>
-              {defaultExcercises.map(ecercise =>
-                <RN.View key={ecercise.title}>
-                  <RN.Text>{ecercise.title}</RN.Text>
-                  <RN.Text>{ecercise.targetMuscles.map(({title}) => title).join(', ')}</RN.Text>
-                </RN.View>,
-              )}
+            <RN.TextInput
+              style={trainingSceneStyles.availableExerciseFilter}
+              placeholder="Filter"
+              onChangeText={(text) => this.setState({ filter: text })}
+            />
+            <RN.ScrollView style={trainingSceneStyles.availableExerciseList}>
+              {defaultExcercises
+                .filter(exercise =>
+                  !training.plannedExercises
+                    .find(ex => ex.title === exercise.title),
+                )
+                .filter(exercise => filter
+                  ? exercise.title.includes(filter)
+                  : true,
+                )
+                .map(exercise =>
+                  <RN.TouchableOpacity
+                    key={exercise.title}
+                    style={trainingSceneStyles.availableExercise}
+                    onPress={() => this.addExercise(exercise)}
+                  >
+                    <RN.Text style={trainingSceneStyles.availableExerciseTitle}>
+                      {exercise.title}
+                    </RN.Text>
+                    <RN.Text style={trainingSceneStyles.availableExerciseMuscles}>
+                      {exercise.targetMuscles.map(({ title }) => title).join(', ')}
+                    </RN.Text>
+                  </RN.TouchableOpacity>,
+                )
+              }
             </RN.ScrollView>
           </RN.View>
         </RN.Modal>
@@ -165,21 +201,39 @@ const trainingSceneStyles = RN.StyleSheet.create({
     color: 'white',
   } as RN.TextStyle,
 
-  availableExcerciseList: {
-    flex: 1,
-  } as RN.ViewStyle,
-
-  availableExcerciseFilter: {
-    height: 44,
-    justifyContent: 'center',
-    borderRadius: 3,
-    backgroundColor: 'rgba(255, 255, 255, 1)',
-  } as RN.ViewStyle,
-
   modal: {
     flexGrow: 1,
-    backgroundColor: 'blue',
+    backgroundColor: 'white',
+    paddingHorizontal: 20,
+    marginTop: 30,
   } as RN.ViewStyle,
+
+  availableExerciseFilter: {
+    height: 44,
+    padding: 10,
+    borderRadius: 3,
+    borderWidth: 2,
+    borderColor: 'purple',
+  } as RN.ViewStyle,
+
+  availableExerciseList: {
+    flex: 1,
+    marginTop: 10,
+  } as RN.ViewStyle,
+
+  availableExercise: {
+    justifyContent: 'center',
+    paddingVertical: 5,
+  } as RN.ViewStyle,
+
+  availableExerciseTitle: {
+    fontSize: 16,
+  } as RN.TextStyle,
+
+  availableExerciseMuscles: {
+    marginTop: 5,
+    fontSize: 12,
+  } as RN.TextStyle,
 });
 
 function generateDefaultExcersices(
