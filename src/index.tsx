@@ -1,8 +1,12 @@
 import * as React from 'react';
 import * as RN from 'react-native';
-import excerscisesData, { ExcerciseData } from './excercises';
-import musclesData, { MuscleData } from './muscles';
 
+import s from './styles';
+import excerscisesData, {ExcerciseData} from './excercises';
+import musclesData, {MuscleData} from './muscles';
+
+
+console.log(s());
 // import * as ReactIntl from 'react-intl';
 // import 'intl';
 

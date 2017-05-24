@@ -17,25 +17,15 @@ export interface StylesResult {
   [key: string]: Style,
 }
 
-const defaultMultiplicators: Multiplicator[] = [
-  {
-    '0': 0,
-  },
-  {
-    '05': 0.5,
-  },
-  {
-    '075': 0.75,
-  },
-  {
-    '1': 1,
-  },
-];
+const defaultMultiplicators: Multiplicator = {
+  '0': 0,
+  '05': 0.5,
+  '075': 0.75,
+  '1': 1,
+};
 
 const result = (
-  remSize: number = 16
-  fontNames: string[] = [],
-  colors: Color[] = [],
+  remSize: number = 16,
 ): StylesResult => {
 
   const borderStyles = generateBorderStyles(defaultMultiplicators);
@@ -49,7 +39,7 @@ const result = (
   };
 };
 
-const generateBorderStyles = (multiplicators: Multiplicator[]): StylesResult => {
+const generateBorderStyles = (multiplicators: Multiplicator): StylesResult => {
   return multiplyStylesValues({
     ba: {
         borderWidth: 1,
@@ -69,7 +59,7 @@ const generateBorderStyles = (multiplicators: Multiplicator[]): StylesResult => 
   }, multiplicators);
 };
 
-const generateBorderRadiusStyles = (multiplicators: Multiplicator[]): StylesResult => {
+const generateBorderRadiusStyles = (multiplicators: Multiplicator): StylesResult => {
   return multiplyStylesValues({
     br: {
         borderRadius: 1,
@@ -94,7 +84,7 @@ const generateBorderRadiusStyles = (multiplicators: Multiplicator[]): StylesResu
   multiplicators);
 };
 
-const generateFontSizeStyles = (multiplicators: Multiplicator[]): StylesResult => {
+const generateFontSizeStyles = (multiplicators: Multiplicator): StylesResult => {
   return multiplyStylesValues({
     fs: {
       fontSize: 1,
@@ -103,16 +93,15 @@ const generateFontSizeStyles = (multiplicators: Multiplicator[]): StylesResult =
   multiplicators);
 };
 
-const multiplyStylesValues = (styles: StylesResult, multiplicators: Multiplicator[]): StylesResult => {
+const multiplyStylesValues = (styles: StylesResult, multiplicators: Multiplicator): StylesResult => {
   const resultStyles: StylesResult = {};
   Object.keys(styles).map(key => {
     if (key.includes('--')) {
       resultStyles[key] = styles[key];
     }
     else {
-      multiplicators.map(multiplicator => {
-        const prefix: string = Object.keys(multiplicator)[0];
-        const multiplicatorValue: number = multiplicator[prefix];
+      Object.keys(multiplicators).map(prefix => {
+        const multiplicatorValue: number = multiplicators[prefix];
         const multiplyedStyle: Style = {};
 
         Object.keys(styles[key]).map((styleKey: string) => {
@@ -132,14 +121,13 @@ const multiplyStylesValues = (styles: StylesResult, multiplicators: Multiplicato
   return resultStyles;
 };
 
-const multiplyToRem = (remValue: number, multiplicators: Multiplicator[]): Multiplicator[] => {
-  return multiplicators.map(multiplicator => {
-    const prefix: string = Object.keys(multiplicator)[0];
-    const multiplicatorValue: number = multiplicator[prefix];
-    return {
-      prefix: multiplicatorValue * remValue,
-    };
+const multiplyToRem = (remValue: number, multiplicators: Multiplicator): Multiplicator => {
+  const multiplied: Multiplicator = {};
+  Object.keys(multiplicators).map(prefix => {
+    const multiplicatorValue: number = multiplicators[prefix];
+    multiplied[prefix] = multiplicatorValue * remValue;
   });
+  return multiplied;
 };
 
 export default result;
