@@ -10,8 +10,7 @@
     "noUnusedParameters": true,
     "noUnusedLocals": true,
     "allowJs": true,
-    "sourceMap": false,
-    "moduleResolution": "node"
+    "sourceMap": false
   },
   "include": [
     "src/**/*.ts",
