@@ -1,7 +1,5 @@
-import Color from 'color';
-
-// import {StyleSheet} from 'react-native';
-// import {ViewStyle, TextStyle, ImageStyle} from '@types/react-native/index';
+const Color = require('color');
+import * as RN from 'react-native';
 
 export interface Multiplicators {
   [key: string]: number,
@@ -18,35 +16,6 @@ export interface Style {
 export interface StylesResult {
   [key: string]: Style,
 }
-
-const defaultMultiplicators: Multiplicators = {
-  '0': 0,
-  '025': 0.25,
-  '05': 0.5,
-  '075': 0.75,
-  '085': 0.85,
-  '1': 1,
-  '115': 1.15,
-  '125': 1.25,
-  '15': 1.5,
-  '175': 1.75,
-  '185': 1.85,
-  '2': 2,
-  '225': 2.25,
-  '25': 2.5,
-  '275': 2.75,
-  '3': 3,
-  '325': 3.25,
-  '35': 3.5,
-  '375': 3.75,
-  '4': 4,
-  '45': 4.5,
-  '5': 5,
-  '55': 5.5,
-  '6': 6,
-  '7': 7,
-  '8': 8,
-};
 
 const remStyles: StylesResult = {
   fs: {
@@ -110,9 +79,24 @@ const remStyles: StylesResult = {
   maxw: {
     maxWidth: 1,
   },
+  r: {
+    right: 1,
+  },
+  l: {
+    left: 1,
+  },
+  t: {
+    top: 1,
+  },
+  b: {
+    bottom: 1,
+  },
+  lh: {
+    lineHeight: 1,
+  },
 };
 
-const pointStyles = {
+const pointStyles: StylesResult = {
   ba: {
     borderWidth: 1,
   },
@@ -130,7 +114,8 @@ const pointStyles = {
   },
 };
 
-const staticStyles = {
+const staticStyles: StylesResult = {
+  // No border radius
   'br__bottom': {
       borderTopLeftRadius: 0,
       borderTopRightRadius: 0,
@@ -146,6 +131,98 @@ const staticStyles = {
   'br__right': {
       borderTopLeftRadius: 0,
       borderBottomLeftRadius: 0,
+  },
+
+  // absolute
+  absolute: {
+    position: 'absolute',
+  },
+  'absolute__fill': {
+    left: 0,
+    top: 0,
+    right: 0,
+    bottom: 0,
+  },
+
+  // flexbox
+  'flx-i': {
+    flex: 1,
+  },
+  'flx-grow': {
+    flexGrow: 1,
+  },
+  'flx-row': {
+    flexDirection: 'row',
+  },
+  'flx-row-reverse': {
+    flexDirection: 'row-reverse',
+  },
+  'flx-col-reverse': {
+    flexDirection: 'column-reverse',
+  },
+  'flx-wrap': {
+    flexWrap: 'wrap',
+  },
+  aifs: {
+    alignItems: 'flex-start',
+  },
+  aic: {
+    alignItems: 'center',
+  },
+  aife: {
+    alignItems: 'flex-end',
+  },
+  asfs: {
+    alignSelf: 'flex-start',
+  },
+  asc: {
+    alignSelf: 'center',
+  },
+  asfe: {
+    alignSelf: 'flex-end',
+  },
+  ass: {
+    alignSelf: 'stretch',
+  },
+  jcfe: {
+    justifyContent: 'flex-end',
+  },
+  jcc: {
+    justifyContent: 'center',
+  },
+  jcsb: {
+    justifyContent: 'space-between',
+  },
+  jcsa: {
+    justifyContent: 'space-around',
+  },
+
+  // Image
+  'rm-contain': {
+    resizeMode: 'contain',
+  },
+  'rm-cover': {
+    resizeMode: 'cover',
+  },
+  'rm-stretch': {
+    resizeMode: 'stretch',
+  },
+
+  // Text
+  i: {
+    fontStyle: 'italic',
+  },
+  tl: {
+    textAlign: 'left',
+  },
+  tc: {
+    textAlign: 'center',
+  },
+  tr: {
+    textAlign: 'right',
+  },
+  tj: {
+    textAlign: 'justify',
   },
 };
 
@@ -194,7 +271,7 @@ const generatePalette = (colors: Palette): StylesResult => {
     resultStyles[name] = { color: color };
     resultStyles[`b_${name}`] = { borderColor: color };
     for (let i: number = 5; i < 100; i += 5) {
-      const rgbString: string = new Color(color).alpha(i / 100).rgb().string();
+      const rgbString: string = Color(color).alpha(i / 100).rgb().string();
       resultStyles[`bg_${name}_${i}`] = { backgroundColor: rgbString };
       resultStyles[`${name}_${i}`] = { color: rgbString };
       resultStyles[`b_${name}_${i}`] = { borderColor: rgbString };
@@ -221,27 +298,92 @@ const generateFonts = (fonts: Palette): StylesResult => {
   return resultStyles;
 };
 
-export default (
+const generateFontWeights = (weights: Palette): StylesResult => {
+  const resultStyles: StylesResult = {};
+  Object.keys(weights).map(name => {
+    const fontWeight: string = weights[name];
+    resultStyles[`f_${name}`] = { fontWeight };
+  });
+  return resultStyles;
+};
+
+const buildStyles = (
   remSize: number = 16,
-  headings: Multiplicators = {
-    '6': 0.875,
-    '5': 1,
-    '4': 1.25,
-    '3': 1.75,
-    '2': 2.35,
-    '1': 3.25,
-  },
-  palette: Palette = {},
+  multiplicators: Multiplicators = defaultMultiplicators,
+  headings: Multiplicators = defaultHeadings,
+  palette: Palette = defaultPalette,
   fonts: Palette = {},
+  fontWeights: Palette = defaultFontWeights,
 ): StylesResult => {
 
-  return {
-    ...multiplyStylesValues(pointStyles, defaultMultiplicators),
-    ...multiplyStylesValues(remStyles, multiplyToRem(remSize, defaultMultiplicators)),
+  return RN.StyleSheet.create({
+    ...multiplyStylesValues(pointStyles, multiplicators),
+    ...multiplyStylesValues(remStyles, multiplyToRem(remSize, multiplicators)),
     ...multiplyStylesValues({f: {fontSize: 1}}, multiplyToRem(remSize, headings)),
     ...generatePalette(palette),
     ...generateFonts(fonts),
+    ...generateFontWeights(fontWeights),
     ...generateOpacity(),
     ...staticStyles,
-  };
+  });
 };
+
+export const defaultMultiplicators: Multiplicators = {
+  '0': 0,
+  '025': 0.25,
+  '05': 0.5,
+  '075': 0.75,
+  '085': 0.85,
+  '1': 1,
+  '115': 1.15,
+  '125': 1.25,
+  '15': 1.5,
+  '175': 1.75,
+  '185': 1.85,
+  '2': 2,
+  '225': 2.25,
+  '25': 2.5,
+  '275': 2.75,
+  '3': 3,
+  '325': 3.25,
+  '35': 3.5,
+  '375': 3.75,
+  '4': 4,
+  '45': 4.5,
+  '5': 5,
+  '55': 5.5,
+  '6': 6,
+  '7': 7,
+  '8': 8,
+};
+
+export const defaultHeadings: Multiplicators = {
+  '6': 0.875,
+  '5': 1,
+  '4': 1.25,
+  '3': 1.75,
+  '2': 2.35,
+  '1': 3.25,
+};
+
+export const defaultPalette: Palette = {
+  white: 'rgb(255,255,255)',
+  black: 'rgb(0,0,0)',
+};
+
+export const defaultFontWeights: Palette = {
+  normal: 'normal',
+  b: 'bold',
+  fw1: '100',
+  fw2: '200',
+  fw3: '300',
+  fw4: '400',
+  fw5: '500',
+  fw6: '600',
+  fw7: '700',
+  fw8: '800',
+  fw9: '900',
+};
+
+export {buildStyles};
+export default buildStyles();
