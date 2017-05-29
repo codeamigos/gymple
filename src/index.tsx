@@ -1,10 +1,14 @@
 import * as React from 'react';
 import * as RN from 'react-native';
 
-import s from './styles';
+
+import bs from './styles';
+
 import excerscisesData, {ExcerciseData} from './excercises';
 import musclesData, {MuscleData} from './muscles';
 
+bs.build({remSize: 14});
+const {styles: s} = bs;
 console.log(s);
 // import * as ReactIntl from 'react-intl';
 // import 'intl';
@@ -99,7 +103,6 @@ class TrainingScreen extends React.PureComponent<void, TrainingScreenState> {
 
   render() {
     const { training, isModalOpened, filter } = this.state;
-
     const defaultExcercises = generateDefaultExcersices(excerscisesData, musclesData);
 
     return (

@@ -258,7 +258,7 @@ const multiplyToRem = (remValue: number, multiplicators: Multiplicators): Multip
   const multiplied: Multiplicators = {};
   Object.keys(multiplicators).map(prefix => {
     const multiplicatorValue: number = multiplicators[prefix];
-    multiplied[prefix] = multiplicatorValue * remValue;
+    multiplied[prefix] = Math.round(multiplicatorValue * remValue * 100) / 100;
   });
   return multiplied;
 };
@@ -307,25 +307,46 @@ const generateFontWeights = (weights: Palette): StylesResult => {
   return resultStyles;
 };
 
-const buildStyles = (
-  remSize: number = 16,
-  multiplicators: Multiplicators = defaultMultiplicators,
-  headings: Multiplicators = defaultHeadings,
-  palette: Palette = defaultPalette,
-  fonts: Palette = {},
-  fontWeights: Palette = defaultFontWeights,
-): StylesResult => {
+interface Options {
+  remSize?: number,
+  multiplicators?: Multiplicators,
+  headings?: Multiplicators
+  palette?: Palette,
+  fonts?: Palette,
+  fontWeights?: Palette
+}
 
-  return RN.StyleSheet.create({
-    ...multiplyStylesValues(pointStyles, multiplicators),
-    ...multiplyStylesValues(remStyles, multiplyToRem(remSize, multiplicators)),
-    ...multiplyStylesValues({f: {fontSize: 1}}, multiplyToRem(remSize, headings)),
-    ...generatePalette(palette),
-    ...generateFonts(fonts),
-    ...generateFontWeights(fontWeights),
-    ...generateOpacity(),
-    ...staticStyles,
-  });
+interface BuildStyles {
+  styles: StylesResult,
+  sizes: Multiplicators,
+  build: (defaultOptions: Options) => void,
+}
+
+const buildStyles: BuildStyles = {
+  styles: {},
+  sizes: {},
+
+  build: (defaultOptions: Options = {}) => {
+
+    const remSize = defaultOptions.remSize || 16;
+    const multiplicators = defaultOptions.multiplicators || defaultMultiplicators;
+    const headings = defaultOptions.headings || defaultHeadings;
+    const palette = defaultOptions.palette || defaultPalette;
+    const fonts = defaultOptions.palette || defaultPalette;
+    const fontWeights = defaultOptions.fontWeights || defaultFontWeights;
+
+    buildStyles.sizes = multiplyToRem(remSize, multiplicators);
+    buildStyles.styles = RN.StyleSheet.create({
+      ...multiplyStylesValues(pointStyles, multiplicators),
+      ...multiplyStylesValues(remStyles, multiplyToRem(remSize, multiplicators)),
+      ...multiplyStylesValues({f: {fontSize: 1}}, multiplyToRem(remSize, headings)),
+      ...generatePalette(palette),
+      ...generateFonts(fonts),
+      ...generateFontWeights(fontWeights),
+      ...generateOpacity(),
+      ...staticStyles,
+    });
+  },
 };
 
 export const defaultMultiplicators: Multiplicators = {
@@ -385,5 +406,4 @@ export const defaultFontWeights: Palette = {
   fw9: '900',
 };
 
-export {buildStyles};
-export default buildStyles();
+export default buildStyles;
