@@ -1,4 +1,4 @@
-export interface ExcerciseData {
+export interface ExerciseData {
   id: number,
   title: string,
   imgSrc: string,
@@ -1665,4 +1665,4 @@ export default [
       3
     ]
   }
-] as ExcerciseData[];
+] as ExerciseData[];

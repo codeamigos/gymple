@@ -94,22 +94,25 @@ const remStyles: StylesResult = {
   lh: {
     lineHeight: 1,
   },
+  br: {
+    borderRadius: 1,
+  }
 };
 
 const pointStyles: StylesResult = {
-  ba: {
+  bw: {
     borderWidth: 1,
   },
-  bt: {
+  bwt: {
     borderTopWidth: 1,
   },
-  br: {
+  bwr: {
     borderRightWidth: 1,
   },
-  bb: {
+  bwb: {
     borderBottomWidth: 1,
   },
-  bl: {
+  bwl: {
     borderLeftWidth: 1,
   },
 };
@@ -145,22 +148,22 @@ const staticStyles: StylesResult = {
   },
 
   // flexbox
-  'flx-i': {
+  'flx_i': {
     flex: 1,
   },
-  'flx-grow': {
+  'flx_grow': {
     flexGrow: 1,
   },
-  'flx-row': {
+  'flx_row': {
     flexDirection: 'row',
   },
-  'flx-row-reverse': {
+  'flx_rr': {
     flexDirection: 'row-reverse',
   },
-  'flx-col-reverse': {
+  'flx_cr': {
     flexDirection: 'column-reverse',
   },
-  'flx-wrap': {
+  'flx_wrap': {
     flexWrap: 'wrap',
   },
   aifs: {
@@ -198,13 +201,13 @@ const staticStyles: StylesResult = {
   },
 
   // Image
-  'rm-contain': {
+  'rm_contain': {
     resizeMode: 'contain',
   },
-  'rm-cover': {
+  'rm_cover': {
     resizeMode: 'cover',
   },
-  'rm-stretch': {
+  'rm_stretch': {
     resizeMode: 'stretch',
   },
 
@@ -263,7 +266,21 @@ const multiplyToRem = (remValue: number, multiplicators: Multiplicators): Multip
   return multiplied;
 };
 
-const generatePalette = (colors: Palette): StylesResult => {
+const generatePalette = (colors: Palette): Palette => {
+  const resultPalette: Palette = {};
+  Object.keys(colors).map(name => {
+    const color: string = colors[name];
+    resultPalette[name] = color;
+
+    for (let i: number = 5; i < 100; i += 5) {
+      const rgbString: string = Color(color).alpha(i / 100).rgb().string();
+      resultPalette[`${name}_${i}`] = rgbString;
+    }
+  });
+  return resultPalette;
+};
+
+const generateStylesPalette = (colors: Palette): StylesResult => {
   const resultStyles: StylesResult = {};
   Object.keys(colors).map(name => {
     const color: string = colors[name];
@@ -302,7 +319,7 @@ const generateFontWeights = (weights: Palette): StylesResult => {
   const resultStyles: StylesResult = {};
   Object.keys(weights).map(name => {
     const fontWeight: string = weights[name];
-    resultStyles[`f_${name}`] = { fontWeight };
+    resultStyles[`${name}`] = { fontWeight };
   });
   return resultStyles;
 };
@@ -319,12 +336,14 @@ export interface Options {
 interface BuildStyles {
   styles: StylesResult,
   sizes: Multiplicators,
+  colors: Palette
   build: (defaultOptions: Options) => void,
 }
 
 const buildStyles: BuildStyles = {
   styles: {},
   sizes: {},
+  colors: {},
 
   build: (defaultOptions: Options = {}) => {
 
@@ -335,12 +354,13 @@ const buildStyles: BuildStyles = {
     const fonts = defaultOptions.palette || defaultPalette;
     const fontWeights = defaultOptions.fontWeights || defaultFontWeights;
 
+    buildStyles.colors = generatePalette(palette);
     buildStyles.sizes = multiplyToRem(remSize, multiplicators);
     buildStyles.styles = RN.StyleSheet.create({
       ...multiplyStylesValues(pointStyles, multiplicators),
       ...multiplyStylesValues(remStyles, multiplyToRem(remSize, multiplicators)),
       ...multiplyStylesValues({f: {fontSize: 1}}, multiplyToRem(remSize, headings)),
-      ...generatePalette(palette),
+      ...generateStylesPalette(palette),
       ...generateFonts(fonts),
       ...generateFontWeights(fontWeights),
       ...generateOpacity(),
