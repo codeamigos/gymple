@@ -1,7 +1,45 @@
 import * as React from 'react';
 import * as RN from 'react-native';
-import excerscisesData, { ExcerciseData } from './excercises';
-import musclesData, { MuscleData } from './muscles';
+
+import bs, {Palette, Multiplicators, Options} from './styles';
+import excerscisesData, {ExcerciseData} from './excercises';
+import musclesData, {MuscleData} from './muscles';
+
+const palette: Palette = {
+  greyDarkest: '#2e333d',
+  greyDarker: '#434b55',
+  greyDark: '#555b65',
+  grey: '#8a949d',
+  greyLight: '#d2dadd',
+  greyLighter: '#e5eaee',
+  greyLightest: '#fafafa',
+  white: '#ffffff',
+  black: '#000000',
+  blueDark: '#2b55e4',
+  blue: '#2c5cff',
+  blueLight: '#587eff',
+  red: '#ff2b71',
+  orange: '#ff605e',
+  yellow: '#fbcf00',
+  green: '#0cddae',
+};
+
+const headings: Multiplicators = {
+  '7': 0.75,
+  '6': 0.85,
+  '5': 1,
+  '4': 1.2,
+  '3': 1.6,
+  '2': 2,
+  '1': 3.25,
+};
+
+bs.build({
+  remSize: 15,
+  palette,
+  headings,
+} as Options);
+const {styles: s} = bs;
 
 // import * as ReactIntl from 'react-intl';
 // import 'intl';
@@ -96,11 +134,10 @@ class TrainingScreen extends React.PureComponent<void, TrainingScreenState> {
 
   render() {
     const { training, isModalOpened, filter } = this.state;
-
     const defaultExcercises = generateDefaultExcersices(excerscisesData, musclesData);
 
     return (
-      <RN.ScrollView contentContainerStyle={trainingSceneStyles.screen}>
+      <RN.ScrollView contentContainerStyle={[s.flx_i]}>
         <RN.View style={trainingSceneStyles.header}>
           <RN.Text style={trainingSceneStyles.title}>
             {training.title}
@@ -122,7 +159,7 @@ class TrainingScreen extends React.PureComponent<void, TrainingScreenState> {
           </RN.Text>
         </RN.TouchableHighlight>
         <RN.Modal
-          animationType="slide"
+          animationType='slide'
           transparent={false}
           visible={isModalOpened}
           onRequestClose={() => this.setState({ isModalOpened: false })}
