@@ -307,7 +307,7 @@ const generateFontWeights = (weights: Palette): StylesResult => {
   return resultStyles;
 };
 
-interface Options {
+export interface Options {
   remSize?: number,
   multiplicators?: Multiplicators,
   headings?: Multiplicators
