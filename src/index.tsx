@@ -1,6 +1,7 @@
 import * as React from 'react';
 import * as RN from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
+import Swipeout from 'react-native-swipeout';
 
 import bs, {Palette, Multiplicators, Options} from './styles';
 import exerscisesData, {ExerciseData} from './exercises';
@@ -104,6 +105,7 @@ interface Muscle {
 interface TrainingScreenState {
   training: NotStartedTraining,
   isModalOpened: boolean,
+  isScrollEnabled: boolean,
   filter: string | null,
 }
 
@@ -117,6 +119,7 @@ class TrainingScreen extends React.PureComponent<void, TrainingScreenState> {
         plannedExercises: [],
       },
       isModalOpened: false,
+      isScrollEnabled: true,
       filter: null,
     };
   }
@@ -134,8 +137,22 @@ class TrainingScreen extends React.PureComponent<void, TrainingScreenState> {
     });
   }
 
+  removeExercise = (index: number) => {
+    const { training } = this.state;
+    this.setState({
+      training: {
+        ...training,
+        plannedExercises: training.plannedExercises.filter((_, i) => i !== index),
+      },
+    });
+  }
+
+  allowScroll = (isScrollEnabled: boolean) => {
+    this.setState({isScrollEnabled});
+  }
+
   render() {
-    const { training, isModalOpened, filter } = this.state;
+    const { training, isModalOpened, filter, isScrollEnabled } = this.state;
     const defaultExercises = generateDefaultExersices(exerscisesData, musclesData);
 
     return (
@@ -153,8 +170,23 @@ class TrainingScreen extends React.PureComponent<void, TrainingScreenState> {
             Today
           </RN.Text>
         </RN.View>
-        <RN.ScrollView style={[s.flx_i]} contentContainerStyle={[s.pl125]}>
-          {training.plannedExercises.map((exercise, i) => <ExerciseListItem key={exercise.title + i} exercise={exercise} />)}
+        <RN.ScrollView style={[s.flx_i]} scrollEnabled={isScrollEnabled}>
+          {training.plannedExercises.map((exercise, i) =>
+          <Swipeout
+            key={exercise.title + i}
+            backgroundColor={colors.t}
+            scroll={isAllow => this.allowScroll(isAllow)}
+            buttonWidth={sizes[7]}
+            right={[
+              {
+                onPress: () => this.removeExercise(i),
+                component: <RN.View style={[s.w7, s.bg_orange, s.jcc, s.flx_i]}><RN.Text style={[s.f5, s.tc, s.white]}>Remove</RN.Text></RN.View>,
+              },
+            ]}
+          >
+            <ExerciseListItem exercise={exercise} />
+          </Swipeout>,
+        )}
         </RN.ScrollView>
         <RN.View style={[s.ph125, s.pb175]}>
           <RN.TouchableHighlight
@@ -190,7 +222,7 @@ class TrainingScreen extends React.PureComponent<void, TrainingScreenState> {
                 />
               </RN.View>
             </RN.View>
-            <RN.ScrollView style={[s.flx_i]} contentContainerStyle={[s.pl125]}>
+            <RN.ScrollView style={[s.flx_i]}>
               {defaultExercises
                 .filter(exercise => filter
                   ? exercise.title.includes(filter)
@@ -215,7 +247,7 @@ interface ExerciseListItemProps {
 }
 
 const ExerciseListItem: React.StatelessComponent<ExerciseListItemProps> = ({exercise}) =>
-  <RN.View style={[s.pv1, s.bbw1, s.b_black_5, s.pr05]}>
+  <RN.View style={[s.pv1, s.bbw1, s.b_black_5, s.pr05, s.ml125]}>
     <RN.Text style={[s.f4, s.bg_t, s.blue]}>
       {exercise.title}
     </RN.Text>
