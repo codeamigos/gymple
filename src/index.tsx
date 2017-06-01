@@ -116,7 +116,7 @@ class TrainingScreen extends React.PureComponent<void, TrainingScreenState> {
         title: 'New training',
         plannedExercises: [],
       },
-      isModalOpened: true,
+      isModalOpened: false,
       filter: null,
     };
   }
@@ -153,7 +153,7 @@ class TrainingScreen extends React.PureComponent<void, TrainingScreenState> {
             Today
           </RN.Text>
         </RN.View>
-        <RN.ScrollView contentContainerStyle={[s.flx_i]}>
+        <RN.ScrollView style={[s.flx_i]} contentContainerStyle={[s.pl125]}>
           {training.plannedExercises.map((exercise, i) => <ExerciseListItem key={exercise.title + i} exercise={exercise} />)}
         </RN.ScrollView>
         <RN.View style={[s.ph125, s.pb175]}>
@@ -190,18 +190,14 @@ class TrainingScreen extends React.PureComponent<void, TrainingScreenState> {
                 />
               </RN.View>
             </RN.View>
-            <RN.ScrollView style={trainingSceneStyles.availableExerciseList}>
+            <RN.ScrollView style={[s.flx_i]} contentContainerStyle={[s.pl125]}>
               {defaultExercises
                 .filter(exercise => filter
                   ? exercise.title.includes(filter)
                   : true,
                 )
                 .map(exercise =>
-                  <RN.TouchableOpacity
-                    key={exercise.title}
-                    style={trainingSceneStyles.availableExercise}
-                    onPress={() => this.addExercise(exercise)}
-                  >
+                  <RN.TouchableOpacity key={exercise.title} onPress={() => this.addExercise(exercise)}>
                     <ExerciseListItem exercise={exercise} />
                   </RN.TouchableOpacity>,
                 )
@@ -219,84 +215,14 @@ interface ExerciseListItemProps {
 }
 
 const ExerciseListItem: React.StatelessComponent<ExerciseListItemProps> = ({exercise}) =>
-  <RN.View>
-    <RN.Text style={trainingSceneStyles.availableExerciseTitle}>
+  <RN.View style={[s.pv1, s.bbw1, s.b_black_5, s.pr05]}>
+    <RN.Text style={[s.f4, s.bg_t, s.blue]}>
       {exercise.title}
     </RN.Text>
-    <RN.Text style={trainingSceneStyles.availableExerciseMuscles}>
+    <RN.Text style={[s.f6]}>
       {exercise.targetMuscles.map(({ title }) => title).join(', ')}
     </RN.Text>
   </RN.View>;
-
-const trainingSceneStyles = RN.StyleSheet.create({
-  screen: {
-    flex: 1,
-    alignItems: 'stretch',
-    backgroundColor: '#F5FCFF',
-  } as RN.ViewStyle,
-
-  header: {
-    alignItems: 'flex-start',
-    padding: 20,
-    backgroundColor: 'grey',
-  } as RN.ViewStyle,
-
-  title: {
-    fontSize: 20,
-    color: 'purple',
-  } as RN.TextStyle,
-
-  date: {
-    color: 'purple',
-  } as RN.TextStyle,
-
-  exercise: {} as RN.ViewStyle,
-
-  addBtn: {
-    alignItems: 'center',
-    backgroundColor: 'purple',
-    paddingVertical: 20,
-    paddingHorizontal: 50,
-  } as RN.ViewStyle,
-
-  addBtnText: {
-    color: 'white',
-  } as RN.TextStyle,
-
-  modal: {
-    flexGrow: 1,
-    backgroundColor: 'white',
-    paddingHorizontal: 20,
-    marginTop: 30,
-  } as RN.ViewStyle,
-
-  availableExerciseFilter: {
-    height: 44,
-    padding: 10,
-    borderRadius: 3,
-    borderWidth: 2,
-    borderColor: 'purple',
-  } as RN.ViewStyle,
-
-  availableExerciseList: {
-    flex: 1,
-    marginTop: 10,
-  } as RN.ViewStyle,
-
-  availableExercise: {
-    justifyContent: 'center',
-    paddingVertical: 5,
-  } as RN.ViewStyle,
-
-  availableExerciseTitle: {
-    fontSize: 16,
-  } as RN.TextStyle,
-
-  availableExerciseMuscles: {
-    marginTop: 5,
-    fontSize: 12,
-  } as RN.TextStyle,
-});
 
 function generateDefaultExersices(
     exerscsesData: ExerciseData[],

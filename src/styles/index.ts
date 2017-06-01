@@ -103,16 +103,16 @@ const pointStyles: StylesResult = {
   bw: {
     borderWidth: 1,
   },
-  bwt: {
+  btw: {
     borderTopWidth: 1,
   },
-  bwr: {
+  brw: {
     borderRightWidth: 1,
   },
-  bwb: {
+  bbw: {
     borderBottomWidth: 1,
   },
-  bwl: {
+  blw: {
     borderLeftWidth: 1,
   },
 };
