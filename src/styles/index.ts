@@ -394,7 +394,9 @@ export const defaultMultiplicators: Multiplicators = {
   '5': 5,
   '55': 5.5,
   '6': 6,
+  '65': 6.5,
   '7': 7,
+  '75': 7.5,
   '8': 8,
 };
 
