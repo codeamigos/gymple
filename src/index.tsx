@@ -132,7 +132,6 @@ class TrainingScreen extends React.PureComponent<void, TrainingScreenState> {
 
   addExercise = (exercise: Exercise) => {
     const { training } = this.state;
-
     this.setState({
       training: {
         ...training,
@@ -211,6 +210,7 @@ class TrainingScreen extends React.PureComponent<void, TrainingScreenState> {
         >
           {editingExercise ?
             <ExerciseSettings
+              onUpdate={this.setEditingExercise}
               onClose={() => this.setState({ editingExercise: null })}
               onAdd={() => this.addExercise(editingExercise)}
               onStart={() => this.addExercise(editingExercise)}
@@ -234,10 +234,21 @@ interface ExerciseListItemProps {
 }
 
 const ExerciseListItem: React.StatelessComponent<ExerciseListItemProps> = ({exercise}) =>
-  <RN.View style={[s.pv1, s.bbw1, s.b_black_5, s.pr05, s.ml125]}>
-    <RN.Text style={[s.f4, s.bg_t, s.blue]}>
-      {exercise.title}
-    </RN.Text>
+  <RN.View style={[s.pv1, s.bbw1, s.b_black_5, s.pr1, s.ml125]}>
+    <RN.View style={[s.flx_row, s.jcsb, s.aifs]}>
+      <RN.Text style={[s.f4, s.bg_t, s.blue, s.flx_i, s.mb025, s.lh125]}>
+        {exercise.title}
+      </RN.Text>
+      {exercise.attempts.length > 0 &&
+        <RN.View style={[s.ml075, s.flx_row, s.aic, s.mt0125]}>
+          <RN.Text style={[s.f6, s.b]}>{exercise.attempts.length}</RN.Text>
+          <Icon name="md-close" color={colors.black_20} style={[s.f5, s.ph025]} />
+          <RN.Text style={[s.f6, s.b]}>{Math.round(exercise.attempts.reduce((acc, a) => acc + a.repetitions, 0) / exercise.attempts.length)}</RN.Text>
+          <Icon name="md-close" color={colors.black_20} style={[s.f5, s.ph025]} />
+          <RN.Text style={[s.f6, s.b]}>{Math.round(exercise.attempts.reduce((acc, a) => acc + a.weight, 0) / exercise.attempts.length)}kg</RN.Text>
+        </RN.View>
+      }
+    </RN.View>
     <RN.Text style={[s.f6]}>
       {exercise.targetMuscles.map(({ title }) => title).join(', ')}
     </RN.Text>
@@ -327,113 +338,188 @@ class ExerciseList extends React.PureComponent<ExerciseListProps, ExerciseListSt
 
 interface ExerciseSettingsProps {
   onClose: () => void,
+  onUpdate: (exercise: Exercise) => void,
   onStart: () => void,
   onAdd: () => void,
   exercise: Exercise,
 }
 
-const ExerciseSettings: React.StatelessComponent<ExerciseSettingsProps> = ({exercise, onClose, onAdd, onStart}) =>
-  <RN.View style={[s.flx_i, s.jcsb, s.bg_greyLightest]}>
-    <RN.View style={[s.bg_blue, s.pt2, s.ph125, s.pb05]}>
-      <RN.TouchableOpacity onPress={onClose}>
-        <Icon name="md-arrow-back" size={sizes[175]} color={colors.white} />
-      </RN.TouchableOpacity>
-      <RN.Text style={[s.white, s.fw3, s.f2, s.mv05, s.lh2]}>
-        {exercise.title}
-      </RN.Text>
-      <RN.Text style={[s.white, s.f5, s.mb05]}>
-        {exercise.targetMuscles.map(({ title }) => title).join(', ')}
-      </RN.Text>
-    </RN.View>
-    <RN.View style={[s.flx_i, s.bg_blueDark, s.jcsb, s.pv175, s.ph125]}>
-      <RN.View>
+const ExerciseSettings: React.StatelessComponent<ExerciseSettingsProps> = ({exercise, onClose, onAdd, onStart, onUpdate}) => {
 
-        <RN.View style={[s.flx_row, s.jcsb, s.aic, s.mb15]}>
-          <RN.Text style={[s.f3, s.white]}>Attempts</RN.Text>
-          <RN.View style={[s.aic, s.flx_row]}>
-            <RN.TouchableOpacity
-              disabled={exercise.attempts.length === 1}
-              style={[s.bg_white_10, s.br2, s.w175, s.h175, s.aic]}>
-              <Icon name="md-remove" size={sizes[175]} color={colors.white} />
-            </RN.TouchableOpacity>
-            <RN.Text style={[s.f2, s.white, s.bg_t, s.b, s.tc, s.w3]}>{exercise.attempts.length}</RN.Text>
-            <RN.TouchableOpacity
-              disabled={exercise.attempts.length === 99}
-              style={[s.bg_white_10, s.br2, s.w175, s.h175, s.aic]}>
-              <Icon name="md-add" size={sizes[175]} color={colors.white} />
-            </RN.TouchableOpacity>
-          </RN.View>
-        </RN.View>
+  const handleAddAttempt = () => {
+    if (exercise.attempts.length >= 1) {
+      onUpdate({
+        ...exercise,
+        attempts: exercise.attempts.concat(exercise.attempts[exercise.attempts.length - 1]),
+      });
+    }
+  };
 
-        <RN.View style={[s.flx_row, s.jcsb, s.aic, s.mb15]}>
-          <RN.Text style={[s.f3, s.white]}>Repeats</RN.Text>
-          <RN.View style={[s.bg_black_10, s.ph075, s.h3, s.br025, s.w65]}>
-            <RN.TextInput
-              value={String(exercise.attempts[exercise.attempts.length - 1].repetitions || '')}
-              keyboardType="numeric"
-              underlineColorAndroid={colors.t}
-              placeholderTextColor={colors.white_20}
-              style={[s.bg_t, s.f2, s.b, s.white, s.h3, s.tc]}
-              placeholder="3"
-              onChangeText={() => {}}
-            />
-          </RN.View>
-        </RN.View>
+  const handleRemoveAttempt = () => {
+    if (exercise.attempts.length >= 2) {
+      onUpdate({
+        ...exercise,
+        attempts: exercise.attempts.slice(0, exercise.attempts.length - 1),
+      });
+    }
+  };
 
-        <RN.View style={[s.flx_row, s.jcsb, s.aic, s.mb15]}>
-          <RN.View style={[s.flx_row, s.aife]}>
-            <RN.Text style={[s.f3, s.white]}>Weight</RN.Text>
-            <RN.Text style={[s.f4, s.white_20]}>, kg</RN.Text>
-          </RN.View>
-          <RN.View style={[s.bg_black_10, s.ph075, s.h3, s.br025, s.w65]}>
-            <RN.TextInput
-              value={String(exercise.attempts[exercise.attempts.length - 1].weight || '')}
-              keyboardType="numeric"
-              underlineColorAndroid={colors.t}
-              placeholderTextColor={colors.white_20}
-              style={[s.bg_t, s.f2, s.b, s.white, s.h3, s.tc]}
-              placeholder="3"
-              onChangeText={() => {}}
-            />
-          </RN.View>
-        </RN.View>
+  const handleChangeOverallWeight = (weightString: string) => {
+    if (!isNaN(parseInt(weightString, 10)) && parseInt(weightString, 10) > 0) {
+      const weight = parseInt(weightString, 10);
+      onUpdate({
+        ...exercise,
+        attempts: exercise.attempts.map(attempt => ({...attempt, weight})),
+      });
+    }
+    else {
+      onUpdate({
+        ...exercise,
+        attempts: exercise.attempts.map(attempt => ({...attempt, weight: 0})),
+      });
+    }
+  };
 
-        <RN.View style={[s.flx_row, s.jcsb, s.aic, s.mb15]}>
-          <RN.View style={[s.flx_row, s.aife]}>
-            <RN.Text style={[s.f3, s.white]}>Rest</RN.Text>
-            <RN.Text style={[s.f4, s.white_20]}>, sec</RN.Text>
-          </RN.View>
-          <RN.View style={[s.bg_black_10, s.ph075, s.h3, s.br025, s.w65]}>
-            <RN.TextInput
-              value={String(exercise.restSeconds || '')}
-              keyboardType="numeric"
-              underlineColorAndroid={colors.t}
-              placeholderTextColor={colors.white_20}
-              style={[s.bg_t, s.f2, s.b, s.white, s.h3, s.tc]}
-              placeholder="3"
-              onChangeText={() => {}}
-            />
-          </RN.View>
-        </RN.View>
+  const handleChangeOverallRepeats = (repeatsString: string) => {
+     if (!isNaN(parseInt(repeatsString, 10)) && parseInt(repeatsString, 10) > 0) {
+      const repetitions = parseInt(repeatsString, 10);
+      onUpdate({
+        ...exercise,
+        attempts: exercise.attempts.map(attempt => ({...attempt, repetitions})),
+      });
+    }
+    else {
+      onUpdate({
+        ...exercise,
+        attempts: exercise.attempts.map(attempt => ({...attempt, repetitions: 1})),
+      });
+    }
+  };
 
+  const handleChangeRestSeconds = (restSecondsString: string) => {
+    if (!isNaN(parseInt(restSecondsString, 10)) && parseInt(restSecondsString, 10) > 0) {
+      const restSeconds: number = parseInt(restSecondsString, 10);
+      onUpdate({
+        ...exercise,
+        restSeconds,
+      });
+    }
+    else {
+      onUpdate({
+        ...exercise,
+        restSeconds: 0,
+      });
+    }
+  };
+
+  return (
+    <RN.View style={[s.flx_i, s.jcsb, s.bg_greyLightest]}>
+      <RN.View style={[s.bg_blue, s.pt2, s.ph125, s.pb05]}>
+        <RN.TouchableOpacity onPress={onClose}>
+          <Icon name="md-arrow-back" size={sizes[175]} color={colors.white} />
+        </RN.TouchableOpacity>
+        <RN.Text style={[s.white, s.fw3, s.f2, s.mv05, s.lh2]}>
+          {exercise.title}
+        </RN.Text>
+        <RN.Text style={[s.white, s.f5, s.mb05]}>
+          {exercise.targetMuscles.map(({ title }) => title).join(', ')}
+        </RN.Text>
       </RN.View>
-      <RN.View>
-        <RN.TouchableHighlight
-          style={[s.ass, s.bg_green, s.br2, s.h325, s.jcc, s.ph1, s.mb075]}
-          onPress={onStart}>
-          <RN.Text style={[s.f4, s.white, s.tc, s.b]}>
-            Do it now
-          </RN.Text>
-        </RN.TouchableHighlight>
-        <RN.TouchableHighlight
-          style={[s.ass, s.bg_t, s.br2, s.h325, s.jcc, s.bw2, s.ph1, s.b_white_10]}
-          onPress={onAdd}>
-          <RN.Text style={[s.f4, s.white, s.tc, s.b]}>
-            Just add
-          </RN.Text>
-        </RN.TouchableHighlight>
+      <RN.View style={[s.flx_i, s.bg_blueDark, s.jcsb, s.pb175, s.ph125]}>
+        <RN.ScrollView contentContainerStyle={s.pt175} scrollEnabled={false }>
+          <RN.View style={[s.flx_row, s.jcsb, s.aic, s.mb15]}>
+            <RN.Text style={[s.f3, s.white]}>Attempts</RN.Text>
+            <RN.View style={[s.aic, s.flx_row]}>
+              <RN.TouchableOpacity
+                onPress={handleRemoveAttempt}
+                disabled={exercise.attempts.length === 1}
+                style={[s.bg_white_10, s.br2, s.w175, s.h175, s.aic]}>
+                <Icon name="md-remove" size={sizes[175]} color={exercise.attempts.length === 1 ? colors.blueDark : colors.white} />
+              </RN.TouchableOpacity>
+              <RN.Text style={[s.f2, s.white, s.bg_t, s.b, s.tc, s.w3]}>{exercise.attempts.length}</RN.Text>
+              <RN.TouchableOpacity
+                onPress={handleAddAttempt}
+                disabled={exercise.attempts.length === 99}
+                style={[s.bg_white_10, s.br2, s.w175, s.h175, s.aic]}>
+                <Icon name="md-add" size={sizes[175]} color={exercise.attempts.length === 99 ? colors.blueDark : colors.white} />
+              </RN.TouchableOpacity>
+            </RN.View>
+          </RN.View>
+
+          <RN.View style={[s.flx_row, s.jcsb, s.aic, s.mb15]}>
+            <RN.Text style={[s.f3, s.white]}>Repeats</RN.Text>
+            <RN.View style={[s.bg_black_10, s.ph075, s.h3, s.br025, s.w65]}>
+              <RN.TextInput
+                value={String(exercise.attempts[exercise.attempts.length - 1].repetitions || '')}
+                keyboardType="numeric"
+                underlineColorAndroid={colors.t}
+                placeholderTextColor={colors.white_20}
+                style={[s.bg_t, s.f2, s.b, s.white, s.h3, s.tc]}
+                placeholder="12"
+                onChangeText={(repeatsString) => handleChangeOverallRepeats(repeatsString)}
+                onBlur={() => RN.Keyboard.dismiss()}
+              />
+            </RN.View>
+          </RN.View>
+
+          <RN.View style={[s.flx_row, s.jcsb, s.aic, s.mb15]}>
+            <RN.View style={[s.flx_row, s.aife]}>
+              <RN.Text style={[s.f3, s.white]}>Weight</RN.Text>
+              <RN.Text style={[s.f4, s.white_20]}>, kg</RN.Text>
+            </RN.View>
+            <RN.View style={[s.bg_black_10, s.ph075, s.h3, s.br025, s.w65]}>
+              <RN.TextInput
+                value={String(exercise.attempts[exercise.attempts.length - 1].weight || '')}
+                keyboardType="numeric"
+                underlineColorAndroid={colors.t}
+                placeholderTextColor={colors.white_20}
+                style={[s.bg_t, s.f2, s.b, s.white, s.h3, s.tc]}
+                placeholder="25"
+                onChangeText={(weightString) => handleChangeOverallWeight(weightString)}
+                onBlur={() => RN.Keyboard.dismiss()}
+              />
+            </RN.View>
+          </RN.View>
+
+          <RN.View style={[s.flx_row, s.jcsb, s.aic, s.mb15]}>
+            <RN.View style={[s.flx_row, s.aife]}>
+              <RN.Text style={[s.f3, s.white]}>Rest</RN.Text>
+              <RN.Text style={[s.f4, s.white_20]}>, sec</RN.Text>
+            </RN.View>
+            <RN.View style={[s.bg_black_10, s.ph075, s.h3, s.br025, s.w65]}>
+              <RN.TextInput
+                value={String(exercise.restSeconds || '')}
+                keyboardType="numeric"
+                underlineColorAndroid={colors.t}
+                placeholderTextColor={colors.white_20}
+                style={[s.bg_t, s.f2, s.b, s.white, s.h3, s.tc]}
+                placeholder="60"
+                onChangeText={(restSecondsString) => handleChangeRestSeconds(restSecondsString)}
+                onBlur={() => RN.Keyboard.dismiss()}
+              />
+            </RN.View>
+          </RN.View>
+
+        </RN.ScrollView>
+        <RN.View>
+          <RN.TouchableHighlight
+            style={[s.ass, s.bg_green, s.br2, s.h325, s.jcc, s.ph1, s.mb075]}
+            onPress={onStart}>
+            <RN.Text style={[s.f4, s.white, s.tc, s.b]}>
+              Do it now
+            </RN.Text>
+          </RN.TouchableHighlight>
+          <RN.TouchableHighlight
+            style={[s.ass, s.bg_t, s.br2, s.h325, s.jcc, s.bw2, s.ph1, s.b_white_10]}
+            onPress={onAdd}>
+            <RN.Text style={[s.f4, s.white, s.tc, s.b]}>
+              Just add
+            </RN.Text>
+          </RN.TouchableHighlight>
+        </RN.View>
       </RN.View>
     </RN.View>
-  </RN.View>;
+  );
+};
 
 RN.AppRegistry.registerComponent('Gymple', () => TrainingScreen);
