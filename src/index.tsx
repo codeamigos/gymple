@@ -204,15 +204,15 @@ class TrainingScreen extends React.PureComponent<void, TrainingScreenState> {
             key={exercise.title + i}
             backgroundColor={colors.t}
             scroll={isAllow => this.allowScroll(isAllow)}
-            buttonWidth={sizes[7]}
+            buttonWidth={sizes[5]}
             right={[
               {
-                onPress: () => this.removeExercise(i),
-                component: <RN.View style={[s.w7, s.bg_orange, s.jcc, s.flx_i]}><RN.Text style={[s.f5, s.tc, s.white]}>Remove</RN.Text></RN.View>,
+                onPress: () => this.setEditingExercise(exercise, i),
+                component: <RN.View style={[s.w5, s.bg_green, s.jcc, s.flx_i]}><Icon name="md-create" style={[s.white, s.f3, s.tc]} /></RN.View>,
               },
               {
-                onPress: () => this.setEditingExercise(exercise, i),
-                component: <RN.View style={[s.w7, s.bg_green, s.jcc, s.flx_i]}><RN.Text style={[s.f5, s.tc, s.white]}>Edit</RN.Text></RN.View>,
+                onPress: () => this.removeExercise(i),
+                component: <RN.View style={[s.w5, s.bg_orange, s.jcc, s.flx_i]}><Icon name="md-trash" style={[s.white, s.f3, s.tc]} /></RN.View>,
               },
             ]}
           >
