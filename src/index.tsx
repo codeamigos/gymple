@@ -7,6 +7,8 @@ import bs, {Palette, Multiplicators, Options} from './styles';
 import exerscisesData, {ExerciseData} from './exercises';
 import musclesData, {MuscleData} from './muscles';
 
+const shouldNeverHappen = (_: never): never => {throw new Error('Should never happen!'); };
+
 const palette: Palette = {
   greyDarkest: '#2e333d',
   greyDarker: '#434b55',
@@ -65,12 +67,13 @@ type Training = NotStartedTraining | OngoingTraining | FinishedTraining;
 */
 
 interface NotStartedTraining {
+  kind: 'NotStartedTraining',
   title: string,
   plannedExercises: Exercise[],
 }
 
-/*
 interface OngoingTraining {
+  kind: 'OngoingTraining',
   title: string,
   startedAt: Date,
   plannedExercises: Exercise[],
@@ -78,6 +81,7 @@ interface OngoingTraining {
   completedExercises: Exercise[],
 }
 
+/*
 interface FinishedTraining {
   title: string,
   startedAt: Date,
@@ -103,10 +107,11 @@ interface Muscle {
 
 
 interface TrainingScreenState {
-  training: NotStartedTraining,
+  training: NotStartedTraining | OngoingTraining,
   editingExercise: Exercise | null,
   isModalOpened: boolean,
   isScrollEnabled: boolean,
+  editingExerciseIndex: number | null,
 }
 
 class TrainingScreen extends React.PureComponent<void, TrainingScreenState> {
@@ -115,18 +120,22 @@ class TrainingScreen extends React.PureComponent<void, TrainingScreenState> {
 
     this.state = {
       training: {
+        kind: 'NotStartedTraining',
         title: 'New training',
         plannedExercises: [],
       },
+      editingExerciseIndex: null,
       editingExercise: null,
       isModalOpened: true,
       isScrollEnabled: true,
     };
   }
 
-  setEditingExercise = (editingExercise: Exercise) => {
+  setEditingExercise = (editingExercise: Exercise, editingExerciseIndex: number | null = null) => {
     this.setState({
       editingExercise: {...editingExercise},
+      editingExerciseIndex,
+      isModalOpened: true,
     });
   }
 
@@ -142,6 +151,21 @@ class TrainingScreen extends React.PureComponent<void, TrainingScreenState> {
     });
   }
 
+  updateExercise = (updatedExercise: Exercise, editingExerciseIndex: number) => {
+    const { training } = this.state;
+    this.setState({
+      training: {
+        ...training,
+        plannedExercises: training.plannedExercises.map((exercise, i) => i === editingExerciseIndex ? updatedExercise : exercise),
+      },
+      editingExercise: null,
+      editingExerciseIndex: null,
+      isModalOpened: false,
+    });
+  }
+
+
+
   removeExercise = (index: number) => {
     const { training } = this.state;
     this.setState({
@@ -156,9 +180,8 @@ class TrainingScreen extends React.PureComponent<void, TrainingScreenState> {
     this.setState({isScrollEnabled});
   }
 
-  render() {
-    const { training, isModalOpened, isScrollEnabled, editingExercise } = this.state;
-
+  renderNotStartedTraining = (): JSX.Element => {
+    const { training, isModalOpened, isScrollEnabled, editingExercise, editingExerciseIndex } = this.state;
     return (
       <RN.View style={[s.flx_i, s.jcsb, s.bg_greyLightest]}>
         <RN.StatusBar
@@ -177,6 +200,7 @@ class TrainingScreen extends React.PureComponent<void, TrainingScreenState> {
         <RN.ScrollView style={[s.flx_i]} scrollEnabled={isScrollEnabled}>
           {training.plannedExercises.map((exercise, i) =>
           <Swipeout
+            autoClose={true}
             key={exercise.title + i}
             backgroundColor={colors.t}
             scroll={isAllow => this.allowScroll(isAllow)}
@@ -186,21 +210,35 @@ class TrainingScreen extends React.PureComponent<void, TrainingScreenState> {
                 onPress: () => this.removeExercise(i),
                 component: <RN.View style={[s.w7, s.bg_orange, s.jcc, s.flx_i]}><RN.Text style={[s.f5, s.tc, s.white]}>Remove</RN.Text></RN.View>,
               },
+              {
+                onPress: () => this.setEditingExercise(exercise, i),
+                component: <RN.View style={[s.w7, s.bg_green, s.jcc, s.flx_i]}><RN.Text style={[s.f5, s.tc, s.white]}>Edit</RN.Text></RN.View>,
+              },
             ]}
           >
             <ExerciseListItem exercise={exercise} />
           </Swipeout>,
         )}
         </RN.ScrollView>
-        <RN.View style={[s.ph125, s.pb175]}>
+        <RN.View style={s.pb175}>
           <RN.TouchableHighlight
-            style={[s.ass, s.bg_green, s.br2, s.h325, s.jcc, s.ph1]}
+            style={[s.asc, s.b_green, s.bw2, s.br2, s.h325, s.jcc, s.ph3]}
             onPress={() => this.setState({ isModalOpened: true })}
           >
-            <RN.Text style={[s.f4, s.white, s.tc, s.b]}>
+            <RN.Text style={[s.f4, s.green, s.tc, s.b]}>
               Add Exercise
             </RN.Text>
           </RN.TouchableHighlight>
+          {training.plannedExercises.length > 0 &&
+            <RN.TouchableHighlight
+              style={[s.asc, s.bg_green, s.br2, s.h325, s.jcc, s.ph3, s.mt075]}
+              onPress={() => this.setState({ isModalOpened: true })}
+            >
+              <RN.Text style={[s.f4, s.white, s.tc, s.b]}>
+                Start Training
+              </RN.Text>
+            </RN.TouchableHighlight>
+          }
         </RN.View>
         <RN.Modal
           animationType="slide"
@@ -210,9 +248,9 @@ class TrainingScreen extends React.PureComponent<void, TrainingScreenState> {
         >
           {editingExercise ?
             <ExerciseSettings
-              onUpdate={this.setEditingExercise}
-              onClose={() => this.setState({ editingExercise: null })}
-              onStart={() => this.addExercise(editingExercise)}
+              onUpdate={(exercise: Exercise) => this.setState({editingExercise: exercise})}
+              onClose={() => this.setState({ editingExercise: null, isModalOpened: editingExerciseIndex === null })}
+              onDone={() => editingExerciseIndex !== null ? this.updateExercise(editingExercise, editingExerciseIndex) : this.addExercise(editingExercise)}
               exercise={editingExercise}
             />
             :
@@ -225,6 +263,38 @@ class TrainingScreen extends React.PureComponent<void, TrainingScreenState> {
         </RN.Modal>
       </RN.View>
     );
+  }
+
+  renderOngoingTraining = (): JSX.Element => {
+    const { training } = this.state;
+    return (
+      <RN.View style={[s.flx_i, s.jcsb, s.bg_greyLightest]}>
+        <RN.StatusBar
+          barStyle="light-content"
+          translucent={true}
+          backgroundColor={colors.t}
+          />
+        <RN.View style={[s.bg_blue, s.pt2, s.ph125, s.pb05]}>
+          <RN.Text style={[s.white, s.fw3, s.f2, s.mb05, s.lh2]}>
+            {training.title}
+          </RN.Text>
+          <RN.Text style={[s.white, s.f5, s.mb05]}>
+            Today
+          </RN.Text>
+        </RN.View>
+      </RN.View>
+    );
+  }
+
+  render() {
+    const {training} = this.state;
+    switch (training.kind) {
+      case 'NotStartedTraining': return this.renderNotStartedTraining();
+      case 'OngoingTraining': return this.renderOngoingTraining();
+      default:
+        shouldNeverHappen(training);
+        return null;
+    }
   }
 }
 
@@ -335,11 +405,11 @@ class ExerciseList extends React.PureComponent<ExerciseListProps, ExerciseListSt
 interface ExerciseSettingsProps {
   onClose: () => void,
   onUpdate: (exercise: Exercise) => void,
-  onStart: () => void,
+  onDone: () => void,
   exercise: Exercise,
 }
 
-const ExerciseSettings: React.StatelessComponent<ExerciseSettingsProps> = ({exercise, onClose, onStart, onUpdate}) => {
+const ExerciseSettings: React.StatelessComponent<ExerciseSettingsProps> = ({exercise, onClose, onDone, onUpdate}) => {
 
   const handleAddAttempt = () => {
     const attempts = exercise.attempts.length >= 1
@@ -505,11 +575,9 @@ const ExerciseSettings: React.StatelessComponent<ExerciseSettingsProps> = ({exer
         <RN.View>
           <RN.TouchableHighlight
             disabled={!exerciseHasAttempts}
-            style={[s.ass, s.bg_green, s.br2, s.h325, s.jcc, s.ph1, s.mb075, !exerciseHasAttempts ? s.o_50 : null]}
-            onPress={onStart}>
-            <RN.Text style={[s.f4, s.white, s.tc, s.b]}>
-              {exerciseHasAttempts ? 'Add Exercise' : 'Set al least one Attempt'}
-            </RN.Text>
+            style={[s.asc, s.bg_green, s.br2, s.h325, s.jcc, s.ph4, s.mb075, !exerciseHasAttempts ? s.o_50 : null]}
+            onPress={onDone}>
+            <RN.Text style={[s.f4, s.white, s.tc, s.b]}>Done</RN.Text>
           </RN.TouchableHighlight>
         </RN.View>
       </RN.View>
