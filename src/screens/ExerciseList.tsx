@@ -2,7 +2,8 @@ import * as React from 'react';
 import * as RN from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 
-import {Exercise, ExerciseTemplate} from '../interfaces';
+import {shouldNeverHappen} from '../utils';
+import {ExerciseTemplate, Exercise} from '../interfaces';
 import exerscisesData, {ExerciseData} from '../exercises';
 import musclesData, {MuscleData} from '../muscles';
 
@@ -27,9 +28,14 @@ export default class ExerciseList extends React.PureComponent<ExerciseListProps,
       exercises: generateDefaultExersices(exerscisesData, musclesData),
     };
   }
+
+  handleSelect = (exerciseTemplate: ExerciseTemplate) => {
+    this.props.onSelect(convertTemplateToGenericExercise(exerciseTemplate));
+  }
+
   render() {
     const {filter, exercises} = this.state;
-    const {onClose, onSelect} = this.props;
+    const {onClose} = this.props;
     return (
       <RN.View style={[s.flx_i, s.jcsb, s.bg_greyLightest]}>
         <RN.View style={[s.bg_blue, s.pt2, s.ph05, s.pb05]}>
@@ -56,7 +62,7 @@ export default class ExerciseList extends React.PureComponent<ExerciseListProps,
               : true,
             )
             .map(exercise =>
-              <RN.TouchableOpacity key={exercise.title} onPress={() => onSelect(exercise)}>
+              <RN.TouchableOpacity key={exercise.title} onPress={() => this.handleSelect(exercise)}>
                 <RN.View style={[s.pv1, s.bbw1, s.b_black_5, s.pr1, s.ml125]}>
                   <RN.View style={[s.flx_row, s.jcsb, s.aifs]}>
                     <RN.Text style={[s.f4, s.bg_t, s.blue, s.flx_i, s.mb025, s.lh125]}>
@@ -99,9 +105,28 @@ const generateDefaultExersices = (
       }, [] as MuscleData[]);
 
     return {
+      kind: 'ExerciseTemplate',
       title,
       restSeconds: 90,
       targetMuscles,
-    };
+    } as ExerciseTemplate;
   });
 };
+
+
+const convertTemplateToGenericExercise = (exercise: Exercise | ExerciseTemplate): Exercise => {
+    switch (exercise.kind) {
+      case 'Exercise': return exercise;
+      case 'ExerciseTemplate': return {
+          kind: 'Exercise',
+          title: exercise.title,
+          restSeconds: exercise.restSeconds,
+          targetMuscles: exercise.targetMuscles,
+          attempts: {
+            first: {weight: 30, repetitions: 8},
+            other: [],
+          },
+      };
+      default: return shouldNeverHappen(exercise);
+    }
+  };

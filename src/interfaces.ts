@@ -37,6 +37,7 @@ export interface Attempt {
 }
 
 export interface Exercise {
+  kind: 'Exercise',
   title: string,
   restSeconds: number,
   attempts: {
@@ -47,6 +48,7 @@ export interface Exercise {
 }
 
 export interface ExerciseTemplate {
+  kind: 'ExerciseTemplate',
   title: string,
   restSeconds: number,
   targetMuscles: Muscle[]

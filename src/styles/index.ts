@@ -96,7 +96,7 @@ const remStyles: StylesResult = {
   },
   br: {
     borderRadius: 1,
-  }
+  },
 };
 
 const pointStyles: StylesResult = {
@@ -337,7 +337,10 @@ interface BuildStyles {
   styles: StylesResult,
   sizes: Multiplicators,
   colors: Palette
-  build: (defaultOptions: Options) => void,
+  build: (
+    defaultOptions: Options,
+    callback?: () => any,
+  ) => void,
 }
 
 const buildStyles: BuildStyles = {
@@ -345,7 +348,7 @@ const buildStyles: BuildStyles = {
   sizes: {},
   colors: {},
 
-  build: (defaultOptions: Options = {}) => {
+  build: (defaultOptions: Options = {}, callback = () => {}) => {
 
     const remSize = defaultOptions.remSize || 16;
     const multiplicators = defaultOptions.multiplicators || defaultMultiplicators;
@@ -366,6 +369,7 @@ const buildStyles: BuildStyles = {
       ...generateOpacity(),
       ...staticStyles,
     });
+    callback();
   },
 };
 

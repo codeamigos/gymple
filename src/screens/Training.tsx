@@ -3,14 +3,16 @@ import * as RN from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import Swipeout from 'react-native-swipeout';
 
-import ExerciseList from './ExerciseList';
-import ExerciseSettings from './ExerciseSettings';
-import RunningExercise from './RunningExercise';
+import ExerciseList from './exerciseList';
+import ExerciseSettings from './exerciseSettings';
+import RunningExercise from './runningExercise';
 import {shouldNeverHappen} from '../utils';
 import {Exercise, NotStartedTraining, OngoingTraining} from '../interfaces';
 
 import bs from './../styles';
 const {styles: s, sizes, colors} = bs;
+
+console.log('from training', colors);
 
 interface TrainingScreenState {
   training: NotStartedTraining | OngoingTraining,

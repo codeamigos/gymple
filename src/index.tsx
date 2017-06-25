@@ -1,7 +1,8 @@
 // import * as React from 'react';
+
 import * as RN from 'react-native';
 
-import Training from './screens/Training';
+import TrainingScreen from './screens/training';
 
 import bs, {Palette, Multiplicators, Options} from './styles';
 
@@ -39,8 +40,13 @@ bs.build({
   remSize: 15,
   palette,
   headings,
-} as Options);
+} as Options,
+  () => {
+    console.log('from index', bs.colors);
+  },
+);
 
+RN.AppRegistry.registerComponent('Gymple', () => TrainingScreen);
 // import * as ReactIntl from 'react-intl';
 // import 'intl';
 
@@ -53,5 +59,3 @@ const ru = require('react-intl/locale-data/ru');
 ReactIntl.addLocaleData([...en, ...ru]);
 
 */
-
-RN.AppRegistry.registerComponent('Gymple', () => Training);

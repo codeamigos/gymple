@@ -2,7 +2,7 @@ import * as React from 'react';
 import * as RN from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 
-import {Exercise} from '../interfaces';
+import {Exercise, Attempt} from '../interfaces';
 
 import bs from './../styles';
 const {styles: s, sizes, colors} = bs;
@@ -43,7 +43,8 @@ export default class ActiveExercise extends React.PureComponent<ActiveExercisePr
     const {onClose, exercise} = this.props;
     const { currentAttemptIndex, timer} = this.state;
 
-    const currentAttempt = exercise.attempts[currentAttemptIndex];
+    const exerciseAttempts: Attempt[] = [exercise.attempts.first, ...exercise.attempts.other];
+    const currentAttempt = exerciseAttempts[currentAttemptIndex];
 
     if (!currentAttempt) {
       throw new Error('Current attempt is not defined in ActiveExercise.');
@@ -67,7 +68,7 @@ export default class ActiveExercise extends React.PureComponent<ActiveExercisePr
               Attempt
             </RN.Text>
             <RN.Text style={[s.white, s.fw3, s.f4]}>
-              {currentAttemptIndex + 1} of {exercise.attempts.length}
+              {currentAttemptIndex + 1} of {exerciseAttempts.length}
             </RN.Text>
           </RN.View>
           <RN.View style={s.mr05}>
