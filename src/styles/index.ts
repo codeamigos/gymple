@@ -1,4 +1,5 @@
 const Color = require('color');
+import {assign} from 'lodash';
 import * as RN from 'react-native';
 
 export interface Multiplicators {
@@ -334,7 +335,7 @@ export interface Options {
 }
 
 interface BuildStyles {
-  styles: StylesResult,
+  s: StylesResult,
   sizes: Multiplicators,
   colors: Palette
   build: (
@@ -344,7 +345,7 @@ interface BuildStyles {
 }
 
 const buildStyles: BuildStyles = {
-  styles: {},
+  s: {},
   sizes: {},
   colors: {},
 
@@ -356,10 +357,9 @@ const buildStyles: BuildStyles = {
     const palette = defaultOptions.palette || defaultPalette;
     const fonts = defaultOptions.palette || defaultPalette;
     const fontWeights = defaultOptions.fontWeights || defaultFontWeights;
-
-    buildStyles.colors = generatePalette(palette);
-    buildStyles.sizes = multiplyToRem(remSize, multiplicators);
-    buildStyles.styles = RN.StyleSheet.create({
+    assign(buildStyles.colors, generatePalette(palette));
+    assign(buildStyles.sizes, multiplyToRem(remSize, multiplicators));
+    assign(buildStyles.s, RN.StyleSheet.create({
       ...multiplyStylesValues(pointStyles, multiplicators),
       ...multiplyStylesValues(remStyles, multiplyToRem(remSize, multiplicators)),
       ...multiplyStylesValues({f: {fontSize: 1}}, multiplyToRem(remSize, headings)),
@@ -368,7 +368,7 @@ const buildStyles: BuildStyles = {
       ...generateFontWeights(fontWeights),
       ...generateOpacity(),
       ...staticStyles,
-    });
+    }));
     callback();
   },
 };
@@ -433,3 +433,4 @@ export const defaultFontWeights: Palette = {
 };
 
 export default buildStyles;
+export const {colors, s, sizes} = buildStyles;

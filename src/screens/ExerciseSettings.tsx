@@ -4,8 +4,7 @@ import Icon from 'react-native-vector-icons/Ionicons';
 
 import {Exercise, Attempt} from '../interfaces';
 
-import bs from './../styles';
-const {styles: s, sizes, colors} = bs;
+import {s, sizes, colors} from './../styles';
 
 interface ExerciseSettingsProps {
   onClose: () => void,
@@ -120,7 +119,7 @@ export default class ExerciseSettings extends React.PureComponent<ExerciseSettin
                   style={[s.bg_white_10, s.br2, s.w175, s.h175, s.aic]}>
                   <Icon name="md-remove" size={sizes[175]} color={exercise.attempts.other.length === 0 ? colors.blueDark : colors.white} />
                 </RN.TouchableOpacity>
-                <RN.Text style={[s.f2, s.white, s.bg_t, s.b, s.tc, s.w3]}>{exercise.attempts.other.length - 2}</RN.Text>
+                <RN.Text style={[s.f2, s.white, s.bg_t, s.b, s.tc, s.w3]}>{exercise.attempts.other.length + 1}</RN.Text>
                 <RN.TouchableOpacity
                   onPress={this.handleAddAttempt}
                   disabled={exercise.attempts.other.length === 99}

@@ -4,8 +4,7 @@ import Icon from 'react-native-vector-icons/Ionicons';
 
 import {Exercise, Attempt} from '../interfaces';
 
-import bs from './../styles';
-const {styles: s, sizes, colors} = bs;
+import {s, sizes, colors} from './../styles';
 
 interface ActiveExerciseProps {
   onClose: () => void,

@@ -40,11 +40,7 @@ bs.build({
   remSize: 15,
   palette,
   headings,
-} as Options,
-  () => {
-    console.log('from index', bs.colors);
-  },
-);
+} as Options);
 
 RN.AppRegistry.registerComponent('Gymple', () => TrainingScreen);
 // import * as ReactIntl from 'react-intl';

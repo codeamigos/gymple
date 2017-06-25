@@ -9,10 +9,7 @@ import RunningExercise from './runningExercise';
 import {shouldNeverHappen} from '../utils';
 import {Exercise, NotStartedTraining, OngoingTraining} from '../interfaces';
 
-import bs from './../styles';
-const {styles: s, sizes, colors} = bs;
-
-console.log('from training', colors);
+import {colors, sizes, s} from './../styles';
 
 interface TrainingScreenState {
   training: NotStartedTraining | OngoingTraining,
@@ -136,7 +133,6 @@ export default class TrainingScreen extends React.PureComponent<void, TrainingSc
 
   renderNotStartedTraining = (training: NotStartedTraining): JSX.Element => {
     const {isModalOpened, isScrollEnabled, editingExercise, editingExerciseIndex } = this.state;
-
     return (
       <RN.View style={[s.flx_i, s.jcsb, s.bg_greyLightest]}>
         <RN.StatusBar

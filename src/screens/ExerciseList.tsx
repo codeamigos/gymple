@@ -7,8 +7,7 @@ import {ExerciseTemplate, Exercise} from '../interfaces';
 import exerscisesData, {ExerciseData} from '../exercises';
 import musclesData, {MuscleData} from '../muscles';
 
-import bs from './../styles';
-const {styles: s, sizes, colors} = bs;
+import {s, sizes, colors} from './../styles';
 
 interface ExerciseListProps {
   onClose: () => void,
