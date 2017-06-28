@@ -51,49 +51,53 @@ export default class ActiveExercise extends React.PureComponent<ActiveExercisePr
 
     return (
       <RN.View style={[s.flx_i, s.jcsb, s.bg_greyLightest]}>
-      <RN.View style={[s.bg_blue, s.pt2, s.ph125, s.pb05]}>
-        <RN.TouchableOpacity onPress={onClose}>
-          <Icon name="md-arrow-back" size={sizes[175]} color={colors.white} />
-        </RN.TouchableOpacity>
-        <RN.Text style={[s.white, s.fw3, s.f2, s.mv05, s.lh2]}>
-          {exercise.title}
-        </RN.Text>
-        <RN.Text style={[s.white, s.f5, s.mb05]}>
-          {exercise.targetMuscles.map(({ title }) => title).join(', ')}
-        </RN.Text>
-        <RN.View style={s.flx_row}>
-          <RN.View style={s.mr05}>
-            <RN.Text style={[s.white, s.f6, s.b]}>
-              Attempt
-            </RN.Text>
-            <RN.Text style={[s.white, s.fw3, s.f4]}>
-              {currentAttemptIndex + 1} of {exerciseAttempts.length}
-            </RN.Text>
+        <RN.StatusBar
+            barStyle="light-content"
+            translucent={true}
+            backgroundColor={colors.t} />
+        <RN.View style={[s.bg_blue, s.pt2, s.ph125, s.pb05]}>
+          <RN.TouchableOpacity onPress={onClose}>
+            <Icon name="md-arrow-back" size={sizes[175]} color={colors.white} />
+          </RN.TouchableOpacity>
+          <RN.Text style={[s.white, s.fw3, s.f2, s.mv05, s.lh2]}>
+            {exercise.title}
+          </RN.Text>
+          <RN.Text style={[s.white, s.f5, s.mb05]}>
+            {exercise.targetMuscles.map(({ title }) => title).join(', ')}
+          </RN.Text>
+          <RN.View style={s.flx_row}>
+            <RN.View style={s.mr05}>
+              <RN.Text style={[s.white, s.f6, s.b]}>
+                Attempt
+              </RN.Text>
+              <RN.Text style={[s.white, s.fw3, s.f4]}>
+                {currentAttemptIndex + 1} of {exerciseAttempts.length}
+              </RN.Text>
+            </RN.View>
+            <RN.View style={s.mr05}>
+              <RN.Text style={[s.white, s.f6, s.b]}>
+                Repeats
+              </RN.Text>
+              <RN.Text style={[s.white, s.fw3, s.f4]}>
+                {currentAttempt.repetitions}
+              </RN.Text>
+            </RN.View>
+            <RN.View>
+              <RN.Text style={[s.white, s.f6, s.b]}>
+                Weight
+              </RN.Text>
+              <RN.Text style={[s.white, s.fw3, s.f4]}>
+                {currentAttempt.weight}kg
+              </RN.Text>
+            </RN.View>
           </RN.View>
-          <RN.View style={s.mr05}>
-            <RN.Text style={[s.white, s.f6, s.b]}>
-              Repeats
-            </RN.Text>
-            <RN.Text style={[s.white, s.fw3, s.f4]}>
-              {currentAttempt.repetitions}
-            </RN.Text>
-          </RN.View>
-          <RN.View>
-            <RN.Text style={[s.white, s.f6, s.b]}>
-              Weight
-            </RN.Text>
-            <RN.Text style={[s.white, s.fw3, s.f4]}>
-              {currentAttempt.weight}kg
-            </RN.Text>
-          </RN.View>
+          <RN.Text style={[s.f1, s.fw2, s.white]}>
+            {secondsToMinutes(timer)}
+          </RN.Text>
         </RN.View>
-        <RN.Text style={[s.f1, s.fw2, s.white]}>
-          {secondsToMinutes(timer)}
-        </RN.Text>
-      </RN.View>
-      <RN.View style={[s.flx_i, s.bg_blueDark, s.jcsb, s.pb175, s.ph125]}>
+        <RN.View style={[s.flx_i, s.bg_blueDark, s.jcsb, s.pb175, s.ph125]}>
 
-      </RN.View>
+        </RN.View>
     </RN.View>
     );
   }

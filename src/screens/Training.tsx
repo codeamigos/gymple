@@ -14,8 +14,6 @@ import {colors, sizes, s} from './../styles';
 interface TrainingScreenState {
   training: NotStartedTraining | OngoingTraining,
   editingExercise: Exercise | null,
-  isModalOpened: boolean,
-  isScrollEnabled: boolean,
   editingExerciseIndex: number | null,
 }
 
@@ -31,16 +29,13 @@ export default class TrainingScreen extends React.PureComponent<void, TrainingSc
       },
       editingExerciseIndex: null,
       editingExercise: null,
-      isModalOpened: true,
-      isScrollEnabled: true,
     };
   }
 
-  setEditingExercise = (editingExercise: Exercise, editingExerciseIndex: number | null = null) => {
+  setEditingExercise = (editingExercise: Exercise | null, editingExerciseIndex: number | null) => {
     this.setState({
-      editingExercise: {...editingExercise},
+      editingExercise: editingExercise ? {...editingExercise} : null,
       editingExerciseIndex,
-      isModalOpened: true,
     });
   }
 
@@ -52,7 +47,6 @@ export default class TrainingScreen extends React.PureComponent<void, TrainingSc
         plannedExercises: training.plannedExercises.concat(exercise),
       },
       editingExercise: null,
-      isModalOpened: false,
     });
   }
 
@@ -65,7 +59,6 @@ export default class TrainingScreen extends React.PureComponent<void, TrainingSc
       },
       editingExercise: null,
       editingExerciseIndex: null,
-      isModalOpened: false,
     });
   }
 
@@ -127,184 +120,29 @@ export default class TrainingScreen extends React.PureComponent<void, TrainingSc
     }
   }
 
-  allowScroll = (isScrollEnabled: boolean) => {
-    this.setState({isScrollEnabled});
-  }
-
-  renderNotStartedTraining = (training: NotStartedTraining): JSX.Element => {
-    const {isModalOpened, isScrollEnabled, editingExercise, editingExerciseIndex } = this.state;
-    return (
-      <RN.View style={[s.flx_i, s.jcsb, s.bg_greyLightest]}>
-        <RN.StatusBar
-          barStyle="light-content"
-          translucent={true}
-          backgroundColor={colors.t}
-          />
-        <RN.View style={[s.bg_blue, s.pt2, s.ph125, s.pb1]}>
-          <RN.Text style={[s.white, s.fw3, s.f2, s.lh2]}>
-            {training.title}
-          </RN.Text>
-        </RN.View>
-        {training.plannedExercises.length > 0 ?
-          <RN.View style={[s.flx_i, s.jcsb]}>
-            <RN.ScrollView style={[s.flx_i]} scrollEnabled={isScrollEnabled}>
-              {training.plannedExercises.map((exercise, i) =>
-                <Swipeout
-                  autoClose={true}
-                  key={exercise.title + i}
-                  backgroundColor={colors.t}
-                  scroll={isAllow => this.allowScroll(isAllow)}
-                  buttonWidth={sizes[5]}
-                  right={[
-                    {
-                      onPress: () => this.setEditingExercise(exercise, i),
-                      component: <RN.View style={[s.w5, s.bg_green, s.jcc, s.flx_i]}><Icon name="md-create" style={[s.white, s.f3, s.tc]} /></RN.View>,
-                    },
-                    {
-                      onPress: () => this.removeExercise(i),
-                      component: <RN.View style={[s.w5, s.bg_orange, s.jcc, s.flx_i]}><Icon name="md-trash" style={[s.white, s.f3, s.tc]} /></RN.View>,
-                    },
-                  ]}
-                >
-                  <ExerciseListItem exercise={exercise} />
-                </Swipeout>,
-              )}
-              <RN.TouchableOpacity
-                style={[s.asc, s.h325, s.jcc, s.ph3]}
-                onPress={() => this.setState({ isModalOpened: true })}
-              >
-                <RN.View style={[s.flx_row, s.flx_i, s.aic]}>
-                  <Icon name="md-add" style={[s.green, s.f2, s.tc, s.mr05]} />
-                  <RN.Text style={[s.f4, s.green, s.tc, s.b, s.jcc, s.aic]}>
-                    Add Exercise
-                  </RN.Text>
-                </RN.View>
-              </RN.TouchableOpacity>
-            </RN.ScrollView>
-            <RN.View style={s.pb175}>
-              <RN.TouchableOpacity
-                style={[s.asc, s.bg_green, s.br2, s.h325, s.jcc, s.ph3, s.mt075]}
-                onPress={this.startTraining}
-              >
-                <RN.Text style={[s.f4, s.white, s.tc, s.b]}>
-                  Start Training
-                </RN.Text>
-              </RN.TouchableOpacity>
-            </RN.View>
-          </RN.View>
-          :
-          <RN.View style={[s.flx_i, s.aic, s.jcc]}>
-            <RN.Text style={[s.tc, s.f4, s.ph3, s.fw3, s.mb075, s.grey]}>There is no Exercises in your training yet</RN.Text>
-            <RN.TouchableOpacity
-              style={[s.asc, s.bg_green, s.br2, s.h325, s.jcc, s.ph3, s.mt075]}
-              onPress={() => this.setState({ isModalOpened: true })}
-            >
-              <RN.Text style={[s.f4, s.white, s.tc, s.b]}>
-                Add First Exercise
-              </RN.Text>
-            </RN.TouchableOpacity>
-          </RN.View>
-        }
-        <RN.Modal
-          animationType="slide"
-          transparent={false}
-          visible={isModalOpened}
-          onRequestClose={() => this.setState({ isModalOpened: false })}
-        >
-          {editingExercise ?
-            <ExerciseSettings
-              onUpdate={(exercise: Exercise) => this.setState({editingExercise: exercise})}
-              onClose={() => this.setState({ editingExercise: null, isModalOpened: editingExerciseIndex === null })}
-              onDone={() => editingExerciseIndex !== null ? this.updateExercise(editingExercise, editingExerciseIndex) : this.addExercise(editingExercise)}
-              exercise={editingExercise}
-            />
-            :
-            <ExerciseList
-              onSelect={this.setEditingExercise}
-              onClose={() => this.setState({ isModalOpened: false })}
-            />
-          }
-        </RN.Modal>
-      </RN.View>
-    );
-  }
-
-  renderOngoingTraining = (training: OngoingTraining): JSX.Element => {
-    const { isScrollEnabled } = this.state;
-    if (training.currentExerciseIndex === null) {
-      return (
-        <RN.View style={[s.flx_i, s.jcsb, s.bg_greyLightest]}>
-          <RN.StatusBar
-            barStyle="light-content"
-            translucent={true}
-            backgroundColor={colors.t}
-            />
-          <RN.View style={[s.bg_blue, s.pt2, s.ph125, s.pb05]}>
-            <RN.Text style={[s.white, s.fw3, s.f2, s.mb05, s.lh2]}>
-              {training.title}
-            </RN.Text>
-            <RN.Text style={[s.white, s.f5, s.mb05]}>
-              Today
-            </RN.Text>
-          </RN.View>
-          <RN.ScrollView style={[s.flx_i]} scrollEnabled={isScrollEnabled}>
-            {training.completedExercises.map((exercise, i) =>
-              <Swipeout
-                autoClose={true}
-                key={exercise.title + i}
-                backgroundColor={colors.t}
-                scroll={isAllow => this.allowScroll(isAllow)}
-                buttonWidth={sizes[5]}
-                right={[
-                  {
-                    onPress: () => this.removeCompletedExercise(i),
-                    component: <RN.View style={[s.w5, s.bg_orange, s.jcc, s.flx_i]}><Icon name="md-trash" style={[s.white, s.f3, s.tc]} /></RN.View>,
-                  },
-                ]}
-              >
-                <RN.TouchableOpacity
-                  onPress={() => this.startExercise(i)}
-                  style={[s.ass, s.brw2, s.b_green]}>
-                  <ExerciseListItem exercise={exercise} />
-                </RN.TouchableOpacity>
-              </Swipeout>,
-            )}
-            {training.plannedExercises.map((exercise, i) =>
-              <Swipeout
-                autoClose={true}
-                key={exercise.title + i}
-                backgroundColor={colors.t}
-                scroll={isAllow => this.allowScroll(isAllow)}
-                buttonWidth={sizes[5]}
-                right={[
-                  {
-                    onPress: () => this.removeExercise(i),
-                    component: <RN.View style={[s.w5, s.bg_orange, s.jcc, s.flx_i]}><Icon name="md-trash" style={[s.white, s.f3, s.tc]} /></RN.View>,
-                  },
-                ]}
-              >
-                  <RN.TouchableOpacity
-                    onPress={() => this.startExercise(i)}
-                    style={[s.ass, s.brw2, s.b_green]}>
-                    <ExerciseListItem exercise={exercise} />
-                  </RN.TouchableOpacity>
-              </Swipeout>,
-            )}
-          </RN.ScrollView>
-        </RN.View>
-      );
-    }
-
-    return <RunningExercise onClose={() => {}} onDone={() => {}} exercise={training.plannedExercises[training.currentExerciseIndex]} />;
-
-  }
-
-
   render() {
-    const {training} = this.state;
+    const {
+      training,
+      editingExerciseIndex,
+      editingExercise,
+    } = this.state;
     switch (training.kind) {
-      case 'NotStartedTraining': return this.renderNotStartedTraining(training);
-      case 'OngoingTraining': return this.renderOngoingTraining(training);
+      case 'NotStartedTraining':
+        return <NotstartedTrainingScreen
+                training={training}
+                editingExerciseIndex={editingExerciseIndex}
+                editingExercise={editingExercise}
+                onAddExercise={this.addExercise}
+                onSetEditingExercise={this.setEditingExercise}
+                onUpdateExercise={this.updateExercise}
+                onRemoveExercise={this.removeExercise}
+                onStartTraining={this.startTraining} />;
+      case 'OngoingTraining':
+        return <OngoingTrainingScreen
+                training={training}
+                onRemoveCompletedExercise={this.removeCompletedExercise}
+                onRemoveExercise={this.removeExercise}
+                onStartExercise={this.startExercise}/>;
       default:
         shouldNeverHappen(training);
         return null;
@@ -312,11 +150,12 @@ export default class TrainingScreen extends React.PureComponent<void, TrainingSc
   }
 }
 
-interface ExerciseListItemProps {
-  exercise: Exercise,
-}
 
-const ExerciseListItem = ({exercise}: ExerciseListItemProps) => {
+
+
+
+
+const ExerciseListItem = ({exercise}: {exercise: Exercise}) => {
   return (
     <RN.View style={[s.pv1, s.bbw1, s.b_black_5, s.pr1, s.ml125]}>
       <RN.View style={[s.flx_row, s.jcsb, s.aifs]}>
@@ -340,3 +179,266 @@ const ExerciseListItem = ({exercise}: ExerciseListItemProps) => {
   );
 };
 
+
+
+
+
+interface NotstartedTrainingScreenProps {
+  training: NotStartedTraining,
+  editingExercise: Exercise | null,
+  editingExerciseIndex: number | null,
+  onAddExercise: (exercise: Exercise) => void,
+  onUpdateExercise: (exercise: Exercise, i: number) => void,
+  onSetEditingExercise: (exercise: Exercise | null, i: number | null) => void,
+  onRemoveExercise: (i: number) => void,
+  onStartTraining: () => void,
+}
+
+interface NotstartedTrainingScreenState {
+  isScrollEnabled: boolean,
+  isModalOpened: boolean,
+}
+
+
+class NotstartedTrainingScreen extends React.PureComponent<NotstartedTrainingScreenProps, NotstartedTrainingScreenState> {
+
+  constructor(props: NotstartedTrainingScreenProps) {
+    super(props);
+    this.state = {
+      isModalOpened: false,
+      isScrollEnabled: true,
+    };
+  }
+
+  allowScroll = (isScrollEnabled: boolean) => {
+    this.setState({isScrollEnabled});
+  }
+
+  toggleModalOpen = (isModalOpened: boolean) => {
+    this.setState({isModalOpened});
+  }
+
+  render() {
+    const {
+      training,
+      editingExerciseIndex,
+      editingExercise,
+      onAddExercise,
+      onSetEditingExercise,
+      onUpdateExercise,
+      onRemoveExercise,
+      onStartTraining,
+    } = this.props;
+
+    const {
+      isScrollEnabled,
+      isModalOpened,
+    } = this.state;
+
+    return (
+       <RN.View style={[s.flx_i, s.jcsb, s.bg_greyLightest]}>
+        <RN.StatusBar
+          barStyle="light-content"
+          translucent={true}
+          backgroundColor={colors.t}
+          />
+        <RN.View style={[s.bg_blue, s.pt2, s.ph125, s.pb1]}>
+          <RN.Text style={[s.white, s.fw3, s.f2, s.lh2]}>
+            {training.title}
+          </RN.Text>
+        </RN.View>
+        {training.plannedExercises.length > 0 ?
+          <RN.View style={[s.flx_i, s.jcsb]}>
+            <RN.ScrollView style={[s.flx_i]} scrollEnabled={isScrollEnabled}>
+              {training.plannedExercises.map((exercise, i) =>
+                <Swipeout
+                  autoClose={true}
+                  key={exercise.title + i}
+                  backgroundColor={colors.t}
+                  scroll={isAllow => this.allowScroll(isAllow)}
+                  buttonWidth={sizes[5]}
+                  right={[
+                    {
+                      onPress: () => onRemoveExercise(i),
+                      component: <RN.View style={[s.w5, s.bg_orange, s.jcc, s.flx_i]}><Icon name="md-trash" style={[s.white, s.f3, s.tc]} /></RN.View>,
+                    },
+                  ]}
+                >
+                  <RN.TouchableOpacity onPress ={() => onSetEditingExercise(exercise, i)}>
+                    <ExerciseListItem exercise={exercise} />
+                  </RN.TouchableOpacity>
+                </Swipeout>,
+              )}
+              <RN.TouchableOpacity
+                style={[s.asc, s.h325, s.jcc, s.ph3]}
+                onPress={() =>  this.toggleModalOpen(true)}
+              >
+                <RN.View style={[s.flx_row, s.flx_i, s.aic]}>
+                  <Icon name="md-add" style={[s.green, s.f2, s.tc, s.mr05]} />
+                  <RN.Text style={[s.f4, s.green, s.tc, s.b, s.jcc, s.aic]}>
+                    Add Exercise
+                  </RN.Text>
+                </RN.View>
+              </RN.TouchableOpacity>
+            </RN.ScrollView>
+            <RN.View style={s.pb175}>
+              <RN.TouchableOpacity
+                style={[s.asc, s.bg_green, s.br2, s.h325, s.jcc, s.ph3, s.mt075]}
+                onPress={onStartTraining}
+              >
+                <RN.Text style={[s.f4, s.white, s.tc, s.b]}>
+                  Start Training
+                </RN.Text>
+              </RN.TouchableOpacity>
+            </RN.View>
+          </RN.View>
+          :
+          <RN.View style={[s.flx_i, s.aic, s.jcc]}>
+            <RN.Text style={[s.tc, s.f4, s.ph3, s.fw3, s.mb075, s.grey]}>There is no Exercises in your training yet</RN.Text>
+            <RN.TouchableOpacity
+              style={[s.asc, s.bg_green, s.br2, s.h325, s.jcc, s.ph3, s.mt075]}
+              onPress={() =>  this.toggleModalOpen(true)}
+            >
+              <RN.Text style={[s.f4, s.white, s.tc, s.b]}>
+                Add First Exercise
+              </RN.Text>
+            </RN.TouchableOpacity>
+          </RN.View>
+        }
+        <RN.Modal
+          animationType="slide"
+          transparent={false}
+          visible={isModalOpened || !!editingExercise}
+          onRequestClose={() =>  {
+            this.toggleModalOpen(false);
+            onSetEditingExercise(null, null);
+          }}>
+          {editingExercise ?
+            <ExerciseSettings
+              onUpdate={(exercise: Exercise) => onSetEditingExercise(exercise, editingExerciseIndex)}
+              onClose={() => onSetEditingExercise(null, null)}
+              onDone={() => {
+                if (editingExerciseIndex !== null) {
+                  onUpdateExercise(editingExercise, editingExerciseIndex);
+                }
+                else {
+                  onAddExercise(editingExercise);
+                }
+              }}
+              exercise={editingExercise}
+            />
+            :
+            <ExerciseList
+              onSelect={(exercise: Exercise) => onSetEditingExercise(exercise, null)}
+              onClose={() => this.toggleModalOpen(false)}
+            />
+          }
+        </RN.Modal>
+      </RN.View>
+    );
+  }
+}
+
+
+
+
+interface OngoingTrainingScreenProps {
+  training: OngoingTraining,
+  onStartExercise: (i: number) => void,
+  onRemoveExercise: (i: number) => void,
+  onRemoveCompletedExercise: (i: number) => void,
+}
+
+interface OngoingTrainingScreenState {
+  isScrollEnabled: boolean,
+}
+
+class OngoingTrainingScreen extends React.PureComponent<OngoingTrainingScreenProps, OngoingTrainingScreenState> {
+
+  constructor(props: OngoingTrainingScreenProps) {
+    super(props);
+    this.state = {
+      isScrollEnabled: true,
+    };
+  }
+
+  allowScroll = (isScrollEnabled: boolean) => {
+    this.setState({isScrollEnabled});
+  }
+
+  render() {
+    const {
+      training,
+      onRemoveCompletedExercise,
+      onStartExercise,
+      onRemoveExercise,
+    } = this.props;
+
+    const { isScrollEnabled } = this.state;
+    if (training.currentExerciseIndex !== null) {
+      const currentExercise = training.plannedExercises[training.currentExerciseIndex];
+      if (!currentExercise) {
+        throw new Error('Trying to access not existing exercise');
+      }
+      return <RunningExercise onClose={() => {}} onDone={() => {}} exercise={training.plannedExercises[training.currentExerciseIndex]} />;
+    }
+    return (
+      <RN.View style={[s.flx_i, s.jcsb, s.bg_greyLightest]}>
+        <RN.StatusBar
+          barStyle="light-content"
+          translucent={true}
+          backgroundColor={colors.t} />
+        <RN.View style={[s.bg_blue, s.pt2, s.ph125, s.pb05]}>
+          <RN.Text style={[s.white, s.fw3, s.f2, s.mb05, s.lh2]}>
+            {training.title}
+          </RN.Text>
+          <RN.Text style={[s.white, s.f5, s.mb05]}>
+            Today
+          </RN.Text>
+        </RN.View>
+        <RN.ScrollView style={[s.flx_i]} scrollEnabled={isScrollEnabled}>
+          {training.completedExercises.map((exercise, i) =>
+            <Swipeout
+              autoClose={true}
+              key={exercise.title + i}
+              backgroundColor={colors.t}
+              scroll={isAllow => this.allowScroll(isAllow)}
+              buttonWidth={sizes[5]}
+              right={[
+                {
+                  onPress: () => onRemoveCompletedExercise(i),
+                  component: <RN.View style={[s.w5, s.bg_orange, s.jcc, s.flx_i]}><Icon name="md-trash" style={[s.white, s.f3, s.tc]} /></RN.View>,
+                },
+              ]}>
+              <RN.TouchableOpacity
+                onPress={() => onStartExercise(i)}
+                style={[s.ass, s.brw2, s.b_green]}>
+                <ExerciseListItem exercise={exercise} />
+              </RN.TouchableOpacity>
+            </Swipeout>,
+          )}
+          {training.plannedExercises.map((exercise, i) =>
+            <Swipeout
+              autoClose={true}
+              key={exercise.title + i}
+              backgroundColor={colors.t}
+              scroll={isAllow => this.allowScroll(isAllow)}
+              buttonWidth={sizes[5]}
+              right={[
+                {
+                  onPress: () => onRemoveExercise(i),
+                  component: <RN.View style={[s.w5, s.bg_orange, s.jcc, s.flx_i]}><Icon name="md-trash" style={[s.white, s.f3, s.tc]} /></RN.View>,
+                },
+              ]}>
+                <RN.TouchableOpacity
+                  onPress={() => onStartExercise(i)}
+                  style={[s.ass, s.brw2, s.b_t]}>
+                  <ExerciseListItem exercise={exercise} />
+                </RN.TouchableOpacity>
+            </Swipeout>,
+          )}
+        </RN.ScrollView>
+      </RN.View>
+    );
+  }
+}
