@@ -39,7 +39,7 @@ export default class ActiveExercise extends React.PureComponent<ActiveExercisePr
   }
 
   render() {
-    const {onClose, exercise} = this.props;
+    const {onClose, onDone, exercise} = this.props;
     const { currentAttemptIndex, timer} = this.state;
 
     const exerciseAttempts: Attempt[] = [exercise.attempts.first, ...exercise.attempts.other];
@@ -94,6 +94,13 @@ export default class ActiveExercise extends React.PureComponent<ActiveExercisePr
           <RN.Text style={[s.f1, s.fw2, s.white]}>
             {secondsToMinutes(timer)}
           </RN.Text>
+          <RN.TouchableOpacity
+            style={[s.asc, s.bg_green, s.br2, s.h325, s.jcc, s.ph3, s.mv075]}
+            onPress={onDone}>
+            <RN.Text style={[s.f4, s.white, s.tc, s.b]}>
+              Complete Exercise
+            </RN.Text>
+          </RN.TouchableOpacity>
         </RN.View>
         <RN.View style={[s.flx_i, s.bg_blueDark, s.jcsb, s.pb175, s.ph125]}>
 

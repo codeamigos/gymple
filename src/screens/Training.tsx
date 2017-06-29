@@ -76,7 +76,7 @@ export default class TrainingScreen extends React.PureComponent<void, TrainingSc
     });
   }
 
-  startExercise = (currentExerciseIndex: number) => {
+  startExercise = (currentExerciseIndex: number | null) => {
     const {training} = this.state;
     switch (training.kind) {
       case 'NotStartedTraining':
@@ -88,6 +88,58 @@ export default class TrainingScreen extends React.PureComponent<void, TrainingSc
             currentExerciseIndex,
           },
         });
+        break;
+      default: shouldNeverHappen(training);
+    }
+  }
+
+  restartExercise = (completedExerciseIndex: number) => {
+    const {training} = this.state;
+    switch (training.kind) {
+      case 'NotStartedTraining':
+        break;
+      case 'OngoingTraining':
+        const completedExercise = training.completedExercises[completedExerciseIndex];
+        if (completedExercise) {
+          this.setState({
+            training: {
+              ...training,
+              plannedExercises: [completedExercise, ...training.plannedExercises],
+              currentExerciseIndex: 0,
+              completedExercises: training.completedExercises.filter((_, i) => i !== completedExerciseIndex),
+            },
+          });
+        }
+        else {
+          throw new Error('Trying to complete non-existing exercise');
+        }
+        break;
+      default: shouldNeverHappen(training);
+    }
+  }
+
+  completeExercise = () => {
+    const {training} = this.state;
+    switch (training.kind) {
+      case 'NotStartedTraining':
+        break;
+      case 'OngoingTraining':
+        if (training.currentExerciseIndex !== null) {
+          const completedExercise = training.plannedExercises[training.currentExerciseIndex];
+          if (completedExercise) {
+            this.setState({
+              training: {
+                ...training,
+                plannedExercises: training.plannedExercises.filter((_, i) => i !== training.currentExerciseIndex),
+                currentExerciseIndex: null,
+                completedExercises: [...training.completedExercises, completedExercise],
+              },
+            });
+          }
+          else {
+            throw new Error('Trying to complete non-existing exercise');
+          }
+        }
         break;
       default: shouldNeverHappen(training);
     }
@@ -141,7 +193,9 @@ export default class TrainingScreen extends React.PureComponent<void, TrainingSc
         return <OngoingTrainingScreen
                 training={training}
                 onRemoveCompletedExercise={this.removeCompletedExercise}
+                onCompleteExercise={this.completeExercise}
                 onRemoveExercise={this.removeExercise}
+                onRestartExercise={this.restartExercise}
                 onStartExercise={this.startExercise}/>;
       default:
         shouldNeverHappen(training);
@@ -324,6 +378,7 @@ class NotstartedTrainingScreen extends React.PureComponent<NotstartedTrainingScr
                 else {
                   onAddExercise(editingExercise);
                 }
+                this.toggleModalOpen(false);
               }}
               exercise={editingExercise}
             />
@@ -344,22 +399,36 @@ class NotstartedTrainingScreen extends React.PureComponent<NotstartedTrainingScr
 
 interface OngoingTrainingScreenProps {
   training: OngoingTraining,
-  onStartExercise: (i: number) => void,
+  onStartExercise: (i: number | null) => void,
+  onRestartExercise: (i: number) => void,
   onRemoveExercise: (i: number) => void,
   onRemoveCompletedExercise: (i: number) => void,
+  onCompleteExercise: () => void,
 }
 
 interface OngoingTrainingScreenState {
   isScrollEnabled: boolean,
+  startCountDown: number,
 }
 
 class OngoingTrainingScreen extends React.PureComponent<OngoingTrainingScreenProps, OngoingTrainingScreenState> {
+
+  interval: number;
 
   constructor(props: OngoingTrainingScreenProps) {
     super(props);
     this.state = {
       isScrollEnabled: true,
+      startCountDown: props.training.currentExerciseIndex !== null ? 5 : 0,
     };
+
+    if (props.training.currentExerciseIndex !== null) {
+      setInterval(() => this.setState({startCountDown: this.state.startCountDown - 1}), 1000);
+    }
+  }
+
+  componentWillUnmount() {
+    clearInterval(this.interval);
   }
 
   allowScroll = (isScrollEnabled: boolean) => {
@@ -370,18 +439,19 @@ class OngoingTrainingScreen extends React.PureComponent<OngoingTrainingScreenPro
     const {
       training,
       onRemoveCompletedExercise,
+      onCompleteExercise,
       onStartExercise,
+      onRestartExercise,
       onRemoveExercise,
     } = this.props;
 
-    const { isScrollEnabled } = this.state;
-    if (training.currentExerciseIndex !== null) {
-      const currentExercise = training.plannedExercises[training.currentExerciseIndex];
-      if (!currentExercise) {
-        throw new Error('Trying to access not existing exercise');
-      }
-      return <RunningExercise onClose={() => {}} onDone={() => {}} exercise={training.plannedExercises[training.currentExerciseIndex]} />;
+    const { isScrollEnabled, startCountDown } = this.state;
+    const currentExercise = training.currentExerciseIndex !== null && training.plannedExercises[training.currentExerciseIndex];
+
+    if (training.currentExerciseIndex !== null && !currentExercise) {
+      throw new Error('Trying to access not existing exercise');
     }
+
     return (
       <RN.View style={[s.flx_i, s.jcsb, s.bg_greyLightest]}>
         <RN.StatusBar
@@ -411,8 +481,8 @@ class OngoingTrainingScreen extends React.PureComponent<OngoingTrainingScreenPro
                 },
               ]}>
               <RN.TouchableOpacity
-                onPress={() => onStartExercise(i)}
-                style={[s.ass, s.brw2, s.b_green]}>
+                onPress={() => onRestartExercise(i)}
+                style={[s.ass, s.brw5, s.b_green]}>
                 <ExerciseListItem exercise={exercise} />
               </RN.TouchableOpacity>
             </Swipeout>,
@@ -432,12 +502,31 @@ class OngoingTrainingScreen extends React.PureComponent<OngoingTrainingScreenPro
               ]}>
                 <RN.TouchableOpacity
                   onPress={() => onStartExercise(i)}
-                  style={[s.ass, s.brw2, s.b_t]}>
+                  style={[s.ass]}>
                   <ExerciseListItem exercise={exercise} />
                 </RN.TouchableOpacity>
             </Swipeout>,
           )}
         </RN.ScrollView>
+        <RN.Modal
+          animationType="slide"
+          transparent={false}
+          visible={!!currentExercise}
+          onRequestClose={() => onStartExercise(null)}>
+            {startCountDown > 0 && currentExercise &&
+              <RN.View style={[s.flx_i, s.jcc, s.bg_blue, s.aic, s.ph4]}>
+                <RN.Text style={[s.fw3, s.f5, s.tc, s.white, s.mb1]}>Starting training in</RN.Text>
+                <RN.Text style={[s.fw2, s.f1, s.tc, s.white]}>{startCountDown}</RN.Text>
+                <RN.View style={[s.btw1, s.b_white_10, s.mt2, s.pt2]}>
+                  <RN.Text style={[s.fw3, s.f6, s.white, s.tc, s.mb05]}>First exercise</RN.Text>
+                  <RN.Text style={[s.fw3, s.f4, s.white, s.tc]}>{currentExercise.title}</RN.Text>
+                </RN.View>
+              </RN.View>
+            }
+            {startCountDown <= 0 && currentExercise &&
+              <RunningExercise onClose={() => onStartExercise(null)} onDone={onCompleteExercise} exercise={currentExercise} />
+            }
+        </RN.Modal>
       </RN.View>
     );
   }
