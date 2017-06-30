@@ -53,7 +53,7 @@ export default class RunningExercise extends React.PureComponent<ActiveExerciseP
 
   render() {
     const {onClose, onDone, exercise} = this.props;
-    const { currentAttemptIndex, timer, isRest} = this.state;
+    const { currentAttemptIndex, isRest} = this.state;
 
     const exerciseAttempts: Attempt[] = [exercise.attempts.first, ...exercise.attempts.other];
     const currentAttempt = exerciseAttempts[currentAttemptIndex];
@@ -92,7 +92,7 @@ export default class RunningExercise extends React.PureComponent<ActiveExerciseP
             </RN.View>
           :
             <RN.View style={[s.flx_row, s.mv1]}>
-              <RN.View style={s.mr1}>
+              <RN.View style={s.mr2}>
                 <RN.Text style={[s.white, s.f6, s.b]}>
                   Attempt
                 </RN.Text>
@@ -100,7 +100,7 @@ export default class RunningExercise extends React.PureComponent<ActiveExerciseP
                   {currentAttemptIndex + 1} of {exerciseAttempts.length}
                 </RN.Text>
               </RN.View>
-              <RN.View style={s.mr1}>
+              <RN.View style={s.mr2}>
                 <RN.Text style={[s.white, s.f6, s.b]}>
                   Repeats
                 </RN.Text>
@@ -137,7 +137,7 @@ export default class RunningExercise extends React.PureComponent<ActiveExerciseP
                   style={[s.asfs, s.bg_green, s.br2, s.h325, s.jcc, s.ph3, s.mv075]}
                   onPress={this.handleNextAttempt}>
                   <RN.Text style={[s.f4, s.white, s.tc, s.b]}>
-                    Start next attempt
+                    Start next Attempt
                   </RN.Text>
                 </RN.TouchableOpacity>
             :

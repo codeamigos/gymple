@@ -419,7 +419,7 @@ class OngoingTrainingScreen extends React.PureComponent<OngoingTrainingScreenPro
     super(props);
     this.state = {
       isScrollEnabled: true,
-      startCountDown: props.training.currentExerciseIndex !== null ? 1 : 0,
+      startCountDown: props.training.currentExerciseIndex !== null ? 3 : 0,
     };
 
     if (props.training.currentExerciseIndex !== null) {
