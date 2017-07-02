@@ -10,6 +10,10 @@
   version "19.2.3"
   resolved "https://registry.yarnpkg.com/@types/jest/-/jest-19.2.3.tgz#61748040e8589a891dfc2ec1d16a2dd74482980e"
 
+"@types/lodash@^4.14.66":
+  version "4.14.66"
+  resolved "https://registry.yarnpkg.com/@types/lodash/-/lodash-4.14.66.tgz#3dbb83477becf130611f8fac82a8fdb199805981"
+
 "@types/react-intl@^2.2.7":
   version "2.2.7"
   resolved "https://registry.yarnpkg.com/@types/react-intl/-/react-intl-2.2.7.tgz#f8c895be35c39ad44103572372f65de528471c95"
@@ -1618,6 +1622,10 @@ form-data@^2.1.1, form-data@~2.1.1:
     combined-stream "^1.0.5"
     mime-types "^2.1.12"
 
+fp-ts@^0.3.0:
+  version "0.3.5"
+  resolved "https://registry.yarnpkg.com/fp-ts/-/fp-ts-0.3.5.tgz#eb00258e0c2643ae370a4588b12e7b71dee985bc"
+
 fresh@0.3.0:
   version "0.3.0"
   resolved "https://registry.yarnpkg.com/fresh/-/fresh-0.3.0.tgz#651f838e22424e7566de161d8358caa199f83d4f"
@@ -1928,6 +1936,12 @@ invariant@^2.1.1, invariant@^2.2.0:
 invert-kv@^1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/invert-kv/-/invert-kv-1.0.0.tgz#104a8e4aaca6d3d8cd157a8ef8bfab2d7a3ffdb6"
+
+io-ts@^0.5.0:
+  version "0.5.0"
+  resolved "https://registry.yarnpkg.com/io-ts/-/io-ts-0.5.0.tgz#c1ce19e93a2ab833d3d840bc9708c453364e35f3"
+  dependencies:
+    fp-ts "^0.3.0"
 
 is-arrayish@^0.2.1:
   version "0.2.1"
@@ -2572,7 +2586,7 @@ lodash@^3.5.0:
   version "3.10.1"
   resolved "https://registry.yarnpkg.com/lodash/-/lodash-3.10.1.tgz#5bf45e8e49ba4189e17d482789dfd15bd140b7b6"
 
-lodash@^4.0.0, lodash@^4.14.0, lodash@^4.16.6, lodash@^4.2.0, lodash@^4.3.0, lodash@^4.5.1, lodash@^4.6.1:
+lodash@^4.0.0, lodash@^4.14.0, lodash@^4.16.6, lodash@^4.17.4, lodash@^4.2.0, lodash@^4.3.0, lodash@^4.5.1, lodash@^4.6.1:
   version "4.17.4"
   resolved "https://registry.yarnpkg.com/lodash/-/lodash-4.17.4.tgz#78203a4d1c328ae1d86dca6460e369b57f4055ae"
 
