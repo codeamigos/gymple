@@ -1,63 +1,69 @@
-export interface NotStartedTraining {
-  kind: 'NotStartedTraining',
-  title: string,
-  plannedExercises: Exercise[],
-}
+import * as t from 'io-ts';
 
-export interface OngoingTraining {
-  kind: 'OngoingTraining',
-  title: string,
-  startedAt: Date,
-  plannedExercises: Exercise[],
-  currentExerciseIndex: number | null,
-  completedExercises: Exercise[],
-}
+export const DateFromString: t.Type<Date> = {
+  _A: t._A,
+  name: 'DateFromString',
+  validate: (v, c) =>
+    t.string.validate(v, c).chain(s => {
+      const d = new Date(s);
+      return isNaN(d.getTime()) ? t.failure<Date>(s, c) : t.success(d);
+    }),
+};
 
-/*
-interface Profile {
-  active: NotStartedTraining | OngoingTraining | null,
-  history: FinishedTraining[],
-}
+export const TMuscle = t.interface({
+  id: t.number,
+  title: t.string,
+});
+export type Muscle = t.TypeOf<typeof TMuscle>;
 
-type Training = NotStartedTraining | OngoingTraining | FinishedTraining;
-*/
+export const TAttempt = t.interface({
+  weight: t.number,
+  repetitions: t.number,
+});
+export type Attempt = t.TypeOf<typeof TAttempt>;
 
-export interface FinishedTraining {
-  kind: 'FinishedTraining',
-  title: string,
-  startedAt: Date,
-  finishedAt: Date,
-  completedExercises: Exercise[],
-}
+export const TExercise = t.interface({
+  kind: t.literal('Exercise'),
+  title: t.string,
+  restSeconds: t.number,
+  attempts: t.interface({
+    first: TAttempt,
+    other: t.array(TAttempt),
+  }),
+  targetMuscles: t.array(TMuscle),
+});
+export type Exercise = t.TypeOf<typeof TExercise>;
 
-export interface Attempt {
-  weight: number,
-  repetitions: number,
-}
+export const TExerciseTemplate = t.interface({
+  kind: t.literal('ExerciseTemplate'),
+  title: t.string,
+  restSeconds: t.number,
+  targetMuscles: t.array(TMuscle),
+});
+export type ExerciseTemplate = t.TypeOf<typeof TExerciseTemplate>;
 
-export interface Exercise {
-  kind: 'Exercise',
-  title: string,
-  restSeconds: number,
-  attempts: {
-    first: Attempt,
-    other: Attempt[],
-  },
-  targetMuscles: Muscle[]
-}
+export const TNotStartedTraining = t.interface({
+  kind: t.literal('NotStartedTraining'),
+  title: t.string,
+  plannedExercises: t.array(TExercise),
+});
+export type NotStartedTraining = t.TypeOf<typeof TNotStartedTraining>;
 
-export interface ExerciseTemplate {
-  kind: 'ExerciseTemplate',
-  title: string,
-  restSeconds: number,
-  targetMuscles: Muscle[]
-}
+export const TOngoingTraining = t.interface({
+  kind: t.literal('OngoingTraining'),
+  title: t.string,
+  startedAt: DateFromString,
+  plannedExercises: t.array(TExercise),
+  currentExerciseIndex: t.union([t.number, t.null]),
+  completedExercises: t.array(TExercise),
+});
+export type OngoingTraining = t.TypeOf<typeof TOngoingTraining>;
 
-export interface Muscle {
-  id: number,
-  title: string,
-}
-
-export interface ExerciseListItemProps {
-  exercise: Exercise,
-}
+export const TFinishedTraining = t.interface({
+  kind: t.literal('FinishedTraining'),
+  title: t.string,
+  startedAt: DateFromString,
+  finishedAt: DateFromString,
+  completedExercises: t.array(TExercise),
+});
+export type FinishedTraining = t.TypeOf<typeof TFinishedTraining>;

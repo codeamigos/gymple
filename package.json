@@ -18,6 +18,7 @@
 		"@types/react-navigation": "^1.0.1",
 		"color": "^1.0.3",
 		"intl": "^1.2.5",
+		"io-ts": "^0.5.0",
 		"lodash": "^4.17.4",
 		"react": "16.0.0-alpha.6",
 		"react-intl": "^2.3.0",

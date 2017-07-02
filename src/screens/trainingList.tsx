@@ -1,29 +1,72 @@
 import * as React from 'react';
 import * as RN from 'react-native';
+import * as t from 'io-ts';
 
 import Training from './training';
-import {shouldNeverHappen} from '../utils';
-import {FinishedTraining, OngoingTraining, NotStartedTraining} from '../interfaces';
+import {shouldNeverHappen, decode} from '../utils';
+import {
+  FinishedTraining,
+  OngoingTraining,
+  NotStartedTraining,
+  TFinishedTraining,
+  TOngoingTraining,
+  TNotStartedTraining,
+} from '../interfaces';
 
 import {s, colors} from './../styles';
-
-interface TrainingsListProps {
-  finishedTrainings?: FinishedTraining[],
-  currentTraining?: OngoingTraining | NotStartedTraining,
-}
 
 interface TrainingsListState {
   currentTraining: OngoingTraining | NotStartedTraining | null,
   finishedTrainings: FinishedTraining[],
 }
 
-export default class TrainingsList extends React.PureComponent<TrainingsListProps, TrainingsListState> {
-  constructor(props: TrainingsListProps) {
-    super(props);
+export default class TrainingsList extends React.PureComponent<void, TrainingsListState> {
+  constructor() {
+    super();
     this.state = {
-      currentTraining: this.props.currentTraining || null,
-      finishedTrainings: this.props.finishedTrainings || [],
+      currentTraining: null,
+      finishedTrainings: [],
     };
+  }
+
+  componentDidMount() {
+    this.fetchData();
+  }
+
+  fetchData = async () => {
+    try {
+      const storedStateJSON = await RN.AsyncStorage.getItem('@Gymple:State');
+      if (storedStateJSON !== null){
+        decode(
+          JSON.parse(storedStateJSON),
+          t.interface({
+            currentTraining: t.union([TOngoingTraining, TNotStartedTraining, t.null]),
+            finishedTrainings: t.array(TFinishedTraining),
+          }),
+        )
+        .then(state => this.setState(state))
+        .catch(async () => {
+          try {
+            await RN.AsyncStorage.setItem('@Gymple:State', '');
+          }
+          catch (error) {
+            throw new Error(error);
+          }
+        });
+      }
+    }
+    catch (error) {
+      throw new Error(error);
+    }
+  }
+
+  storeData = async () => {
+    try {
+      await RN.AsyncStorage.setItem('@Gymple:State', JSON.stringify(this.state));
+    }
+    catch (error) {
+      throw new Error(error);
+    }
   }
 
   startNewTraining = () => {
@@ -33,13 +76,13 @@ export default class TrainingsList extends React.PureComponent<TrainingsListProp
         title: 'New training',
         plannedExercises: [],
       },
-    });
+    }, () => this.storeData());
   }
 
   updateCurrentTraining = (currentTraining: OngoingTraining | NotStartedTraining) => {
     this.setState({
       currentTraining,
-    });
+    }, () => this.storeData());
   }
 
   finishTraining = () => {
@@ -57,10 +100,12 @@ export default class TrainingsList extends React.PureComponent<TrainingsListProp
           this.setState({
             currentTraining: null,
             finishedTrainings: finishedTraining.completedExercises.length > 0 ? [finishedTraining, ...this.state.finishedTrainings] : this.state.finishedTrainings,
-          });
+          }, () => this.storeData());
           break;
         case 'NotStartedTraining':
-          this.setState({currentTraining: null});
+          this.setState({
+            currentTraining: null,
+          }, () => this.storeData());
           break;
         default: shouldNeverHappen(currentTraining);
       }
