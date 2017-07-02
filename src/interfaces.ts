@@ -22,14 +22,13 @@ interface Profile {
 type Training = NotStartedTraining | OngoingTraining | FinishedTraining;
 */
 
-/*
 export interface FinishedTraining {
+  kind: 'FinishedTraining',
   title: string,
   startedAt: Date,
   finishedAt: Date,
   completedExercises: Exercise[],
 }
-*/
 
 export interface Attempt {
   weight: number,

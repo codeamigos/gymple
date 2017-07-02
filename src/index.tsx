@@ -2,7 +2,7 @@
 
 import * as RN from 'react-native';
 
-import TrainingScreen from './screens/training';
+import TrainingList from './screens/trainingList';
 
 import bs, {Palette, Multiplicators, Options} from './styles';
 
@@ -42,7 +42,7 @@ bs.build({
   headings,
 } as Options);
 
-RN.AppRegistry.registerComponent('Gymple', () => TrainingScreen);
+RN.AppRegistry.registerComponent('Gymple', () => TrainingList);
 // import * as ReactIntl from 'react-intl';
 // import 'intl';
 

@@ -12,21 +12,21 @@ import {Exercise, NotStartedTraining, OngoingTraining} from '../interfaces';
 import {colors, sizes, s} from './../styles';
 
 interface TrainingScreenState {
-  training: NotStartedTraining | OngoingTraining,
   editingExercise: Exercise | null,
   editingExerciseIndex: number | null,
 }
 
-export default class TrainingScreen extends React.PureComponent<void, TrainingScreenState> {
-  constructor(props: void) {
+interface TrainingScreenProps {
+  training: NotStartedTraining | OngoingTraining,
+  onFinish: () => void,
+  onUpdate: (training: OngoingTraining | NotStartedTraining) => void,
+}
+
+export default class TrainingScreen extends React.PureComponent<TrainingScreenProps, TrainingScreenState> {
+  constructor(props: TrainingScreenProps) {
     super(props);
 
     this.state = {
-      training: {
-        kind: 'NotStartedTraining',
-        title: 'New training',
-        plannedExercises: [],
-      },
       editingExerciseIndex: null,
       editingExercise: null,
     };
@@ -40,53 +40,49 @@ export default class TrainingScreen extends React.PureComponent<void, TrainingSc
   }
 
   addExercise = (exercise: Exercise) => {
-    const { training } = this.state;
+    const { onUpdate, training } = this.props;
     this.setState({
-      training: {
-        ...training,
-        plannedExercises: training.plannedExercises.concat(exercise),
-      },
       editingExercise: null,
+    });
+    onUpdate({
+      ...training,
+      plannedExercises: training.plannedExercises.concat(exercise),
     });
   }
 
   updateExercise = (updatedExercise: Exercise, editingExerciseIndex: number) => {
-    const { training } = this.state;
+    const { onUpdate, training } = this.props;
     this.setState({
-      training: {
-        ...training,
-        plannedExercises: training.plannedExercises.map((exercise, i) => i === editingExerciseIndex ? updatedExercise : exercise),
-      },
       editingExercise: null,
       editingExerciseIndex: null,
+    });
+    onUpdate({
+      ...training,
+      plannedExercises: training.plannedExercises.map((exercise, i) => i === editingExerciseIndex ? updatedExercise : exercise),
     });
   }
 
   startTraining = () => {
-    const {training} = this.state;
-    this.setState({
-      training: {
-        kind: 'OngoingTraining',
-        title: training.title,
-        startedAt: new Date(),
-        plannedExercises: training.plannedExercises,
-        currentExerciseIndex: training.plannedExercises.length > 0 ? 0 : null,
-        completedExercises: [],
-      },
+    const { onUpdate, training } = this.props;
+    onUpdate({
+      kind: 'OngoingTraining',
+      title: training.title,
+      startedAt: new Date(),
+      plannedExercises: training.plannedExercises,
+      currentExerciseIndex: training.plannedExercises.length > 0 ? 0 : null,
+      completedExercises: [],
     });
   }
 
   startExercise = (currentExerciseIndex: number | null) => {
-    const {training} = this.state;
+    const { onUpdate, training } = this.props;
     switch (training.kind) {
       case 'NotStartedTraining':
         break;
       case 'OngoingTraining':
-        this.setState({
-          training: {
-            ...training,
-            currentExerciseIndex,
-          },
+        onUpdate({
+          ...training,
+          currentExerciseIndex,
         });
         break;
       default: shouldNeverHappen(training);
@@ -94,20 +90,18 @@ export default class TrainingScreen extends React.PureComponent<void, TrainingSc
   }
 
   restartExercise = (completedExerciseIndex: number) => {
-    const {training} = this.state;
+    const { onUpdate, training } = this.props;
     switch (training.kind) {
       case 'NotStartedTraining':
         break;
       case 'OngoingTraining':
         const completedExercise = training.completedExercises[completedExerciseIndex];
         if (completedExercise) {
-          this.setState({
-            training: {
-              ...training,
-              plannedExercises: [completedExercise, ...training.plannedExercises],
-              currentExerciseIndex: 0,
-              completedExercises: training.completedExercises.filter((_, i) => i !== completedExerciseIndex),
-            },
+          onUpdate({
+            ...training,
+            plannedExercises: [completedExercise, ...training.plannedExercises],
+            currentExerciseIndex: 0,
+            completedExercises: training.completedExercises.filter((_, i) => i !== completedExerciseIndex),
           });
         }
         else {
@@ -119,7 +113,7 @@ export default class TrainingScreen extends React.PureComponent<void, TrainingSc
   }
 
   completeExercise = () => {
-    const {training} = this.state;
+    const { onUpdate, training } = this.props;
     switch (training.kind) {
       case 'NotStartedTraining':
         break;
@@ -127,13 +121,11 @@ export default class TrainingScreen extends React.PureComponent<void, TrainingSc
         if (training.currentExerciseIndex !== null) {
           const completedExercise = training.plannedExercises[training.currentExerciseIndex];
           if (completedExercise) {
-            this.setState({
-              training: {
-                ...training,
-                plannedExercises: training.plannedExercises.filter((_, i) => i !== training.currentExerciseIndex),
-                currentExerciseIndex: null,
-                completedExercises: [...training.completedExercises, completedExercise],
-              },
+            onUpdate({
+              ...training,
+              plannedExercises: training.plannedExercises.filter((_, i) => i !== training.currentExerciseIndex),
+              currentExerciseIndex: null,
+              completedExercises: [...training.completedExercises, completedExercise],
             });
           }
           else {
@@ -146,26 +138,22 @@ export default class TrainingScreen extends React.PureComponent<void, TrainingSc
   }
 
   removeExercise = (index: number) => {
-    const { training } = this.state;
-    this.setState({
-      training: {
-        ...training,
-        plannedExercises: training.plannedExercises.filter((_, i) => i !== index),
-      },
+    const { onUpdate, training } = this.props;
+    onUpdate({
+      ...training,
+      plannedExercises: training.plannedExercises.filter((_, i) => i !== index),
     });
   }
 
   removeCompletedExercise = (index: number) => {
-    const { training } = this.state;
+    const { onUpdate, training } = this.props;
     switch (training.kind) {
       case 'NotStartedTraining':
         break;
       case 'OngoingTraining':
-        this.setState({
-          training: {
-            ...training,
-            completedExercises: training.completedExercises.filter((_, i) => i !== index),
-          },
+        onUpdate({
+          ...training,
+          completedExercises: training.completedExercises.filter((_, i) => i !== index),
         });
         break;
       default: shouldNeverHappen(training);
@@ -174,14 +162,18 @@ export default class TrainingScreen extends React.PureComponent<void, TrainingSc
 
   render() {
     const {
-      training,
       editingExerciseIndex,
       editingExercise,
     } = this.state;
+    const {
+      training,
+      onFinish,
+    } = this.props;
     switch (training.kind) {
       case 'NotStartedTraining':
         return <NotstartedTrainingScreen
                 training={training}
+                onFinish={onFinish}
                 editingExerciseIndex={editingExerciseIndex}
                 editingExercise={editingExercise}
                 onAddExercise={this.addExercise}
@@ -192,6 +184,7 @@ export default class TrainingScreen extends React.PureComponent<void, TrainingSc
       case 'OngoingTraining':
         return <OngoingTrainingScreen
                 training={training}
+                onFinish={onFinish}
                 onRemoveCompletedExercise={this.removeCompletedExercise}
                 onCompleteExercise={this.completeExercise}
                 onRemoveExercise={this.removeExercise}
@@ -241,6 +234,7 @@ interface NotstartedTrainingScreenProps {
   training: NotStartedTraining,
   editingExercise: Exercise | null,
   editingExerciseIndex: number | null,
+  onFinish: () => void,
   onAddExercise: (exercise: Exercise) => void,
   onUpdateExercise: (exercise: Exercise, i: number) => void,
   onSetEditingExercise: (exercise: Exercise | null, i: number | null) => void,
@@ -275,6 +269,7 @@ class NotstartedTrainingScreen extends React.PureComponent<NotstartedTrainingScr
   render() {
     const {
       training,
+      onFinish,
       editingExerciseIndex,
       editingExercise,
       onAddExercise,
@@ -297,7 +292,10 @@ class NotstartedTrainingScreen extends React.PureComponent<NotstartedTrainingScr
           backgroundColor={colors.t}
           />
         <RN.View style={[s.bg_blue, s.pt2, s.ph125, s.pb1]}>
-          <RN.Text style={[s.white, s.fw3, s.f2, s.lh2]}>
+          <RN.TouchableOpacity onPress={onFinish}>
+            <Icon name="md-close" size={sizes[175]} color={colors.white} />
+          </RN.TouchableOpacity>
+          <RN.Text style={[s.white, s.fw3, s.f2, s.lh2, s.mt05]}>
             {training.title}
           </RN.Text>
         </RN.View>
@@ -399,6 +397,7 @@ class NotstartedTrainingScreen extends React.PureComponent<NotstartedTrainingScr
 
 interface OngoingTrainingScreenProps {
   training: OngoingTraining,
+  onFinish: () => void,
   onStartExercise: (i: number | null) => void,
   onRestartExercise: (i: number) => void,
   onRemoveExercise: (i: number) => void,
@@ -423,7 +422,7 @@ class OngoingTrainingScreen extends React.PureComponent<OngoingTrainingScreenPro
     };
 
     if (props.training.currentExerciseIndex !== null) {
-      setInterval(() => this.setState({startCountDown: this.state.startCountDown - 1}), 1000);
+      this.interval = setInterval(() => this.setState({startCountDown: this.state.startCountDown - 1}), 1000);
     }
   }
 
@@ -438,6 +437,7 @@ class OngoingTrainingScreen extends React.PureComponent<OngoingTrainingScreenPro
   render() {
     const {
       training,
+      onFinish,
       onRemoveCompletedExercise,
       onCompleteExercise,
       onStartExercise,
@@ -459,7 +459,10 @@ class OngoingTrainingScreen extends React.PureComponent<OngoingTrainingScreenPro
           translucent={true}
           backgroundColor={colors.t} />
         <RN.View style={[s.bg_blue, s.pt2, s.ph125, s.pb05]}>
-          <RN.Text style={[s.white, s.fw3, s.f2, s.mb05, s.lh2]}>
+          <RN.TouchableOpacity onPress={onFinish}>
+            <Icon name="md-close" size={sizes[175]} color={colors.white} />
+          </RN.TouchableOpacity>
+          <RN.Text style={[s.white, s.fw3, s.f2, s.mv05, s.lh2]}>
             {training.title}
           </RN.Text>
           <RN.Text style={[s.white, s.f5, s.mb05]}>
