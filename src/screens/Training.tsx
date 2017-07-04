@@ -511,6 +511,16 @@ class OngoingTrainingScreen extends React.PureComponent<OngoingTrainingScreenPro
             </Swipeout>,
           )}
         </RN.ScrollView>
+        <RN.View style={s.pb175}>
+          <RN.TouchableOpacity
+            style={[s.asc, s.bg_green, s.br2, s.h325, s.jcc, s.ph3, s.mt075]}
+            onPress={onFinish}
+          >
+            <RN.Text style={[s.f4, s.white, s.tc, s.b]}>
+              Finish Training
+            </RN.Text>
+          </RN.TouchableOpacity>
+        </RN.View>
         <RN.Modal
           animationType="slide"
           transparent={false}
