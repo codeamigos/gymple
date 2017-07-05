@@ -6,20 +6,13 @@ import Swipeout from 'react-native-swipeout';
 
 import Training from './training';
 import {shouldNeverHappen, decode} from '../utils';
-import {
-  FinishedTraining,
-  OngoingTraining,
-  NotStartedTraining,
-  TFinishedTraining,
-  TOngoingTraining,
-  TNotStartedTraining,
-} from '../interfaces';
+import * as I from '../interfaces';
 
 import {s, colors, sizes} from './../styles';
 
 interface TrainingsListState {
-  currentTraining: OngoingTraining | NotStartedTraining | null,
-  finishedTrainings: FinishedTraining[],
+  currentTraining: I.OngoingTraining | I.NotStartedTraining | I.FinishedTraining | null,
+  finishedTrainings: I.FinishedTraining[],
   isScrollEnabled: boolean,
 }
 
@@ -44,8 +37,8 @@ export default class TrainingsList extends React.PureComponent<void, TrainingsLi
         decode(
           JSON.parse(storedStateJSON),
           t.interface({
-            currentTraining: t.union([TOngoingTraining, TNotStartedTraining, t.null]),
-            finishedTrainings: t.array(TFinishedTraining),
+            currentTraining: t.union([I.TOngoingTraining, I.TNotStartedTraining, I.TNotStartedTraining, t.null]),
+            finishedTrainings: t.array(I.TFinishedTraining),
             isScrollEnabled: t.boolean,
           }),
         )
@@ -84,7 +77,32 @@ export default class TrainingsList extends React.PureComponent<void, TrainingsLi
     }, () => this.storeData());
   }
 
-  updateCurrentTraining = (currentTraining: OngoingTraining | NotStartedTraining) => {
+  restartFinishedTraining = (finishedTraining: I.FinishedTraining) => {
+    const notStartedTrainingFromFinished: I.NotStartedTraining = {
+        kind: 'NotStartedTraining',
+        title: finishedTraining.title,
+        plannedExercises: finishedTraining.completedExercises,
+    };
+    this.setState({
+      currentTraining: notStartedTrainingFromFinished,
+    }, () => this.storeData());
+  }
+
+  viewFinishedTraining = (finishedTrainingIndex: number) => {
+    const {finishedTrainings} = this.state;
+    const training: I.FinishedTraining = finishedTrainings[finishedTrainingIndex];
+    if (!training) {
+      throw new Error('Trying to access not existing Finished Training');
+    }
+    else {
+      this.setState({
+        currentTraining: training,
+        finishedTrainings: finishedTrainings.filter((_, i) => i !== finishedTrainingIndex),
+      }, () => this.storeData());
+    }
+  }
+
+  updateCurrentTraining = (currentTraining: I.OngoingTraining | I.NotStartedTraining | I.FinishedTraining) => {
     this.setState({
       currentTraining,
     }, () => this.storeData());
@@ -95,7 +113,7 @@ export default class TrainingsList extends React.PureComponent<void, TrainingsLi
     if (currentTraining) {
       switch (currentTraining.kind) {
         case 'OngoingTraining':
-          const finishedTraining: FinishedTraining = {
+          const finishedTraining: I.FinishedTraining = {
             kind: 'FinishedTraining',
             title: currentTraining.title,
             startedAt: currentTraining.startedAt,
@@ -105,6 +123,12 @@ export default class TrainingsList extends React.PureComponent<void, TrainingsLi
           this.setState({
             currentTraining: null,
             finishedTrainings: finishedTraining.completedExercises.length > 0 ? [finishedTraining, ...this.state.finishedTrainings] : this.state.finishedTrainings,
+          }, () => this.storeData());
+          break;
+        case 'FinishedTraining':
+          this.setState({
+            currentTraining: null,
+            finishedTrainings: currentTraining.completedExercises.length > 0 ? [currentTraining, ...this.state.finishedTrainings] : this.state.finishedTrainings,
           }, () => this.storeData());
           break;
         case 'NotStartedTraining':
@@ -132,7 +156,11 @@ export default class TrainingsList extends React.PureComponent<void, TrainingsLi
     const {currentTraining, finishedTrainings, isScrollEnabled} = this.state;
 
     if (currentTraining) {
-      return <Training training={currentTraining} onFinish={this.finishTraining} onUpdate={this.updateCurrentTraining} />;
+      return <Training
+        training={currentTraining}
+        onFinish={this.finishTraining}
+        onRestartFinished={this.restartFinishedTraining}
+        onUpdate={this.updateCurrentTraining} />;
     }
 
     if (finishedTrainings.length === 0) {
@@ -182,7 +210,7 @@ export default class TrainingsList extends React.PureComponent<void, TrainingsLi
                   },
                 ]}
               >
-                <RN.TouchableOpacity onPress ={() => {}}>
+                <RN.TouchableOpacity onPress ={() => this.viewFinishedTraining(i)}>
                   <TrainingsListItem training={training} />
                 </RN.TouchableOpacity>
               </Swipeout>,
@@ -204,7 +232,7 @@ export default class TrainingsList extends React.PureComponent<void, TrainingsLi
   }
 }
 
-const TrainingsListItem = ({training}: {training: FinishedTraining}) => {
+const TrainingsListItem = ({training}: {training: I.FinishedTraining}) => {
   return (
     <RN.View style={[s.pv1, s.bbw1, s.b_black_5, s.pr1, s.ml125]}>
       <RN.View style={[s.flx_row, s.jcsb, s.aifs]}>
