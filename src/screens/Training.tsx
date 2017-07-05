@@ -247,35 +247,6 @@ export default class TrainingScreen extends React.PureComponent<TrainingScreenPr
 
 
 
-
-const ExerciseListItem = ({exercise}: {exercise: I.Exercise}) => {
-  return (
-    <RN.View style={[s.pv1, s.bbw1, s.b_black_5, s.pr1, s.ml125]}>
-      <RN.View style={[s.flx_row, s.jcsb, s.aifs]}>
-        <RN.Text style={[s.f4, s.bg_t, s.blue, s.flx_i, s.mb025, s.lh125]}>
-          {exercise.title}
-        </RN.Text>
-        {/*{exercise.attempts.length > 0 &&
-          <RN.View style={[s.ml075, s.flx_row, s.aic, s.mt0125]}>
-            <RN.Text style={[s.f6, s.b]}>{exercise.attempts.length}</RN.Text>
-            <Icon name="md-close" color={colors.black_20} style={[s.f5, s.ph025]} />
-            <RN.Text style={[s.f6, s.b]}>{Math.round(exercise.attempts.reduce((acc, a) => acc + a.repetitions, 0) / exercise.attempts.length)}</RN.Text>
-            <Icon name="md-close" color={colors.black_20} style={[s.f5, s.ph025]} />
-            <RN.Text style={[s.f6, s.b]}>{Math.round(exercise.attempts.reduce((acc, a) => acc + a.weight, 0) / exercise.attempts.length)}kg</RN.Text>
-          </RN.View>
-        }*/}
-      </RN.View>
-      <RN.Text style={[s.f6]}>
-        {exercise.targetMuscles.map(({ title }) => title).join(', ')}
-      </RN.Text>
-    </RN.View>
-  );
-};
-
-
-
-
-
 interface NotstartedTrainingScreenProps {
   training: I.NotStartedTraining,
   editingExercise: I.Exercise | null,
@@ -341,7 +312,7 @@ class NotstartedTrainingScreen extends React.PureComponent<NotstartedTrainingScr
           <RN.TouchableOpacity onPress={onFinish}>
             <Icon name="md-close" size={sizes[175]} color={colors.white} />
           </RN.TouchableOpacity>
-          <RN.Text style={[s.white, s.fw3, s.f2, s.lh2, s.mt05]}>
+          <RN.Text numberOfLines={2} style={[s.white, s.fw2, s.f2, s.lh2, s.mt05]}>
             {training.title}
           </RN.Text>
         </RN.View>
@@ -482,7 +453,7 @@ class FinishedTrainingScreen extends React.PureComponent<FinishedTrainingScreenP
           <RN.TouchableOpacity onPress={onFinish}>
             <Icon name="md-close" size={sizes[175]} color={colors.white} />
           </RN.TouchableOpacity>
-          <RN.Text style={[s.white, s.fw3, s.f2, s.mv05, s.lh2]}>
+          <RN.Text numberOfLines={2} style={[s.white, s.fw2, s.f2, s.mv05, s.lh2]}>
             {training.title}
           </RN.Text>
           <RN.Text style={[s.white, s.f5, s.mb05]}>
@@ -503,7 +474,7 @@ class FinishedTrainingScreen extends React.PureComponent<FinishedTrainingScreenP
                   component: <RN.View style={[s.w5, s.bg_orange, s.jcc, s.flx_i]}><Icon name="md-trash" style={[s.white, s.f3, s.tc]} /></RN.View>,
                 },
               ]}>
-              <ExerciseListItem exercise={exercise} />
+              <CompletedExerciseListItem exercise={exercise} />
             </Swipeout>,
           )}
         </RN.ScrollView>
@@ -592,7 +563,7 @@ class OngoingTrainingScreen extends React.PureComponent<OngoingTrainingScreenPro
           <RN.TouchableOpacity onPress={onFinish}>
             <Icon name="md-close" size={sizes[175]} color={colors.white} />
           </RN.TouchableOpacity>
-          <RN.Text style={[s.white, s.fw3, s.f2, s.mv05, s.lh2]}>
+          <RN.Text numberOfLines={2} style={[s.white, s.fw2, s.f2, s.mv05, s.lh2]}>
             {training.title}
           </RN.Text>
           <RN.Text style={[s.white, s.f5, s.mb05]}>
@@ -616,7 +587,7 @@ class OngoingTrainingScreen extends React.PureComponent<OngoingTrainingScreenPro
               <RN.TouchableOpacity
                 onPress={() => onRestartExercise(i)}
                 style={[s.ass, s.brw5, s.b_green]}>
-                <ExerciseListItem exercise={exercise} />
+                <CompletedExerciseListItem exercise={exercise} />
               </RN.TouchableOpacity>
             </Swipeout>,
           )}
@@ -642,14 +613,25 @@ class OngoingTrainingScreen extends React.PureComponent<OngoingTrainingScreenPro
           )}
         </RN.ScrollView>
         <RN.View style={s.pb175}>
-          <RN.TouchableOpacity
-            style={[s.asc, s.bg_green, s.br2, s.h325, s.jcc, s.ph3, s.mt075]}
-            onPress={onFinish}
-          >
-            <RN.Text style={[s.f4, s.white, s.tc, s.b]}>
-              Finish Training
-            </RN.Text>
-          </RN.TouchableOpacity>
+          {training.plannedExercises.length > 0 ?
+            <RN.TouchableOpacity
+              style={[s.asc, s.bg_green, s.br2, s.h325, s.jcc, s.ph3, s.mt075]}
+              onPress={() => onStartExercise(0)}
+            >
+              <RN.Text style={[s.f4, s.white, s.tc, s.b]}>
+                Start next Exercise
+              </RN.Text>
+            </RN.TouchableOpacity>
+          :
+            <RN.TouchableOpacity
+              style={[s.asc, s.bg_green, s.br2, s.h325, s.jcc, s.ph3, s.mt075]}
+              onPress={onFinish}
+            >
+              <RN.Text style={[s.f4, s.white, s.tc, s.b]}>
+                Finish Training
+              </RN.Text>
+            </RN.TouchableOpacity>
+          }
         </RN.View>
         <RN.Modal
           animationType="slide"
@@ -674,3 +656,45 @@ class OngoingTrainingScreen extends React.PureComponent<OngoingTrainingScreenPro
     );
   }
 }
+
+
+
+
+const ExerciseListItem = ({exercise}: {exercise: I.Exercise}) => {
+  return (
+    <RN.View style={[s.pv1, s.bbw1, s.b_black_5, s.pr1, s.ml125]}>
+      <RN.Text style={[s.f4, s.fw2, s.bg_t, s.blue, s.flx_i, s.mb025, s.lh125]}>
+        {exercise.title}
+      </RN.Text>
+      <RN.Text style={[s.f6, s.fw3]}>
+        {exercise.targetMuscles.map(({ title }) => title).join(', ')}
+      </RN.Text>
+    </RN.View>
+  );
+};
+
+
+const CompletedExerciseListItem = ({exercise}: {exercise: I.Exercise}) => {
+
+  const attempts = [exercise.attempts.first, ...exercise.attempts.other];
+
+  const repetitionsAvg = Math.round(attempts.reduce((acc, a) => acc + a.repetitions, 0) / attempts.length);
+
+  return (
+    <RN.View style={[s.pv1, s.bbw1, s.b_black_5, s.pr1, s.ml125]}>
+      <RN.Text style={[s.f4, s.fw2, s.bg_t, s.blue, s.flx_i, s.mb025, s.lh125]}>
+        {exercise.title}
+      </RN.Text>
+      <RN.Text style={[s.f6, s.fw3]}>
+        {exercise.targetMuscles.map(({ title }) => title).join(', ')}
+      </RN.Text>
+      <RN.View style={[s.mt05, s.flx_row, s.aic, s.mt0125]}>
+        <RN.Text style={[s.f5, s.fw3]}>{attempts.length} <RN.Text style={[s.f7, s.black_40]}>{attempts.length > 1 ? 'ATTEMPTS' : 'ATTEMPT'}</RN.Text></RN.Text>
+        <Icon name="ios-close" color={colors.black_20} style={[s.f5, s.ph025]} />
+        <RN.Text style={[s.f5, s.fw3]}>{repetitionsAvg} <RN.Text style={[s.f7, s.black_40]}>{repetitionsAvg > 1 ? 'REPS' : 'REP'}</RN.Text></RN.Text>
+        <Icon name="ios-close" color={colors.black_20} style={[s.f5, s.ph025]} />
+        <RN.Text style={[s.f5, s.fw3]}>{Math.round(attempts.reduce((acc, a) => acc + a.weight, 0) / attempts.length)} <RN.Text style={[s.f7, s.black_40]}>KG</RN.Text></RN.Text>
+      </RN.View>
+    </RN.View>
+  );
+};
