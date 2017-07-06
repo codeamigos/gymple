@@ -238,13 +238,15 @@ export default class TrainingScreen extends React.PureComponent<TrainingScreenPr
                 onCompleteExercise={this.completeExercise}
                 onRemoveExercise={this.removeExercise}
                 onRestartExercise={this.restartExercise}
-                onStartExercise={this.startExercise}/>;
+                onStartExercise={this.startExercise}
+                onSetTrainingTitle={this.setTrainingTitle} />;
       case 'FinishedTraining':
         return <FinishedTrainingScreen
                 training={training}
                 onFinish={onFinish}
                 onRemoveCompletedExercise={this.removeCompletedExercise}
-                onRestart={() => onRestartFinished(training)}/>;
+                onRestart={() => onRestartFinished(training)}
+                onSetTrainingTitle={this.setTrainingTitle} />;
       default:
         shouldNeverHappen(training);
         return null;
@@ -428,6 +430,7 @@ class NotstartedTrainingScreen extends React.PureComponent<NotstartedTrainingScr
           <InputScreen
             placeholder="Training Title"
             onChange={onSetTrainingTitle}
+            onClose={() => this.setState({isEditingTitle: false})}
             value={training.title}
             disableEmptySave
           />
@@ -443,11 +446,13 @@ interface FinishedTrainingScreenProps {
   training: I.FinishedTraining,
   onRestart: () => void,
   onRemoveCompletedExercise: (i: number) => void,
+  onSetTrainingTitle: (title: string) => void,
   onFinish: () => void,
 }
 
 interface FinishedTrainingScreenState {
   isScrollEnabled: boolean,
+  isEditingTitle: boolean,
 }
 
 class FinishedTrainingScreen extends React.PureComponent<FinishedTrainingScreenProps, FinishedTrainingScreenState> {
@@ -458,6 +463,7 @@ class FinishedTrainingScreen extends React.PureComponent<FinishedTrainingScreenP
 
   state = {
     isScrollEnabled: false,
+    isEditingTitle: false,
   };
 
   render() {
@@ -466,9 +472,10 @@ class FinishedTrainingScreen extends React.PureComponent<FinishedTrainingScreenP
       onRemoveCompletedExercise,
       onRestart,
       onFinish,
+      onSetTrainingTitle,
     } = this.props;
 
-    const {isScrollEnabled} = this.state;
+    const {isScrollEnabled, isEditingTitle} = this.state;
 
     return (
       <RN.View style={[s.flx_i, s.jcsb, s.bg_greyLightest]}>
@@ -480,9 +487,11 @@ class FinishedTrainingScreen extends React.PureComponent<FinishedTrainingScreenP
           <RN.TouchableOpacity onPress={onFinish}>
             <Icon name="md-close" size={sizes[175]} color={colors.white} />
           </RN.TouchableOpacity>
-          <RN.Text numberOfLines={2} style={[s.white, s.fw2, s.f2, s.mv05, s.lh2]}>
-            {training.title}
-          </RN.Text>
+          <RN.TouchableOpacity onPress={() => this.setState({isEditingTitle: true})}>
+            <RN.Text numberOfLines={2} style={[s.white, s.fw2, s.f2, s.mv05, s.lh2]}>
+              {training.title}
+            </RN.Text>
+          </RN.TouchableOpacity>
           <RN.Text style={[s.white, s.f5, s.mb05]}>
             Today
           </RN.Text>
@@ -515,6 +524,19 @@ class FinishedTrainingScreen extends React.PureComponent<FinishedTrainingScreenP
             </RN.Text>
           </RN.TouchableOpacity>
         </RN.View>
+        <RN.Modal
+          animationType="slide"
+          transparent={false}
+          visible={isEditingTitle}
+          onRequestClose={() => this.setState({isEditingTitle: false})}>
+          <InputScreen
+            placeholder="Training Title"
+            onChange={onSetTrainingTitle}
+            onClose={() => this.setState({isEditingTitle: false})}
+            value={training.title}
+            disableEmptySave
+          />
+        </RN.Modal>
       </RN.View>
     );
   }
@@ -531,6 +553,7 @@ interface OngoingTrainingScreenProps {
   onRemoveExercise: (i: number) => void,
   onRemoveCompletedExercise: (i: number) => void,
   onCompleteExercise: () => void,
+  onSetTrainingTitle: (title: string) => void,
 }
 
 interface OngoingTrainingScreenState {
@@ -573,9 +596,10 @@ class OngoingTrainingScreen extends React.PureComponent<OngoingTrainingScreenPro
       onStartExercise,
       onRestartExercise,
       onRemoveExercise,
+      onSetTrainingTitle,
     } = this.props;
 
-    const { isScrollEnabled, startCountDown } = this.state;
+    const { isScrollEnabled, startCountDown, isEditingTitle } = this.state;
     const currentExercise = training.currentExerciseIndex !== null && training.plannedExercises[training.currentExerciseIndex];
 
     if (training.currentExerciseIndex !== null && !currentExercise) {
@@ -683,6 +707,19 @@ class OngoingTrainingScreen extends React.PureComponent<OngoingTrainingScreenPro
               <RunningExercise onClose={() => onStartExercise(null)} onDone={onCompleteExercise} exercise={currentExercise} />
             }
         </RN.Modal>
+        <RN.Modal
+          animationType="slide"
+          transparent={false}
+          visible={isEditingTitle}
+          onRequestClose={() => this.setState({isEditingTitle: false})}>
+          <InputScreen
+            placeholder="Training Title"
+            onChange={onSetTrainingTitle}
+            onClose={() => this.setState({isEditingTitle: false})}
+            value={training.title}
+            disableEmptySave
+          />
+        </RN.Modal>
       </RN.View>
     );
   }
@@ -735,6 +772,7 @@ const CompletedExerciseListItem = ({exercise}: {exercise: I.Exercise}) => {
 interface InputScreenProps {
   placeholder?: string,
   onChange: (title: string) => void,
+  onClose: () => void;
   value: string,
   disableEmptySave?: boolean,
 }
@@ -749,29 +787,52 @@ class InputScreen extends React.PureComponent<InputScreenProps, {value: string}>
   }
 
   onSubmit = () => {
-    const {onChange, disableEmptySave} = this.props;
+    const {onChange, disableEmptySave, onClose} = this.props;
     const {value} = this.state;
     if (!disableEmptySave || disableEmptySave && value.length > 0 ) {
       onChange(value);
+      onClose();
     }
   }
 
   render() {
     const {value} = this.state;
-    const {placeholder} = this.props;
+    const {placeholder, disableEmptySave, onClose} = this.props;
+    const isSubmitDisable = disableEmptySave && value.length === 0;
     return (
       <RN.KeyboardAvoidingView
-        style={s.flx_i}
-        contentContainerStyle={[s.bg_blueDark, s.jcsa, s.pt3, s.pb1, s.ph2]}>
-        <RN.TextInput
-          value={value}
-          style={[s.pt0, s.pb0, s.h225, s.tc, s.bbw1, s.b_white_10]}
-          onChangeText={(newValue) => this.setState({value: newValue})}
-          underlineColorAndroid={colors.t}
-          placeholder={placeholder || value || ''}
-          onSubmitEditing={this.onSubmit}
-          autoFocus
-        />
+        behavior="padding"
+        style={[s.flx_i, s.bg_blueDark, s.jcsb]}>
+        <RN.View style={[s.pt2, s.ph125, s.pb05]}>
+          <RN.TouchableOpacity onPress={onClose}>
+            <Icon name="md-close" size={sizes[175]} color={colors.white} />
+          </RN.TouchableOpacity>
+        </RN.View>
+        <RN.View style={[s.flx_i, s.jcc, s.aic, s.pt3, s.ph2]}>
+          <RN.View style={[s.bbw1, s.b_white_10, s.mh1, s.ph1, s.pv075, s.ass]}>
+            <RN.TextInput
+              enablesReturnKeyAutomatically
+              value={value}
+              style={[s.pt0, s.pb0, s.tc, s.f3, s.h2, s.white, s.fw2]}
+              onChangeText={(newValue) => this.setState({value: newValue})}
+              returnKeyType="done"
+              underlineColorAndroid={colors.t}
+              placeholderTextColor={colors.white_20}
+              placeholder={placeholder || value || ''}
+              onSubmitEditing={this.onSubmit}
+              autoFocus
+              autoCorrect={false}
+            />
+          </RN.View>
+        </RN.View>
+        <RN.TouchableOpacity
+          disabled={isSubmitDisable}
+          style={[s.asc, s.br2, s.h325, s.jcc, s.ph3, s.mt075, s.mb1, isSubmitDisable ? s.bg_green_30 : s.bg_green]}
+          onPress={this.onSubmit}>
+          <RN.Text style={[s.f4, s.tc, s.b, isSubmitDisable ? s.white_30 : s.white]}>
+            Done
+          </RN.Text>
+        </RN.TouchableOpacity>
       </RN.KeyboardAvoidingView>
     );
   }
