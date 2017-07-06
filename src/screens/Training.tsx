@@ -40,6 +40,14 @@ export default class TrainingScreen extends React.PureComponent<TrainingScreenPr
     });
   }
 
+  setTrainingTitle = (title: string) => {
+    const {onUpdate, training} = this.props;
+    onUpdate({
+      ...training,
+      title,
+    });
+  }
+
   addExercise = (exercise: I.Exercise) => {
     const { onUpdate, training } = this.props;
 
@@ -220,7 +228,8 @@ export default class TrainingScreen extends React.PureComponent<TrainingScreenPr
                 onSetEditingExercise={this.setEditingExercise}
                 onUpdateExercise={this.updateExercise}
                 onRemoveExercise={this.removeExercise}
-                onStartTraining={this.startTraining} />;
+                onStartTraining={this.startTraining}
+                onSetTrainingTitle={this.setTrainingTitle} />;
       case 'OngoingTraining':
         return <OngoingTrainingScreen
                 training={training}
@@ -257,11 +266,13 @@ interface NotstartedTrainingScreenProps {
   onSetEditingExercise: (exercise: I.Exercise | null, i: number | null) => void,
   onRemoveExercise: (i: number) => void,
   onStartTraining: () => void,
+  onSetTrainingTitle: (title: string) => void,
 }
 
 interface NotstartedTrainingScreenState {
   isScrollEnabled: boolean,
   isModalOpened: boolean,
+  isEditingTitle: boolean,
 }
 
 
@@ -272,6 +283,7 @@ class NotstartedTrainingScreen extends React.PureComponent<NotstartedTrainingScr
     this.state = {
       isModalOpened: false,
       isScrollEnabled: true,
+      isEditingTitle: false,
     };
   }
 
@@ -287,6 +299,7 @@ class NotstartedTrainingScreen extends React.PureComponent<NotstartedTrainingScr
     const {
       training,
       onFinish,
+      onSetTrainingTitle,
       editingExerciseIndex,
       editingExercise,
       onAddExercise,
@@ -299,6 +312,7 @@ class NotstartedTrainingScreen extends React.PureComponent<NotstartedTrainingScr
     const {
       isScrollEnabled,
       isModalOpened,
+      isEditingTitle,
     } = this.state;
 
     return (
@@ -312,9 +326,11 @@ class NotstartedTrainingScreen extends React.PureComponent<NotstartedTrainingScr
           <RN.TouchableOpacity onPress={onFinish}>
             <Icon name="md-close" size={sizes[175]} color={colors.white} />
           </RN.TouchableOpacity>
-          <RN.Text numberOfLines={2} style={[s.white, s.fw2, s.f2, s.lh2, s.mt05]}>
-            {training.title}
-          </RN.Text>
+          <RN.TouchableOpacity onPress={() => this.setState({isEditingTitle: true})}>
+            <RN.Text numberOfLines={2} style={[s.white, s.fw2, s.f2, s.lh2, s.mt05]}>
+              {training.title}
+            </RN.Text>
+          </RN.TouchableOpacity>
         </RN.View>
         {training.plannedExercises.length > 0 ?
           <RN.View style={[s.flx_i, s.jcsb]}>
@@ -404,11 +420,22 @@ class NotstartedTrainingScreen extends React.PureComponent<NotstartedTrainingScr
             />
           }
         </RN.Modal>
+        <RN.Modal
+          animationType="slide"
+          transparent={false}
+          visible={isEditingTitle}
+          onRequestClose={() => this.setState({isEditingTitle: false})}>
+          <InputScreen
+            placeholder="Training Title"
+            onChange={onSetTrainingTitle}
+            value={training.title}
+            disableEmptySave
+          />
+        </RN.Modal>
       </RN.View>
     );
   }
 }
-
 
 
 
@@ -509,6 +536,7 @@ interface OngoingTrainingScreenProps {
 interface OngoingTrainingScreenState {
   isScrollEnabled: boolean,
   startCountDown: number,
+  isEditingTitle: boolean,
 }
 
 class OngoingTrainingScreen extends React.PureComponent<OngoingTrainingScreenProps, OngoingTrainingScreenState> {
@@ -519,6 +547,7 @@ class OngoingTrainingScreen extends React.PureComponent<OngoingTrainingScreenPro
     super(props);
     this.state = {
       isScrollEnabled: true,
+      isEditingTitle: false,
       startCountDown: props.training.currentExerciseIndex !== null ? 3 : 0,
     };
 
@@ -563,9 +592,11 @@ class OngoingTrainingScreen extends React.PureComponent<OngoingTrainingScreenPro
           <RN.TouchableOpacity onPress={onFinish}>
             <Icon name="md-close" size={sizes[175]} color={colors.white} />
           </RN.TouchableOpacity>
-          <RN.Text numberOfLines={2} style={[s.white, s.fw2, s.f2, s.mv05, s.lh2]}>
-            {training.title}
-          </RN.Text>
+          <RN.TouchableOpacity onPress={() => this.setState({isEditingTitle: true})}>
+            <RN.Text numberOfLines={2} style={[s.white, s.fw2, s.f2, s.mv05, s.lh2]}>
+              {training.title}
+            </RN.Text>
+          </RN.TouchableOpacity>
           <RN.Text style={[s.white, s.f5, s.mb05]}>
             Today
           </RN.Text>
@@ -698,3 +729,50 @@ const CompletedExerciseListItem = ({exercise}: {exercise: I.Exercise}) => {
     </RN.View>
   );
 };
+
+
+
+interface InputScreenProps {
+  placeholder?: string,
+  onChange: (title: string) => void,
+  value: string,
+  disableEmptySave?: boolean,
+}
+
+class InputScreen extends React.PureComponent<InputScreenProps, {value: string}> {
+
+  constructor(props: InputScreenProps) {
+    super(props);
+    this.state = {
+      value: props.value,
+    };
+  }
+
+  onSubmit = () => {
+    const {onChange, disableEmptySave} = this.props;
+    const {value} = this.state;
+    if (!disableEmptySave || disableEmptySave && value.length > 0 ) {
+      onChange(value);
+    }
+  }
+
+  render() {
+    const {value} = this.state;
+    const {placeholder} = this.props;
+    return (
+      <RN.KeyboardAvoidingView
+        style={s.flx_i}
+        contentContainerStyle={[s.bg_blueDark, s.jcsa, s.pt3, s.pb1, s.ph2]}>
+        <RN.TextInput
+          value={value}
+          style={[s.pt0, s.pb0, s.h225, s.tc, s.bbw1, s.b_white_10]}
+          onChangeText={(newValue) => this.setState({value: newValue})}
+          underlineColorAndroid={colors.t}
+          placeholder={placeholder || value || ''}
+          onSubmitEditing={this.onSubmit}
+          autoFocus
+        />
+      </RN.KeyboardAvoidingView>
+    );
+  }
+}

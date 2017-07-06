@@ -36,6 +36,26 @@
 		2DCD954D1E0B4F2C00145EB5 /* GympleTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 00E356F21AD99517003FC87E /* GympleTests.m */; };
 		5E9157361DD0AC6A00FF2AA8 /* libRCTAnimation.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 5E9157331DD0AC6500FF2AA8 /* libRCTAnimation.a */; };
 		832341BD1AAA6AB300B99B32 /* libRCTText.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 832341B51AAA6A8300B99B32 /* libRCTText.a */; };
+		F97D54E91F0D8AFF00EDCD2D /* AppIcon29x29.png in Resources */ = {isa = PBXBuildFile; fileRef = F97D54D51F0D8AFF00EDCD2D /* AppIcon29x29.png */; };
+		F97D54EA1F0D8AFF00EDCD2D /* AppIcon29x29@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = F97D54D61F0D8AFF00EDCD2D /* AppIcon29x29@2x.png */; };
+		F97D54EB1F0D8AFF00EDCD2D /* AppIcon40x40.png in Resources */ = {isa = PBXBuildFile; fileRef = F97D54D71F0D8AFF00EDCD2D /* AppIcon40x40.png */; };
+		F97D54EC1F0D8AFF00EDCD2D /* AppIcon40x40@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = F97D54D81F0D8AFF00EDCD2D /* AppIcon40x40@2x.png */; };
+		F97D54ED1F0D8AFF00EDCD2D /* AppIcon40x40@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = F97D54D91F0D8AFF00EDCD2D /* AppIcon40x40@3x.png */; };
+		F97D54EE1F0D8AFF00EDCD2D /* AppIcon50x50.png in Resources */ = {isa = PBXBuildFile; fileRef = F97D54DA1F0D8AFF00EDCD2D /* AppIcon50x50.png */; };
+		F97D54EF1F0D8AFF00EDCD2D /* AppIcon50x50@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = F97D54DB1F0D8AFF00EDCD2D /* AppIcon50x50@2x.png */; };
+		F97D54F01F0D8AFF00EDCD2D /* AppIcon57x57.png in Resources */ = {isa = PBXBuildFile; fileRef = F97D54DC1F0D8AFF00EDCD2D /* AppIcon57x57.png */; };
+		F97D54F11F0D8AFF00EDCD2D /* AppIcon57x57@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = F97D54DD1F0D8AFF00EDCD2D /* AppIcon57x57@2x.png */; };
+		F97D54F21F0D8AFF00EDCD2D /* AppIcon60x60.png in Resources */ = {isa = PBXBuildFile; fileRef = F97D54DE1F0D8AFF00EDCD2D /* AppIcon60x60.png */; };
+		F97D54F31F0D8AFF00EDCD2D /* AppIcon60x60@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = F97D54DF1F0D8AFF00EDCD2D /* AppIcon60x60@2x.png */; };
+		F97D54F41F0D8AFF00EDCD2D /* AppIcon60x60@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = F97D54E01F0D8AFF00EDCD2D /* AppIcon60x60@3x.png */; };
+		F97D54F51F0D8AFF00EDCD2D /* AppIcon72x72.png in Resources */ = {isa = PBXBuildFile; fileRef = F97D54E11F0D8AFF00EDCD2D /* AppIcon72x72.png */; };
+		F97D54F61F0D8AFF00EDCD2D /* AppIcon72x72@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = F97D54E21F0D8AFF00EDCD2D /* AppIcon72x72@2x.png */; };
+		F97D54F71F0D8AFF00EDCD2D /* AppIcon76x76.png in Resources */ = {isa = PBXBuildFile; fileRef = F97D54E31F0D8AFF00EDCD2D /* AppIcon76x76.png */; };
+		F97D54F81F0D8AFF00EDCD2D /* AppIcon76x76@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = F97D54E41F0D8AFF00EDCD2D /* AppIcon76x76@2x.png */; };
+		F97D54F91F0D8AFF00EDCD2D /* AppIcon84x84 .png in Resources */ = {isa = PBXBuildFile; fileRef = F97D54E51F0D8AFF00EDCD2D /* AppIcon84x84 .png */; };
+		F97D54FA1F0D8AFF00EDCD2D /* AppIcon84x84 @2x.png in Resources */ = {isa = PBXBuildFile; fileRef = F97D54E61F0D8AFF00EDCD2D /* AppIcon84x84 @2x.png */; };
+		F97D54FB1F0D8AFF00EDCD2D /* AppIcon87x87@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = F97D54E71F0D8AFF00EDCD2D /* AppIcon87x87@3x.png */; };
+		F97D54FC1F0D8AFF00EDCD2D /* iTunesArtwork.png in Resources */ = {isa = PBXBuildFile; fileRef = F97D54E81F0D8AFF00EDCD2D /* iTunesArtwork.png */; };
 		F9BCE3CD1EDF075F002D57AA /* Ionicons.ttf in Resources */ = {isa = PBXBuildFile; fileRef = F9BCE3CC1EDF06ED002D57AA /* Ionicons.ttf */; };
 /* End PBXBuildFile section */
 
@@ -256,6 +276,26 @@
 		5E91572D1DD0AC6500FF2AA8 /* RCTAnimation.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RCTAnimation.xcodeproj; path = "../node_modules/react-native/Libraries/NativeAnimation/RCTAnimation.xcodeproj"; sourceTree = "<group>"; };
 		78C398B01ACF4ADC00677621 /* RCTLinking.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RCTLinking.xcodeproj; path = "../node_modules/react-native/Libraries/LinkingIOS/RCTLinking.xcodeproj"; sourceTree = "<group>"; };
 		832341B01AAA6A8300B99B32 /* RCTText.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RCTText.xcodeproj; path = "../node_modules/react-native/Libraries/Text/RCTText.xcodeproj"; sourceTree = "<group>"; };
+		F97D54D51F0D8AFF00EDCD2D /* AppIcon29x29.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = AppIcon29x29.png; path = icon/AppIcon29x29.png; sourceTree = "<group>"; };
+		F97D54D61F0D8AFF00EDCD2D /* AppIcon29x29@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "AppIcon29x29@2x.png"; path = "icon/AppIcon29x29@2x.png"; sourceTree = "<group>"; };
+		F97D54D71F0D8AFF00EDCD2D /* AppIcon40x40.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = AppIcon40x40.png; path = icon/AppIcon40x40.png; sourceTree = "<group>"; };
+		F97D54D81F0D8AFF00EDCD2D /* AppIcon40x40@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "AppIcon40x40@2x.png"; path = "icon/AppIcon40x40@2x.png"; sourceTree = "<group>"; };
+		F97D54D91F0D8AFF00EDCD2D /* AppIcon40x40@3x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "AppIcon40x40@3x.png"; path = "icon/AppIcon40x40@3x.png"; sourceTree = "<group>"; };
+		F97D54DA1F0D8AFF00EDCD2D /* AppIcon50x50.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = AppIcon50x50.png; path = icon/AppIcon50x50.png; sourceTree = "<group>"; };
+		F97D54DB1F0D8AFF00EDCD2D /* AppIcon50x50@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "AppIcon50x50@2x.png"; path = "icon/AppIcon50x50@2x.png"; sourceTree = "<group>"; };
+		F97D54DC1F0D8AFF00EDCD2D /* AppIcon57x57.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = AppIcon57x57.png; path = icon/AppIcon57x57.png; sourceTree = "<group>"; };
+		F97D54DD1F0D8AFF00EDCD2D /* AppIcon57x57@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "AppIcon57x57@2x.png"; path = "icon/AppIcon57x57@2x.png"; sourceTree = "<group>"; };
+		F97D54DE1F0D8AFF00EDCD2D /* AppIcon60x60.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = AppIcon60x60.png; path = icon/AppIcon60x60.png; sourceTree = "<group>"; };
+		F97D54DF1F0D8AFF00EDCD2D /* AppIcon60x60@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "AppIcon60x60@2x.png"; path = "icon/AppIcon60x60@2x.png"; sourceTree = "<group>"; };
+		F97D54E01F0D8AFF00EDCD2D /* AppIcon60x60@3x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "AppIcon60x60@3x.png"; path = "icon/AppIcon60x60@3x.png"; sourceTree = "<group>"; };
+		F97D54E11F0D8AFF00EDCD2D /* AppIcon72x72.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = AppIcon72x72.png; path = icon/AppIcon72x72.png; sourceTree = "<group>"; };
+		F97D54E21F0D8AFF00EDCD2D /* AppIcon72x72@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "AppIcon72x72@2x.png"; path = "icon/AppIcon72x72@2x.png"; sourceTree = "<group>"; };
+		F97D54E31F0D8AFF00EDCD2D /* AppIcon76x76.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = AppIcon76x76.png; path = icon/AppIcon76x76.png; sourceTree = "<group>"; };
+		F97D54E41F0D8AFF00EDCD2D /* AppIcon76x76@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "AppIcon76x76@2x.png"; path = "icon/AppIcon76x76@2x.png"; sourceTree = "<group>"; };
+		F97D54E51F0D8AFF00EDCD2D /* AppIcon84x84 .png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "AppIcon84x84 .png"; path = "icon/AppIcon84x84 .png"; sourceTree = "<group>"; };
+		F97D54E61F0D8AFF00EDCD2D /* AppIcon84x84 @2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "AppIcon84x84 @2x.png"; path = "icon/AppIcon84x84 @2x.png"; sourceTree = "<group>"; };
+		F97D54E71F0D8AFF00EDCD2D /* AppIcon87x87@3x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "AppIcon87x87@3x.png"; path = "icon/AppIcon87x87@3x.png"; sourceTree = "<group>"; };
+		F97D54E81F0D8AFF00EDCD2D /* iTunesArtwork.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = iTunesArtwork.png; path = icon/iTunesArtwork.png; sourceTree = "<group>"; };
 		F9BCE3CC1EDF06ED002D57AA /* Ionicons.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = Ionicons.ttf; path = "../node_modules/react-native-vector-icons/Fonts/Ionicons.ttf"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -466,6 +506,26 @@
 		83CBB9F61A601CBA00E9B192 = {
 			isa = PBXGroup;
 			children = (
+				F97D54D51F0D8AFF00EDCD2D /* AppIcon29x29.png */,
+				F97D54D61F0D8AFF00EDCD2D /* AppIcon29x29@2x.png */,
+				F97D54D71F0D8AFF00EDCD2D /* AppIcon40x40.png */,
+				F97D54D81F0D8AFF00EDCD2D /* AppIcon40x40@2x.png */,
+				F97D54D91F0D8AFF00EDCD2D /* AppIcon40x40@3x.png */,
+				F97D54DA1F0D8AFF00EDCD2D /* AppIcon50x50.png */,
+				F97D54DB1F0D8AFF00EDCD2D /* AppIcon50x50@2x.png */,
+				F97D54DC1F0D8AFF00EDCD2D /* AppIcon57x57.png */,
+				F97D54DD1F0D8AFF00EDCD2D /* AppIcon57x57@2x.png */,
+				F97D54DE1F0D8AFF00EDCD2D /* AppIcon60x60.png */,
+				F97D54DF1F0D8AFF00EDCD2D /* AppIcon60x60@2x.png */,
+				F97D54E01F0D8AFF00EDCD2D /* AppIcon60x60@3x.png */,
+				F97D54E11F0D8AFF00EDCD2D /* AppIcon72x72.png */,
+				F97D54E21F0D8AFF00EDCD2D /* AppIcon72x72@2x.png */,
+				F97D54E31F0D8AFF00EDCD2D /* AppIcon76x76.png */,
+				F97D54E41F0D8AFF00EDCD2D /* AppIcon76x76@2x.png */,
+				F97D54E51F0D8AFF00EDCD2D /* AppIcon84x84 .png */,
+				F97D54E61F0D8AFF00EDCD2D /* AppIcon84x84 @2x.png */,
+				F97D54E71F0D8AFF00EDCD2D /* AppIcon87x87@3x.png */,
+				F97D54E81F0D8AFF00EDCD2D /* iTunesArtwork.png */,
 				13B07FAE1A68108700A75B9A /* Gymple */,
 				832341AE1AAA6A7D00B99B32 /* Libraries */,
 				00E356EF1AD99517003FC87E /* GympleTests */,
@@ -580,7 +640,11 @@
 				TargetAttributes = {
 					00E356ED1AD99517003FC87E = {
 						CreatedOnToolsVersion = 6.2;
+						DevelopmentTeam = 93CS6UB5VN;
 						TestTargetID = 13B07F861A680F5B00A75B9A;
+					};
+					13B07F861A680F5B00A75B9A = {
+						DevelopmentTeam = 93CS6UB5VN;
 					};
 					2D02E47A1E0B4A5D006451C7 = {
 						CreatedOnToolsVersion = 8.2.1;
@@ -851,8 +915,28 @@
 			buildActionMask = 2147483647;
 			files = (
 				F9BCE3CD1EDF075F002D57AA /* Ionicons.ttf in Resources */,
+				F97D54F81F0D8AFF00EDCD2D /* AppIcon76x76@2x.png in Resources */,
+				F97D54EB1F0D8AFF00EDCD2D /* AppIcon40x40.png in Resources */,
+				F97D54EC1F0D8AFF00EDCD2D /* AppIcon40x40@2x.png in Resources */,
+				F97D54F71F0D8AFF00EDCD2D /* AppIcon76x76.png in Resources */,
+				F97D54ED1F0D8AFF00EDCD2D /* AppIcon40x40@3x.png in Resources */,
+				F97D54FA1F0D8AFF00EDCD2D /* AppIcon84x84 @2x.png in Resources */,
+				F97D54F91F0D8AFF00EDCD2D /* AppIcon84x84 .png in Resources */,
+				F97D54EA1F0D8AFF00EDCD2D /* AppIcon29x29@2x.png in Resources */,
+				F97D54FC1F0D8AFF00EDCD2D /* iTunesArtwork.png in Resources */,
+				F97D54FB1F0D8AFF00EDCD2D /* AppIcon87x87@3x.png in Resources */,
 				13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */,
+				F97D54F11F0D8AFF00EDCD2D /* AppIcon57x57@2x.png in Resources */,
+				F97D54F51F0D8AFF00EDCD2D /* AppIcon72x72.png in Resources */,
+				F97D54F01F0D8AFF00EDCD2D /* AppIcon57x57.png in Resources */,
 				13B07FBD1A68108700A75B9A /* LaunchScreen.xib in Resources */,
+				F97D54E91F0D8AFF00EDCD2D /* AppIcon29x29.png in Resources */,
+				F97D54F31F0D8AFF00EDCD2D /* AppIcon60x60@2x.png in Resources */,
+				F97D54F61F0D8AFF00EDCD2D /* AppIcon72x72@2x.png in Resources */,
+				F97D54EF1F0D8AFF00EDCD2D /* AppIcon50x50@2x.png in Resources */,
+				F97D54F21F0D8AFF00EDCD2D /* AppIcon60x60.png in Resources */,
+				F97D54F41F0D8AFF00EDCD2D /* AppIcon60x60@3x.png in Resources */,
+				F97D54EE1F0D8AFF00EDCD2D /* AppIcon50x50.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -971,6 +1055,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
+				DEVELOPMENT_TEAM = 93CS6UB5VN;
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"DEBUG=1",
 					"$(inherited)",
@@ -992,6 +1077,7 @@
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				COPY_PHASE_STRIP = NO;
+				DEVELOPMENT_TEAM = 93CS6UB5VN;
 				INFOPLIST_FILE = GympleTests/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
@@ -1010,6 +1096,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CURRENT_PROJECT_VERSION = 1;
 				DEAD_CODE_STRIPPING = NO;
+				DEVELOPMENT_TEAM = 93CS6UB5VN;
 				INFOPLIST_FILE = Gymple/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				OTHER_LDFLAGS = (
@@ -1027,6 +1114,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 93CS6UB5VN;
 				INFOPLIST_FILE = Gymple/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				OTHER_LDFLAGS = (
