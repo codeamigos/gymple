@@ -64,7 +64,7 @@ export default class ExerciseList extends React.PureComponent<ExerciseListProps,
               <RN.TouchableOpacity key={exercise.title} onPress={() => this.handleSelect(exercise)}>
                 <RN.View style={[s.pv1, s.bbw1, s.b_black_5, s.pr1, s.ml125]}>
                   <RN.View style={[s.flx_row, s.jcsb, s.aifs]}>
-                    <RN.Text style={[s.f4, s.bg_t, s.blue, s.flx_i, s.mb025, s.lh125]}>
+                    <RN.Text style={[s.f4, s.fw3, s.bg_t, s.blue, s.flx_i, s.mb025, s.lh125]}>
                       {exercise.title}
                     </RN.Text>
                     {/*{exercise.attempts.length > 0 &&
@@ -77,7 +77,7 @@ export default class ExerciseList extends React.PureComponent<ExerciseListProps,
                       </RN.View>
                     }*/}
                   </RN.View>
-                  <RN.Text style={[s.f6]}>
+                  <RN.Text style={[s.f7, s.fw3]}>
                     {exercise.targetMuscles.map(({ title }) => title).join(', ')}
                   </RN.Text>
                 </RN.View>

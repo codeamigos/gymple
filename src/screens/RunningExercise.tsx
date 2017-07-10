@@ -131,7 +131,7 @@ export default class RunningExercise extends React.PureComponent<ActiveExerciseP
                   style={[s.asfs, s.bg_green, s.br2, s.h325, s.jcc, s.ph3, s.mv075]}
                   onPress={this.handleRest}>
                   <RN.Text style={[s.f4, s.white, s.tc, s.b]}>
-                    Done it
+                    Done with it
                   </RN.Text>
                 </RN.TouchableOpacity>
               :

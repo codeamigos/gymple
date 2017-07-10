@@ -7,19 +7,20 @@ import ExerciseList from './exerciseList';
 import ExerciseSettings from './exerciseSettings';
 import RunningExercise from './runningExercise';
 import {shouldNeverHappen} from '../utils';
-import {Exercise, NotStartedTraining, OngoingTraining} from '../interfaces';
+import * as I from '../interfaces';
 
 import {colors, sizes, s} from './../styles';
 
 interface TrainingScreenState {
-  editingExercise: Exercise | null,
+  editingExercise: I.Exercise | null,
   editingExerciseIndex: number | null,
 }
 
 interface TrainingScreenProps {
-  training: NotStartedTraining | OngoingTraining,
+  training: I.NotStartedTraining | I.OngoingTraining | I.FinishedTraining,
+  onRestartFinished: (finishedTraining: I.FinishedTraining) => void,
   onFinish: () => void,
-  onUpdate: (training: OngoingTraining | NotStartedTraining) => void,
+  onUpdate: (training: I.OngoingTraining | I.NotStartedTraining | I.FinishedTraining) => void,
 }
 
 export default class TrainingScreen extends React.PureComponent<TrainingScreenProps, TrainingScreenState> {
@@ -32,58 +33,93 @@ export default class TrainingScreen extends React.PureComponent<TrainingScreenPr
     };
   }
 
-  setEditingExercise = (editingExercise: Exercise | null, editingExerciseIndex: number | null) => {
+  setEditingExercise = (editingExercise: I.Exercise | null, editingExerciseIndex: number | null) => {
     this.setState({
       editingExercise: editingExercise ? {...editingExercise} : null,
       editingExerciseIndex,
     });
   }
 
-  addExercise = (exercise: Exercise) => {
-    const { onUpdate, training } = this.props;
-    this.setState({
-      editingExercise: null,
-    });
+  setTrainingTitle = (title: string) => {
+    const {onUpdate, training} = this.props;
     onUpdate({
       ...training,
-      plannedExercises: training.plannedExercises.concat(exercise),
+      title,
     });
   }
 
-  updateExercise = (updatedExercise: Exercise, editingExerciseIndex: number) => {
+  addExercise = (exercise: I.Exercise) => {
     const { onUpdate, training } = this.props;
-    this.setState({
-      editingExercise: null,
-      editingExerciseIndex: null,
-    });
-    onUpdate({
-      ...training,
-      plannedExercises: training.plannedExercises.map((exercise, i) => i === editingExerciseIndex ? updatedExercise : exercise),
-    });
+
+    switch (training.kind) {
+      case 'NotStartedTraining':
+      case 'OngoingTraining':
+        this.setState({
+          editingExercise: null,
+        });
+        onUpdate({
+          ...training,
+          plannedExercises: training.plannedExercises.concat(exercise),
+        });
+        break;
+      case 'FinishedTraining':
+        break;
+      default: shouldNeverHappen(training);
+    }
+  }
+
+  updateExercise = (updatedExercise: I.Exercise, editingExerciseIndex: number) => {
+    const { onUpdate, training } = this.props;
+
+    switch (training.kind) {
+      case 'NotStartedTraining':
+      case 'OngoingTraining':
+        this.setState({
+          editingExercise: null,
+          editingExerciseIndex: null,
+        });
+        onUpdate({
+          ...training,
+          plannedExercises: training.plannedExercises.map((exercise, i) => i === editingExerciseIndex ? updatedExercise : exercise),
+        });
+        break;
+      case 'FinishedTraining':
+        break;
+      default: shouldNeverHappen(training);
+    }
   }
 
   startTraining = () => {
     const { onUpdate, training } = this.props;
-    onUpdate({
-      kind: 'OngoingTraining',
-      title: training.title,
-      startedAt: new Date(),
-      plannedExercises: training.plannedExercises,
-      currentExerciseIndex: training.plannedExercises.length > 0 ? 0 : null,
-      completedExercises: [],
-    });
+    switch (training.kind) {
+      case 'NotStartedTraining':
+      case 'OngoingTraining':
+        onUpdate({
+          kind: 'OngoingTraining',
+          title: training.title,
+          startedAt: new Date(),
+          plannedExercises: training.plannedExercises,
+          currentExerciseIndex: training.plannedExercises.length > 0 ? 0 : null,
+          completedExercises: [],
+        });
+        break;
+      case 'FinishedTraining':
+        break;
+      default: shouldNeverHappen(training);
+    }
   }
 
   startExercise = (currentExerciseIndex: number | null) => {
     const { onUpdate, training } = this.props;
     switch (training.kind) {
-      case 'NotStartedTraining':
-        break;
       case 'OngoingTraining':
         onUpdate({
           ...training,
           currentExerciseIndex,
         });
+        break;
+      case 'NotStartedTraining':
+      case 'FinishedTraining':
         break;
       default: shouldNeverHappen(training);
     }
@@ -92,8 +128,6 @@ export default class TrainingScreen extends React.PureComponent<TrainingScreenPr
   restartExercise = (completedExerciseIndex: number) => {
     const { onUpdate, training } = this.props;
     switch (training.kind) {
-      case 'NotStartedTraining':
-        break;
       case 'OngoingTraining':
         const completedExercise = training.completedExercises[completedExerciseIndex];
         if (completedExercise) {
@@ -108,6 +142,9 @@ export default class TrainingScreen extends React.PureComponent<TrainingScreenPr
           throw new Error('Trying to complete non-existing exercise');
         }
         break;
+      case 'NotStartedTraining':
+      case 'FinishedTraining':
+        break;
       default: shouldNeverHappen(training);
     }
   }
@@ -115,8 +152,6 @@ export default class TrainingScreen extends React.PureComponent<TrainingScreenPr
   completeExercise = () => {
     const { onUpdate, training } = this.props;
     switch (training.kind) {
-      case 'NotStartedTraining':
-        break;
       case 'OngoingTraining':
         if (training.currentExerciseIndex !== null) {
           const completedExercise = training.plannedExercises[training.currentExerciseIndex];
@@ -133,16 +168,27 @@ export default class TrainingScreen extends React.PureComponent<TrainingScreenPr
           }
         }
         break;
+      case 'NotStartedTraining':
+      case 'FinishedTraining':
+        break;
       default: shouldNeverHappen(training);
     }
   }
 
   removeExercise = (index: number) => {
     const { onUpdate, training } = this.props;
-    onUpdate({
-      ...training,
-      plannedExercises: training.plannedExercises.filter((_, i) => i !== index),
-    });
+    switch (training.kind) {
+      case 'NotStartedTraining':
+      case 'OngoingTraining':
+        onUpdate({
+          ...training,
+          plannedExercises: training.plannedExercises.filter((_, i) => i !== index),
+        });
+        break;
+      case 'FinishedTraining':
+        break;
+      default: shouldNeverHappen(training);
+    }
   }
 
   removeCompletedExercise = (index: number) => {
@@ -151,6 +197,7 @@ export default class TrainingScreen extends React.PureComponent<TrainingScreenPr
       case 'NotStartedTraining':
         break;
       case 'OngoingTraining':
+      case 'FinishedTraining':
         onUpdate({
           ...training,
           completedExercises: training.completedExercises.filter((_, i) => i !== index),
@@ -168,6 +215,7 @@ export default class TrainingScreen extends React.PureComponent<TrainingScreenPr
     const {
       training,
       onFinish,
+      onRestartFinished,
     } = this.props;
     switch (training.kind) {
       case 'NotStartedTraining':
@@ -180,7 +228,8 @@ export default class TrainingScreen extends React.PureComponent<TrainingScreenPr
                 onSetEditingExercise={this.setEditingExercise}
                 onUpdateExercise={this.updateExercise}
                 onRemoveExercise={this.removeExercise}
-                onStartTraining={this.startTraining} />;
+                onStartTraining={this.startTraining}
+                onSetTrainingTitle={this.setTrainingTitle} />;
       case 'OngoingTraining':
         return <OngoingTrainingScreen
                 training={training}
@@ -189,7 +238,15 @@ export default class TrainingScreen extends React.PureComponent<TrainingScreenPr
                 onCompleteExercise={this.completeExercise}
                 onRemoveExercise={this.removeExercise}
                 onRestartExercise={this.restartExercise}
-                onStartExercise={this.startExercise}/>;
+                onStartExercise={this.startExercise}
+                onSetTrainingTitle={this.setTrainingTitle} />;
+      case 'FinishedTraining':
+        return <FinishedTrainingScreen
+                training={training}
+                onFinish={onFinish}
+                onRemoveCompletedExercise={this.removeCompletedExercise}
+                onRestart={() => onRestartFinished(training)}
+                onSetTrainingTitle={this.setTrainingTitle} />;
       default:
         shouldNeverHappen(training);
         return null;
@@ -201,50 +258,23 @@ export default class TrainingScreen extends React.PureComponent<TrainingScreenPr
 
 
 
-
-const ExerciseListItem = ({exercise}: {exercise: Exercise}) => {
-  return (
-    <RN.View style={[s.pv1, s.bbw1, s.b_black_5, s.pr1, s.ml125]}>
-      <RN.View style={[s.flx_row, s.jcsb, s.aifs]}>
-        <RN.Text style={[s.f4, s.bg_t, s.blue, s.flx_i, s.mb025, s.lh125]}>
-          {exercise.title}
-        </RN.Text>
-        {/*{exercise.attempts.length > 0 &&
-          <RN.View style={[s.ml075, s.flx_row, s.aic, s.mt0125]}>
-            <RN.Text style={[s.f6, s.b]}>{exercise.attempts.length}</RN.Text>
-            <Icon name="md-close" color={colors.black_20} style={[s.f5, s.ph025]} />
-            <RN.Text style={[s.f6, s.b]}>{Math.round(exercise.attempts.reduce((acc, a) => acc + a.repetitions, 0) / exercise.attempts.length)}</RN.Text>
-            <Icon name="md-close" color={colors.black_20} style={[s.f5, s.ph025]} />
-            <RN.Text style={[s.f6, s.b]}>{Math.round(exercise.attempts.reduce((acc, a) => acc + a.weight, 0) / exercise.attempts.length)}kg</RN.Text>
-          </RN.View>
-        }*/}
-      </RN.View>
-      <RN.Text style={[s.f6]}>
-        {exercise.targetMuscles.map(({ title }) => title).join(', ')}
-      </RN.Text>
-    </RN.View>
-  );
-};
-
-
-
-
-
 interface NotstartedTrainingScreenProps {
-  training: NotStartedTraining,
-  editingExercise: Exercise | null,
+  training: I.NotStartedTraining,
+  editingExercise: I.Exercise | null,
   editingExerciseIndex: number | null,
   onFinish: () => void,
-  onAddExercise: (exercise: Exercise) => void,
-  onUpdateExercise: (exercise: Exercise, i: number) => void,
-  onSetEditingExercise: (exercise: Exercise | null, i: number | null) => void,
+  onAddExercise: (exercise: I.Exercise) => void,
+  onUpdateExercise: (exercise: I.Exercise, i: number) => void,
+  onSetEditingExercise: (exercise: I.Exercise | null, i: number | null) => void,
   onRemoveExercise: (i: number) => void,
   onStartTraining: () => void,
+  onSetTrainingTitle: (title: string) => void,
 }
 
 interface NotstartedTrainingScreenState {
   isScrollEnabled: boolean,
   isModalOpened: boolean,
+  isEditingTitle: boolean,
 }
 
 
@@ -255,6 +285,7 @@ class NotstartedTrainingScreen extends React.PureComponent<NotstartedTrainingScr
     this.state = {
       isModalOpened: false,
       isScrollEnabled: true,
+      isEditingTitle: false,
     };
   }
 
@@ -270,6 +301,7 @@ class NotstartedTrainingScreen extends React.PureComponent<NotstartedTrainingScr
     const {
       training,
       onFinish,
+      onSetTrainingTitle,
       editingExerciseIndex,
       editingExercise,
       onAddExercise,
@@ -282,6 +314,7 @@ class NotstartedTrainingScreen extends React.PureComponent<NotstartedTrainingScr
     const {
       isScrollEnabled,
       isModalOpened,
+      isEditingTitle,
     } = this.state;
 
     return (
@@ -295,9 +328,11 @@ class NotstartedTrainingScreen extends React.PureComponent<NotstartedTrainingScr
           <RN.TouchableOpacity onPress={onFinish}>
             <Icon name="md-close" size={sizes[175]} color={colors.white} />
           </RN.TouchableOpacity>
-          <RN.Text style={[s.white, s.fw3, s.f2, s.lh2, s.mt05]}>
-            {training.title}
-          </RN.Text>
+          <RN.TouchableOpacity onPress={() => this.setState({isEditingTitle: true})}>
+            <RN.Text numberOfLines={2} style={[s.white, s.fw2, s.f2, s.lh2, s.mt05]}>
+              {training.title}
+            </RN.Text>
+          </RN.TouchableOpacity>
         </RN.View>
         {training.plannedExercises.length > 0 ?
           <RN.View style={[s.flx_i, s.jcsb]}>
@@ -367,7 +402,7 @@ class NotstartedTrainingScreen extends React.PureComponent<NotstartedTrainingScr
           }}>
           {editingExercise ?
             <ExerciseSettings
-              onUpdate={(exercise: Exercise) => onSetEditingExercise(exercise, editingExerciseIndex)}
+              onUpdate={(exercise: I.Exercise) => onSetEditingExercise(exercise, editingExerciseIndex)}
               onClose={() => onSetEditingExercise(null, null)}
               onDone={() => {
                 if (editingExerciseIndex !== null) {
@@ -382,10 +417,125 @@ class NotstartedTrainingScreen extends React.PureComponent<NotstartedTrainingScr
             />
             :
             <ExerciseList
-              onSelect={(exercise: Exercise) => onSetEditingExercise(exercise, null)}
+              onSelect={(exercise: I.Exercise) => onSetEditingExercise(exercise, null)}
               onClose={() => this.toggleModalOpen(false)}
             />
           }
+        </RN.Modal>
+        <RN.Modal
+          animationType="slide"
+          transparent={false}
+          visible={isEditingTitle}
+          onRequestClose={() => this.setState({isEditingTitle: false})}>
+          <InputScreen
+            placeholder="Training Title"
+            onChange={onSetTrainingTitle}
+            onClose={() => this.setState({isEditingTitle: false})}
+            value={training.title}
+            disableEmptySave
+          />
+        </RN.Modal>
+      </RN.View>
+    );
+  }
+}
+
+
+
+interface FinishedTrainingScreenProps {
+  training: I.FinishedTraining,
+  onRestart: () => void,
+  onRemoveCompletedExercise: (i: number) => void,
+  onSetTrainingTitle: (title: string) => void,
+  onFinish: () => void,
+}
+
+interface FinishedTrainingScreenState {
+  isScrollEnabled: boolean,
+  isEditingTitle: boolean,
+}
+
+class FinishedTrainingScreen extends React.PureComponent<FinishedTrainingScreenProps, FinishedTrainingScreenState> {
+
+  allowScroll = (isScrollEnabled: boolean) => {
+    this.setState({isScrollEnabled});
+  }
+
+  state = {
+    isScrollEnabled: false,
+    isEditingTitle: false,
+  };
+
+  render() {
+    const {
+      training,
+      onRemoveCompletedExercise,
+      onRestart,
+      onFinish,
+      onSetTrainingTitle,
+    } = this.props;
+
+    const {isScrollEnabled, isEditingTitle} = this.state;
+
+    return (
+      <RN.View style={[s.flx_i, s.jcsb, s.bg_greyLightest]}>
+        <RN.StatusBar
+          barStyle="light-content"
+          translucent={true}
+          backgroundColor={colors.t} />
+        <RN.View style={[s.bg_blue, s.pt2, s.ph125, s.pb05]}>
+          <RN.TouchableOpacity onPress={onFinish}>
+            <Icon name="md-close" size={sizes[175]} color={colors.white} />
+          </RN.TouchableOpacity>
+          <RN.TouchableOpacity onPress={() => this.setState({isEditingTitle: true})}>
+            <RN.Text numberOfLines={2} style={[s.white, s.fw2, s.f2, s.mv05, s.lh2]}>
+              {training.title}
+            </RN.Text>
+          </RN.TouchableOpacity>
+          <RN.Text style={[s.white, s.f5, s.mb05]}>
+            Today
+          </RN.Text>
+        </RN.View>
+        <RN.ScrollView style={[s.flx_i]} scrollEnabled={isScrollEnabled}>
+          {training.completedExercises.map((exercise, i) =>
+            <Swipeout
+              autoClose={true}
+              key={exercise.title + i}
+              backgroundColor={colors.t}
+              scroll={isAllow => this.allowScroll(isAllow)}
+              buttonWidth={sizes[5]}
+              right={[
+                {
+                  onPress: () => onRemoveCompletedExercise(i),
+                  component: <RN.View style={[s.w5, s.bg_orange, s.jcc, s.flx_i]}><Icon name="md-trash" style={[s.white, s.f3, s.tc]} /></RN.View>,
+                },
+              ]}>
+              <CompletedExerciseListItem exercise={exercise} />
+            </Swipeout>,
+          )}
+        </RN.ScrollView>
+        <RN.View style={s.pb175}>
+          <RN.TouchableOpacity
+            style={[s.asc, s.bg_green, s.br2, s.h325, s.jcc, s.ph3, s.mt075]}
+            onPress={onRestart}
+          >
+            <RN.Text style={[s.f4, s.white, s.tc, s.b]}>
+              Restart Training
+            </RN.Text>
+          </RN.TouchableOpacity>
+        </RN.View>
+        <RN.Modal
+          animationType="slide"
+          transparent={false}
+          visible={isEditingTitle}
+          onRequestClose={() => this.setState({isEditingTitle: false})}>
+          <InputScreen
+            placeholder="Training Title"
+            onChange={onSetTrainingTitle}
+            onClose={() => this.setState({isEditingTitle: false})}
+            value={training.title}
+            disableEmptySave
+          />
         </RN.Modal>
       </RN.View>
     );
@@ -396,18 +546,20 @@ class NotstartedTrainingScreen extends React.PureComponent<NotstartedTrainingScr
 
 
 interface OngoingTrainingScreenProps {
-  training: OngoingTraining,
+  training: I.OngoingTraining,
   onFinish: () => void,
   onStartExercise: (i: number | null) => void,
   onRestartExercise: (i: number) => void,
   onRemoveExercise: (i: number) => void,
   onRemoveCompletedExercise: (i: number) => void,
   onCompleteExercise: () => void,
+  onSetTrainingTitle: (title: string) => void,
 }
 
 interface OngoingTrainingScreenState {
   isScrollEnabled: boolean,
   startCountDown: number,
+  isEditingTitle: boolean,
 }
 
 class OngoingTrainingScreen extends React.PureComponent<OngoingTrainingScreenProps, OngoingTrainingScreenState> {
@@ -419,6 +571,7 @@ class OngoingTrainingScreen extends React.PureComponent<OngoingTrainingScreenPro
 
     this.state = {
       isScrollEnabled: true,
+      isEditingTitle: false,
       startCountDown: props.training.currentExerciseIndex !== null ? 3 : 0,
     };
   }
@@ -448,9 +601,10 @@ class OngoingTrainingScreen extends React.PureComponent<OngoingTrainingScreenPro
       onStartExercise,
       onRestartExercise,
       onRemoveExercise,
+      onSetTrainingTitle,
     } = this.props;
 
-    const { isScrollEnabled, startCountDown } = this.state;
+    const { isScrollEnabled, startCountDown, isEditingTitle } = this.state;
     const currentExercise = training.currentExerciseIndex !== null && training.plannedExercises[training.currentExerciseIndex];
 
     if (training.currentExerciseIndex !== null && !currentExercise) {
@@ -467,9 +621,11 @@ class OngoingTrainingScreen extends React.PureComponent<OngoingTrainingScreenPro
           <RN.TouchableOpacity onPress={onFinish}>
             <Icon name="md-close" size={sizes[175]} color={colors.white} />
           </RN.TouchableOpacity>
-          <RN.Text style={[s.white, s.fw3, s.f2, s.mv05, s.lh2]}>
-            {training.title}
-          </RN.Text>
+          <RN.TouchableOpacity onPress={() => this.setState({isEditingTitle: true})}>
+            <RN.Text numberOfLines={2} style={[s.white, s.fw2, s.f2, s.mv05, s.lh2]}>
+              {training.title}
+            </RN.Text>
+          </RN.TouchableOpacity>
           <RN.Text style={[s.white, s.f5, s.mb05]}>
             Today
           </RN.Text>
@@ -491,7 +647,7 @@ class OngoingTrainingScreen extends React.PureComponent<OngoingTrainingScreenPro
               <RN.TouchableOpacity
                 onPress={() => onRestartExercise(i)}
                 style={[s.ass, s.brw5, s.b_green]}>
-                <ExerciseListItem exercise={exercise} />
+                <CompletedExerciseListItem exercise={exercise} />
               </RN.TouchableOpacity>
             </Swipeout>,
           )}
@@ -516,6 +672,27 @@ class OngoingTrainingScreen extends React.PureComponent<OngoingTrainingScreenPro
             </Swipeout>,
           )}
         </RN.ScrollView>
+        <RN.View style={s.pb175}>
+          {training.plannedExercises.length > 0 ?
+            <RN.TouchableOpacity
+              style={[s.asc, s.bg_green, s.br2, s.h325, s.jcc, s.ph3, s.mt075]}
+              onPress={() => onStartExercise(0)}
+            >
+              <RN.Text style={[s.f4, s.white, s.tc, s.b]}>
+                Start next Exercise
+              </RN.Text>
+            </RN.TouchableOpacity>
+          :
+            <RN.TouchableOpacity
+              style={[s.asc, s.bg_green, s.br2, s.h325, s.jcc, s.ph3, s.mt075]}
+              onPress={onFinish}
+            >
+              <RN.Text style={[s.f4, s.white, s.tc, s.b]}>
+                Finish Training
+              </RN.Text>
+            </RN.TouchableOpacity>
+          }
+        </RN.View>
         <RN.Modal
           animationType="slide"
           transparent={false}
@@ -535,7 +712,133 @@ class OngoingTrainingScreen extends React.PureComponent<OngoingTrainingScreenPro
               <RunningExercise onClose={() => onStartExercise(null)} onDone={onCompleteExercise} exercise={currentExercise} />
             }
         </RN.Modal>
+        <RN.Modal
+          animationType="slide"
+          transparent={false}
+          visible={isEditingTitle}
+          onRequestClose={() => this.setState({isEditingTitle: false})}>
+          <InputScreen
+            placeholder="Training Title"
+            onChange={onSetTrainingTitle}
+            onClose={() => this.setState({isEditingTitle: false})}
+            value={training.title}
+            disableEmptySave
+          />
+        </RN.Modal>
       </RN.View>
+    );
+  }
+}
+
+
+
+
+const ExerciseListItem = ({exercise}: {exercise: I.Exercise}) => {
+  return (
+    <RN.View style={[s.pv1, s.bbw1, s.b_black_5, s.pr1, s.ml125]}>
+      <RN.Text style={[s.f4, s.fw2, s.bg_t, s.blue, s.flx_i, s.mb025, s.lh125]}>
+        {exercise.title}
+      </RN.Text>
+      <RN.Text style={[s.f6, s.fw3]}>
+        {exercise.targetMuscles.map(({ title }) => title).join(', ')}
+      </RN.Text>
+    </RN.View>
+  );
+};
+
+
+const CompletedExerciseListItem = ({exercise}: {exercise: I.Exercise}) => {
+
+  const attempts = [exercise.attempts.first, ...exercise.attempts.other];
+
+  const repetitionsAvg = Math.round(attempts.reduce((acc, a) => acc + a.repetitions, 0) / attempts.length);
+
+  return (
+    <RN.View style={[s.pv1, s.bbw1, s.b_black_5, s.pr1, s.ml125]}>
+      <RN.Text style={[s.f4, s.fw2, s.bg_t, s.blue, s.flx_i, s.mb025, s.lh125]}>
+        {exercise.title}
+      </RN.Text>
+      <RN.Text style={[s.f6, s.fw3]}>
+        {exercise.targetMuscles.map(({ title }) => title).join(', ')}
+      </RN.Text>
+      <RN.View style={[s.mt05, s.flx_row, s.aic, s.mt0125]}>
+        <RN.Text style={[s.f5, s.fw3]}>{attempts.length} <RN.Text style={[s.f7, s.black_40]}>{attempts.length > 1 ? 'ATTEMPTS' : 'ATTEMPT'}</RN.Text></RN.Text>
+        <Icon name="ios-close" color={colors.black_20} style={[s.f5, s.ph025]} />
+        <RN.Text style={[s.f5, s.fw3]}>{repetitionsAvg} <RN.Text style={[s.f7, s.black_40]}>{repetitionsAvg > 1 ? 'REPS' : 'REP'}</RN.Text></RN.Text>
+        <Icon name="ios-close" color={colors.black_20} style={[s.f5, s.ph025]} />
+        <RN.Text style={[s.f5, s.fw3]}>{Math.round(attempts.reduce((acc, a) => acc + a.weight, 0) / attempts.length)} <RN.Text style={[s.f7, s.black_40]}>KG</RN.Text></RN.Text>
+      </RN.View>
+    </RN.View>
+  );
+};
+
+
+
+interface InputScreenProps {
+  placeholder?: string,
+  onChange: (title: string) => void,
+  onClose: () => void;
+  value: string,
+  disableEmptySave?: boolean,
+}
+
+class InputScreen extends React.PureComponent<InputScreenProps, {value: string}> {
+
+  constructor(props: InputScreenProps) {
+    super(props);
+    this.state = {
+      value: props.value,
+    };
+  }
+
+  onSubmit = () => {
+    const {onChange, disableEmptySave, onClose} = this.props;
+    const {value} = this.state;
+    if (!disableEmptySave || disableEmptySave && value.length > 0 ) {
+      onChange(value);
+      onClose();
+    }
+  }
+
+  render() {
+    const {value} = this.state;
+    const {placeholder, disableEmptySave, onClose} = this.props;
+    const isSubmitDisable = disableEmptySave && value.length === 0;
+    return (
+      <RN.KeyboardAvoidingView
+        behavior="padding"
+        style={[s.flx_i, s.bg_blueDark, s.jcsb]}>
+        <RN.View style={[s.pt2, s.ph125, s.pb05]}>
+          <RN.TouchableOpacity onPress={onClose}>
+            <Icon name="md-close" size={sizes[175]} color={colors.white} />
+          </RN.TouchableOpacity>
+        </RN.View>
+        <RN.View style={[s.flx_i, s.jcc, s.aic, s.pt3, s.ph2]}>
+          <RN.View style={[s.bbw1, s.b_white_10, s.mh1, s.ph1, s.pv075, s.ass]}>
+            <RN.TextInput
+              enablesReturnKeyAutomatically
+              value={value}
+              style={[s.pt0, s.pb0, s.tc, s.f3, s.h2, s.white, s.fw2]}
+              onChangeText={(newValue) => this.setState({value: newValue})}
+              returnKeyType="done"
+              underlineColorAndroid={colors.t}
+              placeholderTextColor={colors.white_20}
+              placeholder={placeholder || value || ''}
+              onSubmitEditing={this.onSubmit}
+              autoFocus
+              autoCorrect={false}
+            />
+          </RN.View>
+        </RN.View>
+        <RN.TouchableOpacity
+          disabled={isSubmitDisable}
+          style={[s.asc, s.br2, s.h325, s.jcc, s.ph3, s.mt075, s.mb1, isSubmitDisable ? s.bg_green_30 : s.bg_green]}
+          onPress={this.onSubmit}>
+          <RN.Text style={[s.f4, s.tc, s.b, isSubmitDisable ? s.white_30 : s.white]}>
+            Done
+          </RN.Text>
+        </RN.TouchableOpacity>
+      </RN.KeyboardAvoidingView>
     );
   }
 }
