@@ -4,9 +4,9 @@
 	"private": true,
 	"scripts": {
 		"start": "concurrently \"tsc --project tsconfig.json --watch --pretty\" \"react-native start --skipflow\" ",
-		"test": "yarn build && jest",
+		"test": "npm run build && jest",
 		"build": "tsc --project tsconfig.json",
-		"ios": "react-native run-ios --no-packager && yarn start",
+		"ios": "react-native run-ios --no-packager && npm start",
 		"postinstall": "rm -f node_modules/intl/.babelrc"
 	},
 	"dependencies": {
