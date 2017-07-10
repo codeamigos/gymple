@@ -412,22 +412,27 @@ interface OngoingTrainingScreenState {
 
 class OngoingTrainingScreen extends React.PureComponent<OngoingTrainingScreenProps, OngoingTrainingScreenState> {
 
-  interval: number;
+  interval: number | null = null;
 
   constructor(props: OngoingTrainingScreenProps) {
     super(props);
+
     this.state = {
       isScrollEnabled: true,
       startCountDown: props.training.currentExerciseIndex !== null ? 3 : 0,
     };
+  }
 
-    if (props.training.currentExerciseIndex !== null) {
+  componentDidMount() {
+    if (this.props.training.currentExerciseIndex !== null) {
       this.interval = setInterval(() => this.setState({startCountDown: this.state.startCountDown - 1}), 1000);
     }
   }
 
   componentWillUnmount() {
-    clearInterval(this.interval);
+    if (this.interval) {
+      clearInterval(this.interval);
+    }
   }
 
   allowScroll = (isScrollEnabled: boolean) => {

@@ -28,14 +28,16 @@ export default class RunningExercise extends React.PureComponent<ActiveExerciseP
     };
   }
 
-  interval: number = 0;
+  interval: number | null = null;
 
-  componentWillMount() {
+  componentDidMount() {
     this.interval = setInterval(() => this.setState({timer: this.state.timer + 1}), 1000);
   }
 
   componentWillUnmount() {
-    clearInterval(this.interval);
+    if (this.interval) {
+      clearInterval(this.interval);
+    }
   }
 
   handleNextAttempt = () => this.setState({currentAttemptIndex: this.state.currentAttemptIndex + 1, isRest: false, timer: 0});
