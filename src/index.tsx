@@ -1,10 +1,10 @@
 // import * as React from 'react';
 
-import * as RN from 'react-native';
+import * as RN from 'react-native'
 
-import TrainingList from './screens/trainingList';
+import TrainingListScreen from './screens/TrainingListScreen'
 
-import bs, {Palette, Multiplicators, Options} from './styles';
+import bs, { Palette, Multiplicators, Options } from './styles'
 
 const palette: Palette = {
   greyDarkest: '#2e333d',
@@ -23,8 +23,8 @@ const palette: Palette = {
   orange: '#ff605e',
   yellow: '#fbcf00',
   green: '#0cddae',
-  t: 'rgba(0,0,0,0)',
-};
+  t: 'rgba(0,0,0,0)'
+}
 
 const headings: Multiplicators = {
   '7': 0.75,
@@ -33,16 +33,18 @@ const headings: Multiplicators = {
   '4': 1.2,
   '3': 1.6,
   '2': 2,
-  '1': 3.25,
-};
+  '1': 3.25
+}
 
-bs.build({
-  remSize: 15,
-  palette,
-  headings,
-} as Options);
+bs.build(
+  {
+    remSize: 15,
+    palette,
+    headings
+  } as Options
+)
 
-RN.AppRegistry.registerComponent('Gymple', () => TrainingList);
+RN.AppRegistry.registerComponent('Gymple', () => TrainingListScreen)
 // import * as ReactIntl from 'react-intl';
 // import 'intl';
 

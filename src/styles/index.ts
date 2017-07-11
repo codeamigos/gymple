@@ -1,347 +1,342 @@
-const Color = require('color');
-import {assign} from 'lodash';
-import * as RN from 'react-native';
+const Color = require('color')
+import { assign } from 'lodash'
+import * as RN from 'react-native'
 
 export interface Multiplicators {
-  [key: string]: number,
+  [key: string]: number
 }
 
 export interface Palette {
-  [key: string]: string,
+  [key: string]: string
 }
 
 export interface Style {
-  [key: string]: number | string,
+  [key: string]: number | string
 }
 
 export interface StylesResult {
-  [key: string]: Style,
+  [key: string]: Style
 }
 
 const remStyles: StylesResult = {
   fs: {
-    fontSize: 1,
+    fontSize: 1
   },
   mt: {
-    marginTop: 1,
+    marginTop: 1
   },
   mb: {
-    marginBottom: 1,
+    marginBottom: 1
   },
   mr: {
-    marginRight: 1,
+    marginRight: 1
   },
   ml: {
-    marginLeft: 1,
+    marginLeft: 1
   },
   mh: {
     marginLeft: 1,
-    marginRight: 1,
+    marginRight: 1
   },
   mv: {
     marginTop: 1,
-    marginBottom: 1,
+    marginBottom: 1
   },
   pt: {
-    paddingTop: 1,
+    paddingTop: 1
   },
   pb: {
-    paddingBottom: 1,
+    paddingBottom: 1
   },
   pr: {
-    paddingRight: 1,
+    paddingRight: 1
   },
   pl: {
-    paddingLeft: 1,
+    paddingLeft: 1
   },
   ph: {
     paddingLeft: 1,
-    paddingRight: 1,
+    paddingRight: 1
   },
   pv: {
     paddingTop: 1,
-    paddingBottom: 1,
+    paddingBottom: 1
   },
   h: {
-    height: 1,
+    height: 1
   },
   w: {
-    width: 1,
+    width: 1
   },
   minh: {
-    minHeight: 1,
+    minHeight: 1
   },
   minw: {
-    minWidth: 1,
+    minWidth: 1
   },
   maxh: {
-    maxHeight: 1,
+    maxHeight: 1
   },
   maxw: {
-    maxWidth: 1,
+    maxWidth: 1
   },
   r: {
-    right: 1,
+    right: 1
   },
   l: {
-    left: 1,
+    left: 1
   },
   t: {
-    top: 1,
+    top: 1
   },
   b: {
-    bottom: 1,
+    bottom: 1
   },
   lh: {
-    lineHeight: 1,
+    lineHeight: 1
   },
   br: {
-    borderRadius: 1,
-  },
-};
+    borderRadius: 1
+  }
+}
 
 const pointStyles: StylesResult = {
   bw: {
-    borderWidth: 1,
+    borderWidth: 1
   },
   btw: {
-    borderTopWidth: 1,
+    borderTopWidth: 1
   },
   brw: {
-    borderRightWidth: 1,
+    borderRightWidth: 1
   },
   bbw: {
-    borderBottomWidth: 1,
+    borderBottomWidth: 1
   },
   blw: {
-    borderLeftWidth: 1,
-  },
-};
+    borderLeftWidth: 1
+  }
+}
 
 const staticStyles: StylesResult = {
   // No border radius
-  'br__bottom': {
-      borderTopLeftRadius: 0,
-      borderTopRightRadius: 0,
+  br__bottom: {
+    borderTopLeftRadius: 0,
+    borderTopRightRadius: 0
   },
-  'br__top': {
-      borderBottomLeftRadius: 0,
-      borderBottomRightRadius: 0,
+  br__top: {
+    borderBottomLeftRadius: 0,
+    borderBottomRightRadius: 0
   },
-  'br__left': {
-      borderTopRightRadius: 0,
-      borderBottomRightRadius: 0,
+  br__left: {
+    borderTopRightRadius: 0,
+    borderBottomRightRadius: 0
   },
-  'br__right': {
-      borderTopLeftRadius: 0,
-      borderBottomLeftRadius: 0,
+  br__right: {
+    borderTopLeftRadius: 0,
+    borderBottomLeftRadius: 0
   },
 
   // absolute
   absolute: {
-    position: 'absolute',
+    position: 'absolute'
   },
-  'absolute__fill': {
+  absolute__fill: {
     left: 0,
     top: 0,
     right: 0,
-    bottom: 0,
+    bottom: 0
   },
 
   // flexbox
-  'flx_i': {
-    flex: 1,
+  flx_i: {
+    flex: 1
   },
-  'flx_grow': {
-    flexGrow: 1,
+  flx_grow: {
+    flexGrow: 1
   },
-  'flx_row': {
-    flexDirection: 'row',
+  flx_row: {
+    flexDirection: 'row'
   },
-  'flx_rr': {
-    flexDirection: 'row-reverse',
+  flx_rr: {
+    flexDirection: 'row-reverse'
   },
-  'flx_cr': {
-    flexDirection: 'column-reverse',
+  flx_cr: {
+    flexDirection: 'column-reverse'
   },
-  'flx_wrap': {
-    flexWrap: 'wrap',
+  flx_wrap: {
+    flexWrap: 'wrap'
   },
   aifs: {
-    alignItems: 'flex-start',
+    alignItems: 'flex-start'
   },
   aic: {
-    alignItems: 'center',
+    alignItems: 'center'
   },
   aife: {
-    alignItems: 'flex-end',
+    alignItems: 'flex-end'
   },
   asfs: {
-    alignSelf: 'flex-start',
+    alignSelf: 'flex-start'
   },
   asc: {
-    alignSelf: 'center',
+    alignSelf: 'center'
   },
   asfe: {
-    alignSelf: 'flex-end',
+    alignSelf: 'flex-end'
   },
   ass: {
-    alignSelf: 'stretch',
+    alignSelf: 'stretch'
   },
   jcfe: {
-    justifyContent: 'flex-end',
+    justifyContent: 'flex-end'
   },
   jcc: {
-    justifyContent: 'center',
+    justifyContent: 'center'
   },
   jcsb: {
-    justifyContent: 'space-between',
+    justifyContent: 'space-between'
   },
   jcsa: {
-    justifyContent: 'space-around',
+    justifyContent: 'space-around'
   },
 
   // Image
-  'rm_contain': {
-    resizeMode: 'contain',
+  rm_contain: {
+    resizeMode: 'contain'
   },
-  'rm_cover': {
-    resizeMode: 'cover',
+  rm_cover: {
+    resizeMode: 'cover'
   },
-  'rm_stretch': {
-    resizeMode: 'stretch',
+  rm_stretch: {
+    resizeMode: 'stretch'
   },
 
   // Text
   i: {
-    fontStyle: 'italic',
+    fontStyle: 'italic'
   },
   tl: {
-    textAlign: 'left',
+    textAlign: 'left'
   },
   tc: {
-    textAlign: 'center',
+    textAlign: 'center'
   },
   tr: {
-    textAlign: 'right',
+    textAlign: 'right'
   },
   tj: {
-    textAlign: 'justify',
-  },
-};
+    textAlign: 'justify'
+  }
+}
 
 const multiplyStylesValues = (styles: StylesResult, multiplicators: Multiplicators): StylesResult => {
-  const resultStyles: StylesResult = {};
+  const resultStyles: StylesResult = {}
   Object.keys(styles).map(key => {
     if (key.includes('__')) {
-      resultStyles[key] = styles[key];
-    }
-    else {
+      resultStyles[key] = styles[key]
+    } else {
       Object.keys(multiplicators).map(prefix => {
-        const multiplicatorValue: number = multiplicators[prefix];
-        const multiplyedStyle: Style = {};
+        const multiplicatorValue: number = multiplicators[prefix]
+        const multiplyedStyle: Style = {}
 
         Object.keys(styles[key]).map((styleKey: string) => {
-          const oldStyleValue = styles[key][styleKey];
+          const oldStyleValue = styles[key][styleKey]
           if (typeof oldStyleValue === 'number') {
-            multiplyedStyle[styleKey] = oldStyleValue * multiplicatorValue;
+            multiplyedStyle[styleKey] = oldStyleValue * multiplicatorValue
+          } else {
+            multiplyedStyle[styleKey] = oldStyleValue
           }
-          else {
-            multiplyedStyle[styleKey] = oldStyleValue;
-          }
-        });
+        })
 
-        resultStyles[key + prefix] = multiplyedStyle;
-      });
+        resultStyles[key + prefix] = multiplyedStyle
+      })
     }
-  });
-  return resultStyles;
-};
+  })
+  return resultStyles
+}
 
 const multiplyToRem = (remValue: number, multiplicators: Multiplicators): Multiplicators => {
-  const multiplied: Multiplicators = {};
+  const multiplied: Multiplicators = {}
   Object.keys(multiplicators).map(prefix => {
-    const multiplicatorValue: number = multiplicators[prefix];
-    multiplied[prefix] = Math.round(multiplicatorValue * remValue * 100) / 100;
-  });
-  return multiplied;
-};
+    const multiplicatorValue: number = multiplicators[prefix]
+    multiplied[prefix] = Math.round(multiplicatorValue * remValue * 100) / 100
+  })
+  return multiplied
+}
 
 const generatePalette = (colors: Palette): Palette => {
-  const resultPalette: Palette = {};
+  const resultPalette: Palette = {}
   Object.keys(colors).map(name => {
-    const color: string = colors[name];
-    resultPalette[name] = color;
+    const color: string = colors[name]
+    resultPalette[name] = color
 
     for (let i: number = 5; i < 100; i += 5) {
-      const rgbString: string = Color(color).alpha(i / 100).rgb().string();
-      resultPalette[`${name}_${i}`] = rgbString;
+      const rgbString: string = Color(color).alpha(i / 100).rgb().string()
+      resultPalette[`${name}_${i}`] = rgbString
     }
-  });
-  return resultPalette;
-};
+  })
+  return resultPalette
+}
 
 const generateStylesPalette = (colors: Palette): StylesResult => {
-  const resultStyles: StylesResult = {};
+  const resultStyles: StylesResult = {}
   Object.keys(colors).map(name => {
-    const color: string = colors[name];
-    resultStyles[`bg_${name}`] = { backgroundColor: color };
-    resultStyles[name] = { color: color };
-    resultStyles[`b_${name}`] = { borderColor: color };
+    const color: string = colors[name]
+    resultStyles[`bg_${name}`] = { backgroundColor: color }
+    resultStyles[name] = { color: color }
+    resultStyles[`b_${name}`] = { borderColor: color }
     for (let i: number = 5; i < 100; i += 5) {
-      const rgbString: string = Color(color).alpha(i / 100).rgb().string();
-      resultStyles[`bg_${name}_${i}`] = { backgroundColor: rgbString };
-      resultStyles[`${name}_${i}`] = { color: rgbString };
-      resultStyles[`b_${name}_${i}`] = { borderColor: rgbString };
+      const rgbString: string = Color(color).alpha(i / 100).rgb().string()
+      resultStyles[`bg_${name}_${i}`] = { backgroundColor: rgbString }
+      resultStyles[`${name}_${i}`] = { color: rgbString }
+      resultStyles[`b_${name}_${i}`] = { borderColor: rgbString }
     }
-  });
-  return resultStyles;
-};
+  })
+  return resultStyles
+}
 
 const generateOpacity = (): StylesResult => {
-  const resultStyles: StylesResult = {};
+  const resultStyles: StylesResult = {}
   for (let i: number = 5; i < 100; i += 5) {
-    const opacity: number = i / 100;
-    resultStyles[`o_${i}`] = { opacity };
+    const opacity: number = i / 100
+    resultStyles[`o_${i}`] = { opacity }
   }
-  return resultStyles;
-};
+  return resultStyles
+}
 
 const generateFonts = (fonts: Palette): StylesResult => {
-  const resultStyles: StylesResult = {};
+  const resultStyles: StylesResult = {}
   Object.keys(fonts).map(name => {
-    const fontFamily: string = fonts[name];
-    resultStyles[`f_${name}`] = { fontFamily };
-  });
-  return resultStyles;
-};
+    const fontFamily: string = fonts[name]
+    resultStyles[`f_${name}`] = { fontFamily }
+  })
+  return resultStyles
+}
 
 const generateFontWeights = (weights: Palette): StylesResult => {
-  const resultStyles: StylesResult = {};
+  const resultStyles: StylesResult = {}
   Object.keys(weights).map(name => {
-    const fontWeight: string = weights[name];
-    resultStyles[`${name}`] = { fontWeight };
-  });
-  return resultStyles;
-};
+    const fontWeight: string = weights[name]
+    resultStyles[`${name}`] = { fontWeight }
+  })
+  return resultStyles
+}
 
 export interface Options {
-  remSize?: number,
-  multiplicators?: Multiplicators,
+  remSize?: number
+  multiplicators?: Multiplicators
   headings?: Multiplicators
-  palette?: Palette,
-  fonts?: Palette,
+  palette?: Palette
+  fonts?: Palette
   fontWeights?: Palette
 }
 
 interface BuildStyles {
-  s: StylesResult,
-  sizes: Multiplicators,
+  s: StylesResult
+  sizes: Multiplicators
   colors: Palette
-  build: (
-    defaultOptions: Options,
-    callback?: () => any,
-  ) => void,
+  build: (defaultOptions: Options, callback?: () => any) => void
 }
 
 const buildStyles: BuildStyles = {
@@ -350,28 +345,30 @@ const buildStyles: BuildStyles = {
   colors: {},
 
   build: (defaultOptions: Options = {}, callback = () => {}) => {
-
-    const remSize = defaultOptions.remSize || 16;
-    const multiplicators = defaultOptions.multiplicators || defaultMultiplicators;
-    const headings = defaultOptions.headings || defaultHeadings;
-    const palette = defaultOptions.palette || defaultPalette;
-    const fonts = defaultOptions.palette || defaultPalette;
-    const fontWeights = defaultOptions.fontWeights || defaultFontWeights;
-    assign(buildStyles.colors, generatePalette(palette));
-    assign(buildStyles.sizes, multiplyToRem(remSize, multiplicators));
-    assign(buildStyles.s, RN.StyleSheet.create({
-      ...multiplyStylesValues(pointStyles, multiplicators),
-      ...multiplyStylesValues(remStyles, multiplyToRem(remSize, multiplicators)),
-      ...multiplyStylesValues({f: {fontSize: 1}}, multiplyToRem(remSize, headings)),
-      ...generateStylesPalette(palette),
-      ...generateFonts(fonts),
-      ...generateFontWeights(fontWeights),
-      ...generateOpacity(),
-      ...staticStyles,
-    }));
-    callback();
-  },
-};
+    const remSize = defaultOptions.remSize || 16
+    const multiplicators = defaultOptions.multiplicators || defaultMultiplicators
+    const headings = defaultOptions.headings || defaultHeadings
+    const palette = defaultOptions.palette || defaultPalette
+    const fonts = defaultOptions.palette || defaultPalette
+    const fontWeights = defaultOptions.fontWeights || defaultFontWeights
+    assign(buildStyles.colors, generatePalette(palette))
+    assign(buildStyles.sizes, multiplyToRem(remSize, multiplicators))
+    assign(
+      buildStyles.s,
+      RN.StyleSheet.create({
+        ...multiplyStylesValues(pointStyles, multiplicators),
+        ...multiplyStylesValues(remStyles, multiplyToRem(remSize, multiplicators)),
+        ...multiplyStylesValues({ f: { fontSize: 1 } }, multiplyToRem(remSize, headings)),
+        ...generateStylesPalette(palette),
+        ...generateFonts(fonts),
+        ...generateFontWeights(fontWeights),
+        ...generateOpacity(),
+        ...staticStyles
+      })
+    )
+    callback()
+  }
+}
 
 export const defaultMultiplicators: Multiplicators = {
   '0': 0,
@@ -401,8 +398,8 @@ export const defaultMultiplicators: Multiplicators = {
   '65': 6.5,
   '7': 7,
   '75': 7.5,
-  '8': 8,
-};
+  '8': 8
+}
 
 export const defaultHeadings: Multiplicators = {
   '6': 0.875,
@@ -410,13 +407,13 @@ export const defaultHeadings: Multiplicators = {
   '4': 1.25,
   '3': 1.75,
   '2': 2.35,
-  '1': 3.25,
-};
+  '1': 3.25
+}
 
 export const defaultPalette: Palette = {
   white: 'rgb(255,255,255)',
-  black: 'rgb(0,0,0)',
-};
+  black: 'rgb(0,0,0)'
+}
 
 export const defaultFontWeights: Palette = {
   normal: 'normal',
@@ -429,8 +426,8 @@ export const defaultFontWeights: Palette = {
   fw6: '600',
   fw7: '700',
   fw8: '800',
-  fw9: '900',
-};
+  fw9: '900'
+}
 
-export default buildStyles;
-export const {colors, s, sizes} = buildStyles;
+export default buildStyles
+export const { colors, s, sizes } = buildStyles

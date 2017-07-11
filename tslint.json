@@ -1,7 +1,6 @@
 {
-  "extends": "tslint:latest",
   "rules": {
-    "align": [ false ],
+    "align": [false],
     "arrow-parens": false,
     "interface-name": [true, "never-prefix"],
     "no-consecutive-blank-lines": [false],
@@ -22,7 +21,6 @@
     "one-line": [false],
     "one-variable-per-declaration": [false],
     "ordered-imports": [false],
-    "semicolon": [true, "always", "ignore-interfaces"],
     "switch-default": true,
     "quotemark": [true, "single", "jsx-double"],
     "variable-name": [true, "ban-keywords"],
