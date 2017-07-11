@@ -61,15 +61,6 @@ export default class ExerciseListScreen extends React.PureComponent<ExerciseList
                   <RN.Text style={[s.f4, s.fw3, s.bg_t, s.blue, s.flx_i, s.mb025, s.lh125]}>
                     {exercise.title}
                   </RN.Text>
-                  {/*{exercise.attempts.length > 0 &&
-                      <RN.View style={[s.ml075, s.flx_row, s.aic, s.mt0125]}>
-                        <RN.Text style={[s.f6, s.b]}>{exercise.attempts.length}</RN.Text>
-                        <Icon name="md-close" color={colors.black_20} style={[s.f5, s.ph025]} />
-                        <RN.Text style={[s.f6, s.b]}>{Math.round(exercise.attempts.reduce((acc, a) => acc + a.repetitions, 0) / exercise.attempts.length)}</RN.Text>
-                        <Icon name="md-close" color={colors.black_20} style={[s.f5, s.ph025]} />
-                        <RN.Text style={[s.f6, s.b]}>{Math.round(exercise.attempts.reduce((acc, a) => acc + a.weight, 0) / exercise.attempts.length)}kg</RN.Text>
-                      </RN.View>
-                    }*/}
                 </RN.View>
                 <RN.Text style={[s.f7, s.fw3]}>
                   {exercise.targetMuscles.map(({ title }) => title).join(', ')}

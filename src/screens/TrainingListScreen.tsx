@@ -37,7 +37,7 @@ export default class TrainingsListScreen extends React.PureComponent<void, Train
     try {
       const storedStateJSON = await RN.AsyncStorage.getItem('@Gymple:State')
       if (storedStateJSON !== null) {
-        Util.decode(
+        const state = await Util.decode(
           JSON.parse(storedStateJSON),
           t.interface({
             currentTraining: t.union([
@@ -50,16 +50,10 @@ export default class TrainingsListScreen extends React.PureComponent<void, Train
             isScrollEnabled: t.boolean
           })
         )
-          .then(state => this.setState(state))
-          .catch(async () => {
-            try {
-              await RN.AsyncStorage.setItem('@Gymple:State', '')
-            } catch (error) {
-              throw new Error(error)
-            }
-          })
+        this.setState(state)
       }
     } catch (error) {
+      await RN.AsyncStorage.setItem('@Gymple:State', '')
       throw new Error(error)
     }
   }

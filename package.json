@@ -12,10 +12,10 @@
 	"dependencies": {
 		"@types/color": "^1.0.4",
 		"@types/lodash": "^4.14.66",
-		"@types/react": "^15.0.24",
+		"@types/react": "^15.0.37",
 		"@types/react-intl": "^2.2.7",
-		"@types/react-native": "^0.44.0",
-		"@types/react-navigation": "^1.0.1",
+		"@types/react-native": "^0.44.19",
+		"@types/react-navigation": "^1.0.15",
 		"color": "^1.0.3",
 		"intl": "^1.2.5",
 		"io-ts": "^0.5.0",
@@ -26,7 +26,7 @@
 		"react-native": "0.44.0",
 		"react-native-swipeout": "^2.1.1",
 		"react-native-vector-icons": "^4.2.0",
-		"react-navigation": "^1.0.0-beta.9"
+		"react-navigation": "^1.0.0-beta.11"
 	},
 	"devDependencies": {
 		"@types/jest": "^19.2.3",
