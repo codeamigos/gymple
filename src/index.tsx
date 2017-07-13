@@ -4,6 +4,7 @@ import * as RN from 'react-native'
 import * as t from 'io-ts'
 // import * as ReactRouter from 'react-router'
 import * as ReactRouterNative from 'react-router-native'
+import * as ReactRouter from 'react-router'
 import * as moment from 'moment'
 
 import TrainingListScreen from './screens/TrainingListScreen'
@@ -54,15 +55,19 @@ interface AppState {
   editingTrainingIndex: number | null
   currentTraining: Model.OngoingTraining | Model.NotStartedTraining | Model.FinishedTraining | null
   finishedTrainings: Model.FinishedTraining[]
+  anim: RN.Animated.Value
+  animating: boolean
 }
 
-class App extends React.Component<{}, AppState> {
+class App extends React.Component<ReactRouter.RouteComponentProps<{ isExact: boolean }>, AppState> {
   constructor() {
     super()
     this.state = {
       editingTrainingIndex: null,
       currentTraining: null,
-      finishedTrainings: []
+      finishedTrainings: [],
+      anim: new RN.Animated.Value(1),
+      animating: false
     }
   }
 
@@ -99,8 +104,15 @@ class App extends React.Component<{}, AppState> {
   }
 
   storeData = async () => {
+    const { currentTraining, finishedTrainings } = this.state
     try {
-      await RN.AsyncStorage.setItem('@Gymple:State', JSON.stringify(this.state))
+      await RN.AsyncStorage.setItem(
+        '@Gymple:State',
+        JSON.stringify({
+          currentTraining,
+          finishedTrainings
+        })
+      )
     } catch (error) {
       throw new Error(error)
     }
@@ -190,8 +202,8 @@ class App extends React.Component<{}, AppState> {
   render() {
     const { currentTraining, finishedTrainings, editingTrainingIndex } = this.state
     return (
-      <ReactRouterNative.NativeRouter>
-        <ReactRouterNative.Switch>
+      <AnimatedChildRoute anim={this.state.anim} atParent={this.props.match.isExact} animating={this.state.animating}>
+        <ReactRouterNative.Switch location={this.props.location}>
           <ReactRouterNative.Route
             exact
             path="/"
@@ -208,24 +220,102 @@ class App extends React.Component<{}, AppState> {
           <ReactRouterNative.Route
             exact
             path="/training"
-            render={() => {
-              return currentTraining
+            render={() =>
+              currentTraining !== null
                 ? <TrainingScreen
                     training={currentTraining}
                     onFinish={this.finishTraining}
                     onRestartFinished={this.restartFinishedTraining}
                     onUpdate={training => this.updateCurrentTraining(training, editingTrainingIndex)}
                   />
-                : <ReactRouterNative.Redirect to="/" />
-            }}
+                : <ReactRouterNative.Redirect to="/" />}
           />
         </ReactRouterNative.Switch>
+      </AnimatedChildRoute>
+    )
+  }
+}
+
+interface AnimatedChildRouteProps {
+  children: React.ReactNode
+  animating: boolean
+  anim: RN.Animated.Value
+  atParent: boolean
+}
+
+interface AnimatedChildRouteState {
+  previousChildren: React.ReactNode | null
+}
+
+class AnimatedChildRoute extends React.Component<AnimatedChildRouteProps, AnimatedChildRouteState> {
+  constructor(props: AnimatedChildRouteProps) {
+    super(props)
+    this.state = {
+      // we're going to save the old children so we can render
+      // it when it doesnt' actually match the location anymore
+      previousChildren: null
+    }
+  }
+
+  // componentWillReceiveProps(nextProps: AnimatedChildRouteProps) {
+  //   // figure out what to do with the children
+  //   const navigatingToParent = nextProps.atParent && !this.props.atParent
+  //   const animationEnded = this.props.animating && !nextProps.animating
+
+  //   if (navigatingToParent) {
+  //     // we were rendering, but now we're heading back up to the parent,
+  //     // so we need to save the children (har har) so we can render them
+  //     // while the animation is playing
+  //     this.setState({
+  //       previousChildren: this.props.children
+  //     })
+  //   } else if (animationEnded) {
+  //     // When we're done animating, we can get rid of the old children.
+  //     this.setState({
+  //       previousChildren: null
+  //     })
+  //   }
+  // }
+
+  render() {
+    const { anim, children } = this.props
+    const { previousChildren } = this.state
+    return (
+      <RN.Animated.View
+        style={{
+          bottom: 0,
+          position: 'absolute',
+          left: 0,
+          right: 0,
+          top: anim.interpolate({
+            inputRange: [0, 1],
+            outputRange: [20, 0]
+          }),
+          opacity: anim.interpolate({
+            inputRange: [0, 0.75],
+            outputRange: [0, 1]
+          })
+        }}
+      >
+        {/* render the old ones if we have them */}
+        {previousChildren || children}
+      </RN.Animated.View>
+    )
+  }
+}
+
+const Routed = ReactRouter.withRouter(App) as any
+class RoutedApp extends React.Component {
+  render() {
+    return (
+      <ReactRouterNative.NativeRouter>
+        <Routed />
       </ReactRouterNative.NativeRouter>
     )
   }
 }
 
-RN.AppRegistry.registerComponent('Gymple', () => App)
+RN.AppRegistry.registerComponent('Gymple', () => RoutedApp)
 // import * as ReactIntl from 'react-intl';
 // import 'intl';
 
