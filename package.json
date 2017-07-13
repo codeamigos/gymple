@@ -1,47 +1,49 @@
 {
-	"name": "Gymple",
-	"version": "0.0.1",
-	"private": true,
-	"scripts": {
-		"start": "concurrently \"tsc --project tsconfig.json --watch --pretty\" \"react-native start --skipflow\" ",
-		"test": "npm run build && jest",
-		"build": "tsc --project tsconfig.json",
-		"ios": "react-native run-ios --no-packager && npm start",
-		"postinstall": "rm -f node_modules/intl/.babelrc"
-	},
-	"dependencies": {
-		"@types/color": "^1.0.4",
-		"@types/lodash": "^4.14.66",
-		"@types/react": "^15.0.37",
-		"@types/react-intl": "^2.2.7",
-		"@types/react-native": "^0.44.19",
-		"@types/react-navigation": "^1.0.15",
-		"color": "^1.0.3",
-		"intl": "^1.2.5",
-		"io-ts": "^0.5.0",
-		"lodash": "^4.17.4",
-		"moment": "^2.18.1",
-		"react": "^16.0.0-alpha.12",
-		"react-intl": "^2.3.0",
-		"react-native": "^0.46.1",
-		"react-native-swipeout": "^2.1.1",
-		"react-native-vector-icons": "^4.2.0",
-		"react-navigation": "^1.0.0-beta.11"
-	},
-	"devDependencies": {
-		"@types/jest": "^19.2.3",
-		"babel-jest": "19.0.0",
-		"babel-preset-react-native": "1.9.1",
-		"concurrently": "^3.4.0",
-		"jest": "19.0.2",
-		"react-test-renderer": "16.0.0-alpha.6",
-		"tslint": "^5.2.0",
-		"typescript": "^2.3.2"
-	},
-	"jest": {
-		"preset": "react-native"
-	},
-	"babel": {
-		"presets": "react-native"
-	}
+  "name": "Gymple",
+  "version": "0.0.1",
+  "private": true,
+  "scripts": {
+    "start": "concurrently \"tsc --project tsconfig.json --watch --pretty\" \"react-native start --skipflow\" ",
+    "test": "npm run build && jest",
+    "build": "tsc --project tsconfig.json",
+    "ios": "react-native run-ios --no-packager && npm start",
+    "postinstall": "rm -f node_modules/intl/.babelrc"
+  },
+  "dependencies": {
+    "@types/color": "^1.0.4",
+    "@types/lodash": "^4.14.66",
+    "@types/react": "^15.0.37",
+    "@types/react-intl": "^2.2.7",
+    "@types/react-native": "^0.46.0",
+    "@types/react-router": "^4.0.14",
+    "@types/react-router-native": "^4.0.1",
+    "color": "^1.0.3",
+    "intl": "^1.2.5",
+    "io-ts": "^0.5.0",
+    "lodash": "^4.17.4",
+    "moment": "^2.18.1",
+    "react": "^16.0.0-alpha.12",
+    "react-intl": "^2.3.0",
+    "react-native": "^0.46.1",
+    "react-native-swipeout": "^2.1.1",
+    "react-native-vector-icons": "^4.2.0",
+    "react-router": "^4.1.1",
+    "react-router-native": "^4.1.1"
+  },
+  "devDependencies": {
+    "@types/jest": "^19.2.3",
+    "babel-jest": "19.0.0",
+    "babel-preset-react-native": "1.9.1",
+    "concurrently": "^3.4.0",
+    "jest": "19.0.2",
+    "react-test-renderer": "16.0.0-alpha.6",
+    "tslint": "^5.2.0",
+    "typescript": "^2.3.2"
+  },
+  "jest": {
+    "preset": "react-native"
+  },
+  "babel": {
+    "presets": "react-native"
+  }
 }

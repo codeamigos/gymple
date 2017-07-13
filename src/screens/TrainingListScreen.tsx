@@ -1,171 +1,34 @@
 import * as React from 'react'
 import * as RN from 'react-native'
-import * as t from 'io-ts'
 import Icon from 'react-native-vector-icons/Ionicons'
 import Swipeout from 'react-native-swipeout'
+import * as ReactRouterNative from 'react-router-native'
 import * as moment from 'moment'
 
-import TrainingScreen from './TrainingScreen'
-import * as Util from '../Util'
+// import TrainingScreen from './TrainingScreen'
 import * as Model from '../Model'
 
 import { s, colors, sizes } from './../styles'
 
 interface TrainingsListState {
-  editingTrainingIndex: number | null
-  currentTraining: Model.OngoingTraining | Model.NotStartedTraining | Model.FinishedTraining | null
-  finishedTrainings: Model.FinishedTraining[]
   isScrollEnabled: boolean
 }
 
-export default class TrainingsListScreen extends React.PureComponent<void, TrainingsListState> {
+interface TrainingsListProps {
+  editingTrainingIndex: number | null
+  currentTraining: Model.OngoingTraining | Model.NotStartedTraining | Model.FinishedTraining | null
+  finishedTrainings: Model.FinishedTraining[]
+  onStartNewTraining: () => void
+  onRemoveFinishedTraining: (i: number) => void
+  onUpdateCurrentTraining: (training: Model.FinishedTraining, i: number) => void
+}
+
+export default class TrainingsListScreen extends React.PureComponent<TrainingsListProps, TrainingsListState> {
   constructor() {
     super()
     this.state = {
-      editingTrainingIndex: null,
-      currentTraining: null,
-      finishedTrainings: [],
       isScrollEnabled: true
     }
-  }
-
-  componentDidMount() {
-    this.fetchData()
-  }
-
-  fetchData = async () => {
-    try {
-      const storedStateJSON = await RN.AsyncStorage.getItem('@Gymple:State')
-      if (storedStateJSON !== null) {
-        const state = await Util.decode(
-          JSON.parse(storedStateJSON),
-          t.interface({
-            currentTraining: t.union([
-              Model.TOngoingTraining,
-              Model.TNotStartedTraining,
-              Model.TFinishedTraining,
-              t.null
-            ]),
-            finishedTrainings: t.array(Model.TFinishedTraining),
-            isScrollEnabled: t.boolean
-          })
-        )
-        this.setState(state)
-      }
-    } catch (error) {
-      await RN.AsyncStorage.setItem('@Gymple:State', '')
-      throw new Error(error)
-    }
-  }
-
-  storeData = async () => {
-    try {
-      await RN.AsyncStorage.setItem('@Gymple:State', JSON.stringify(this.state))
-    } catch (error) {
-      throw new Error(error)
-    }
-  }
-
-  startNewTraining = () => {
-    this.setState(
-      {
-        currentTraining: {
-          kind: 'NotStartedTraining',
-          title: 'Training on ' + moment().format('dddd'),
-          plannedExercises: []
-        },
-        editingTrainingIndex: null
-      },
-      () => this.storeData()
-    )
-  }
-
-  restartFinishedTraining = (finishedTraining: Model.FinishedTraining) => {
-    const notStartedTrainingFromFinished: Model.NotStartedTraining = {
-      kind: 'NotStartedTraining',
-      title: finishedTraining.title + ' copy',
-      plannedExercises: finishedTraining.completedExercises
-    }
-    this.setState(
-      {
-        currentTraining: notStartedTrainingFromFinished,
-        editingTrainingIndex: null
-      },
-      () => this.storeData()
-    )
-  }
-
-  updateCurrentTraining = (
-    currentTraining: Model.OngoingTraining | Model.NotStartedTraining | Model.FinishedTraining,
-    editingTrainingIndex: number | null
-  ) => {
-    this.setState(
-      {
-        currentTraining,
-        editingTrainingIndex
-      },
-      () => this.storeData()
-    )
-  }
-
-  finishTraining = () => {
-    const { currentTraining, finishedTrainings, editingTrainingIndex } = this.state
-    if (currentTraining) {
-      switch (currentTraining.kind) {
-        case 'OngoingTraining':
-          const newFinishedTraining: Model.FinishedTraining = {
-            kind: 'FinishedTraining',
-            title: currentTraining.title,
-            startedAt: currentTraining.startedAt,
-            finishedAt: new Date(),
-            completedExercises: currentTraining.completedExercises
-          }
-          this.setState(
-            {
-              currentTraining: null,
-              finishedTrainings:
-                newFinishedTraining.completedExercises.length > 0
-                  ? [newFinishedTraining, ...finishedTrainings]
-                  : finishedTrainings
-            },
-            () => this.storeData()
-          )
-          break
-        case 'FinishedTraining':
-          this.setState(
-            {
-              currentTraining: null,
-              editingTrainingIndex: null,
-              finishedTrainings:
-                currentTraining.completedExercises.length > 0
-                  ? finishedTrainings.map((t, i) => (i === editingTrainingIndex ? currentTraining : t))
-                  : finishedTrainings.filter((_, i) => i !== editingTrainingIndex)
-            },
-            () => this.storeData()
-          )
-          break
-        case 'NotStartedTraining':
-          this.setState(
-            {
-              currentTraining: null
-            },
-            () => this.storeData()
-          )
-          break
-        default:
-          Util.shouldNeverHappen(currentTraining)
-      }
-    }
-  }
-
-  removeFinishedTraining = (index: number) => {
-    const { finishedTrainings } = this.state
-    this.setState(
-      {
-        finishedTrainings: finishedTrainings.filter((_, i) => i !== index)
-      },
-      () => this.storeData()
-    )
   }
 
   allowScroll = (isScrollEnabled: boolean) => {
@@ -173,17 +36,17 @@ export default class TrainingsListScreen extends React.PureComponent<void, Train
   }
 
   render() {
-    const { currentTraining, finishedTrainings, isScrollEnabled, editingTrainingIndex } = this.state
+    const { isScrollEnabled } = this.state
+    const {
+      currentTraining,
+      finishedTrainings,
+      onStartNewTraining,
+      onRemoveFinishedTraining,
+      onUpdateCurrentTraining
+    } = this.props
 
     if (currentTraining) {
-      return (
-        <TrainingScreen
-          training={currentTraining}
-          onFinish={this.finishTraining}
-          onRestartFinished={this.restartFinishedTraining}
-          onUpdate={training => this.updateCurrentTraining(training, editingTrainingIndex)}
-        />
-      )
+      return <ReactRouterNative.Redirect to="/training" />
     }
 
     if (finishedTrainings.length === 0) {
@@ -195,7 +58,7 @@ export default class TrainingsListScreen extends React.PureComponent<void, Train
           </RN.Text>
           <RN.TouchableOpacity
             style={[s.asc, s.bg_green, s.br2, s.h325, s.jcc, s.ph3, s.mt075]}
-            onPress={this.startNewTraining}
+            onPress={onStartNewTraining}
           >
             <RN.Text style={[s.f4, s.white, s.tc, s.b]}>Start First Training</RN.Text>
           </RN.TouchableOpacity>
@@ -220,7 +83,7 @@ export default class TrainingsListScreen extends React.PureComponent<void, Train
                 buttonWidth={sizes[5]}
                 right={[
                   {
-                    onPress: () => this.removeFinishedTraining(i),
+                    onPress: () => onRemoveFinishedTraining(i),
                     component: (
                       <RN.View style={[s.w5, s.bg_orange, s.jcc, s.flx_i]}>
                         <Icon name="md-trash" style={[s.white, s.f3, s.tc]} />
@@ -229,7 +92,7 @@ export default class TrainingsListScreen extends React.PureComponent<void, Train
                   }
                 ]}
               >
-                <RN.TouchableOpacity onPress={() => this.updateCurrentTraining(training, i)}>
+                <RN.TouchableOpacity onPress={() => onUpdateCurrentTraining(training, i)}>
                   <TrainingsListItem training={training} />
                 </RN.TouchableOpacity>
               </Swipeout>
@@ -238,7 +101,7 @@ export default class TrainingsListScreen extends React.PureComponent<void, Train
           <RN.View style={s.pb175}>
             <RN.TouchableOpacity
               style={[s.asc, s.bg_green, s.br2, s.h325, s.jcc, s.ph3, s.mt075]}
-              onPress={this.startNewTraining}
+              onPress={onStartNewTraining}
             >
               <RN.Text style={[s.f4, s.white, s.tc, s.b]}>Start New Training</RN.Text>
             </RN.TouchableOpacity>
