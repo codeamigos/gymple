@@ -2,6 +2,7 @@
 import * as React from 'react'
 import * as RN from 'react-native'
 import * as t from 'io-ts'
+import * as H from 'history'
 // import * as ReactRouter from 'react-router'
 import * as ReactRouterNative from 'react-router-native'
 import * as ReactRouter from 'react-router'
@@ -12,6 +13,7 @@ import TrainingScreen from './screens/TrainingScreen'
 import * as Util from './Util'
 import * as Model from './Model'
 import bs, { Palette, Multiplicators, Options } from './styles'
+// const { s } = bs
 
 const palette: Palette = {
   greyDarkest: '#2e333d',
@@ -55,19 +57,17 @@ interface AppState {
   editingTrainingIndex: number | null
   currentTraining: Model.OngoingTraining | Model.NotStartedTraining | Model.FinishedTraining | null
   finishedTrainings: Model.FinishedTraining[]
-  anim: RN.Animated.Value
-  animating: boolean
 }
 
-class App extends React.Component<ReactRouter.RouteComponentProps<{ isExact: boolean }>, AppState> {
-  constructor() {
-    super()
+type AppProps = ReactRouter.RouteComponentProps<{ isExact: boolean }>
+
+class App extends React.Component<AppProps, AppState> {
+  constructor(props: AppProps) {
+    super(props)
     this.state = {
       editingTrainingIndex: null,
       currentTraining: null,
-      finishedTrainings: [],
-      anim: new RN.Animated.Value(1),
-      animating: false
+      finishedTrainings: []
     }
   }
 
@@ -202,7 +202,7 @@ class App extends React.Component<ReactRouter.RouteComponentProps<{ isExact: boo
   render() {
     const { currentTraining, finishedTrainings, editingTrainingIndex } = this.state
     return (
-      <AnimatedChildRoute anim={this.state.anim} atParent={this.props.match.isExact} animating={this.state.animating}>
+      <AnimatedChildRoute location={this.props.location}>
         <ReactRouterNative.Switch location={this.props.location}>
           <ReactRouterNative.Route
             exact
@@ -221,7 +221,7 @@ class App extends React.Component<ReactRouter.RouteComponentProps<{ isExact: boo
             exact
             path="/training"
             render={() =>
-              currentTraining !== null
+              currentTraining
                 ? <TrainingScreen
                     training={currentTraining}
                     onFinish={this.finishTraining}
@@ -237,69 +237,86 @@ class App extends React.Component<ReactRouter.RouteComponentProps<{ isExact: boo
 }
 
 interface AnimatedChildRouteProps {
+  location: H.Location
   children: React.ReactNode
-  animating: boolean
-  anim: RN.Animated.Value
-  atParent: boolean
 }
 
 interface AnimatedChildRouteState {
   previousChildren: React.ReactNode | null
+  anim: RN.Animated.Value
 }
 
 class AnimatedChildRoute extends React.Component<AnimatedChildRouteProps, AnimatedChildRouteState> {
   constructor(props: AnimatedChildRouteProps) {
     super(props)
     this.state = {
-      // we're going to save the old children so we can render
-      // it when it doesnt' actually match the location anymore
+      anim: new RN.Animated.Value(1),
       previousChildren: null
     }
   }
 
-  // componentWillReceiveProps(nextProps: AnimatedChildRouteProps) {
-  //   // figure out what to do with the children
-  //   const navigatingToParent = nextProps.atParent && !this.props.atParent
-  //   const animationEnded = this.props.animating && !nextProps.animating
+  componentWillReceiveProps(nextProps: AnimatedChildRouteProps) {
+    if (this.props.location.pathname !== nextProps.location.pathname) {
+      this.state.anim.setValue(0)
 
-  //   if (navigatingToParent) {
-  //     // we were rendering, but now we're heading back up to the parent,
-  //     // so we need to save the children (har har) so we can render them
-  //     // while the animation is playing
-  //     this.setState({
-  //       previousChildren: this.props.children
-  //     })
-  //   } else if (animationEnded) {
-  //     // When we're done animating, we can get rid of the old children.
-  //     this.setState({
-  //       previousChildren: null
-  //     })
-  //   }
-  // }
+      this.setState(
+        {
+          previousChildren: this.props.children
+        },
+        () => {
+          RN.Animated
+            .timing(this.state.anim, {
+              toValue: 1,
+              duration: 600
+            })
+            .start(() => {
+              this.setState({
+                previousChildren: null
+              })
+            })
+        }
+      )
+    }
+  }
 
   render() {
-    const { anim, children } = this.props
-    const { previousChildren } = this.state
+    const { previousChildren, anim } = this.state
+    const { children } = this.props
+
     return (
-      <RN.Animated.View
-        style={{
-          bottom: 0,
-          position: 'absolute',
-          left: 0,
-          right: 0,
-          top: anim.interpolate({
-            inputRange: [0, 1],
-            outputRange: [20, 0]
-          }),
-          opacity: anim.interpolate({
-            inputRange: [0, 0.75],
-            outputRange: [0, 1]
-          })
-        }}
-      >
-        {/* render the old ones if we have them */}
-        {previousChildren || children}
-      </RN.Animated.View>
+      <RN.View style={{ flex: 1 }}>
+        {previousChildren &&
+          <RN.View
+            style={{
+              bottom: 0,
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              right: 0
+            }}
+          >
+            {children}
+          </RN.View>}
+        <RN.Animated.View
+          style={{
+            bottom: 0,
+            position: 'absolute',
+            left: 0,
+            right: 0,
+            top: 0,
+            transform: [
+              {
+                translateX: anim.interpolate({
+                  inputRange: [0, 1],
+                  outputRange: [200, 0]
+                })
+              }
+            ]
+          }}
+        >
+          {children}
+        </RN.Animated.View>
+      </RN.View>
     )
   }
 }

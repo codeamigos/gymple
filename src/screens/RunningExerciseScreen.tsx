@@ -159,7 +159,7 @@ interface AttemptListItemProps {
 const AttemptListItem = ({ attempt, num, restSeconds, isActive }: AttemptListItemProps) =>
   <RN.View>
     {!isActive &&
-      <RN.View style={[s.flx_row, s.jcsb, s.pr05, s.aic, s.pv1, s.b_white_10, s.ass, restSeconds ? s.bbw1 : null]}>
+      <RN.View style={[s.flx_row, s.jcsb, s.pr05, s.aic, s.pv1, s.b_white_10, s.ass, restSeconds ? s.bbw1 : undefined]}>
         <RN.View style={s.flx_i}>
           <RN.Text style={[s.fw3, s.f3, s.white, s.bg_t]}>
             Attempt {num}
