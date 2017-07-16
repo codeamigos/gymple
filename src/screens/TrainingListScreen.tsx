@@ -2,9 +2,8 @@ import * as React from 'react'
 import * as RN from 'react-native'
 import Icon from 'react-native-vector-icons/Ionicons'
 import Swipeout from 'react-native-swipeout'
-import * as ReactRouterNative from 'react-router-native'
 import * as moment from 'moment'
-
+import * as ReactRouterNative from 'react-router-native'
 // import TrainingScreen from './TrainingScreen'
 import * as Model from '../Model'
 
@@ -16,11 +15,11 @@ interface TrainingsListState {
 
 interface TrainingsListProps {
   editingTrainingIndex: number | null
-  currentTraining: Model.OngoingTraining | Model.NotStartedTraining | Model.FinishedTraining | null
+  hasCurrentTraining: boolean
   finishedTrainings: Model.FinishedTraining[]
   onStartNewTraining: () => void
   onRemoveFinishedTraining: (i: number) => void
-  onUpdateCurrentTraining: (training: Model.FinishedTraining, i: number) => void
+  onOpenTraining: (training: Model.FinishedTraining, i: number) => void
 }
 
 export default class TrainingsListScreen extends React.PureComponent<TrainingsListProps, TrainingsListState> {
@@ -37,17 +36,7 @@ export default class TrainingsListScreen extends React.PureComponent<TrainingsLi
 
   render() {
     const { isScrollEnabled } = this.state
-    const {
-      currentTraining,
-      finishedTrainings,
-      onStartNewTraining,
-      onRemoveFinishedTraining,
-      onUpdateCurrentTraining
-    } = this.props
-
-    if (currentTraining) {
-      return <ReactRouterNative.Redirect to="/training" />
-    }
+    const { finishedTrainings, onStartNewTraining, onRemoveFinishedTraining, onOpenTraining } = this.props
 
     if (finishedTrainings.length === 0) {
       return (
@@ -92,7 +81,11 @@ export default class TrainingsListScreen extends React.PureComponent<TrainingsLi
                   }
                 ]}
               >
-                <RN.TouchableOpacity onPress={() => onUpdateCurrentTraining(training, i)}>
+                <RN.TouchableOpacity
+                  onPress={() => {
+                    onOpenTraining(training, i)
+                  }}
+                >
                   <TrainingsListItem training={training} />
                 </RN.TouchableOpacity>
               </Swipeout>

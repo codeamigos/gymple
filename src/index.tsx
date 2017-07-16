@@ -13,7 +13,9 @@ import TrainingScreen from './screens/TrainingScreen'
 import * as Util from './Util'
 import * as Model from './Model'
 import bs, { Palette, Multiplicators, Options } from './styles'
-// const { s } = bs
+const { s } = bs
+
+const { width } = RN.Dimensions.get('window')
 
 const palette: Palette = {
   greyDarkest: '#2e333d',
@@ -164,7 +166,6 @@ class App extends React.Component<AppProps, AppState> {
             completedExercises: currentTraining.completedExercises
           }
           this.setState({
-            currentTraining: null,
             finishedTrainings:
               newFinishedTraining.completedExercises.length > 0
                 ? [newFinishedTraining, ...finishedTrainings]
@@ -173,7 +174,6 @@ class App extends React.Component<AppProps, AppState> {
           break
         case 'FinishedTraining':
           this.setState({
-            currentTraining: null,
             editingTrainingIndex: null,
             finishedTrainings:
               currentTraining.completedExercises.length > 0
@@ -182,9 +182,6 @@ class App extends React.Component<AppProps, AppState> {
           })
           break
         case 'NotStartedTraining':
-          this.setState({
-            currentTraining: null
-          })
           break
         default:
           Util.shouldNeverHappen(currentTraining)
@@ -200,6 +197,7 @@ class App extends React.Component<AppProps, AppState> {
   }
 
   render() {
+    const { history } = this.props
     const { currentTraining, finishedTrainings, editingTrainingIndex } = this.state
     return (
       <AnimatedChildRoute location={this.props.location}>
@@ -209,11 +207,17 @@ class App extends React.Component<AppProps, AppState> {
             path="/"
             render={() =>
               <TrainingListScreen
-                currentTraining={currentTraining}
+                hasCurrentTraining={!!currentTraining}
                 editingTrainingIndex={editingTrainingIndex}
                 finishedTrainings={finishedTrainings}
-                onStartNewTraining={this.startNewTraining}
-                onUpdateCurrentTraining={this.updateCurrentTraining}
+                onStartNewTraining={() => {
+                  this.startNewTraining()
+                  history.push('/training')
+                }}
+                onOpenTraining={(training, i) => {
+                  this.updateCurrentTraining(training, i)
+                  history.push('/training')
+                }}
                 onRemoveFinishedTraining={this.removeFinishedTraining}
               />}
           />
@@ -224,7 +228,10 @@ class App extends React.Component<AppProps, AppState> {
               currentTraining
                 ? <TrainingScreen
                     training={currentTraining}
-                    onFinish={this.finishTraining}
+                    onFinish={() => {
+                      this.finishTraining()
+                      history.push('/')
+                    }}
                     onRestartFinished={this.restartFinishedTraining}
                     onUpdate={training => this.updateCurrentTraining(training, editingTrainingIndex)}
                   />
@@ -250,7 +257,7 @@ class AnimatedChildRoute extends React.Component<AnimatedChildRouteProps, Animat
   constructor(props: AnimatedChildRouteProps) {
     super(props)
     this.state = {
-      anim: new RN.Animated.Value(1),
+      anim: new RN.Animated.Value(100),
       previousChildren: null
     }
   }
@@ -266,8 +273,9 @@ class AnimatedChildRoute extends React.Component<AnimatedChildRouteProps, Animat
         () => {
           RN.Animated
             .timing(this.state.anim, {
-              toValue: 1,
-              duration: 600
+              easing: RN.Easing.quad,
+              toValue: 100,
+              duration: 300
             })
             .start(() => {
               this.setState({
@@ -286,7 +294,7 @@ class AnimatedChildRoute extends React.Component<AnimatedChildRouteProps, Animat
     return (
       <RN.View style={{ flex: 1 }}>
         {previousChildren &&
-          <RN.View
+          <RN.Animated.View
             style={{
               bottom: 0,
               position: 'absolute',
@@ -295,8 +303,8 @@ class AnimatedChildRoute extends React.Component<AnimatedChildRouteProps, Animat
               right: 0
             }}
           >
-            {children}
-          </RN.View>}
+            {previousChildren}
+          </RN.Animated.View>}
         <RN.Animated.View
           style={{
             bottom: 0,
@@ -307,8 +315,8 @@ class AnimatedChildRoute extends React.Component<AnimatedChildRouteProps, Animat
             transform: [
               {
                 translateX: anim.interpolate({
-                  inputRange: [0, 1],
-                  outputRange: [200, 0]
+                  inputRange: [0, 100],
+                  outputRange: [width, 0]
                 })
               }
             ]
