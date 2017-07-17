@@ -40,6 +40,14 @@ export default class RunningExercise extends React.PureComponent<ActiveExerciseP
     }
   }
 
+  componentDidUpdate(_: ActiveExerciseProps, prevState: ActiveExerciseState) {
+    const { isRest, timer } = this.state
+    const { exercise } = this.props
+    if (isRest && exercise.restSeconds - timer <= 0 && exercise.restSeconds - prevState.timer > 0)
+      RN.Vibration.vibrate(50, true)
+    else if (!isRest) RN.Vibration.cancel()
+  }
+
   handleNextAttempt = () =>
     this.setState({ currentAttemptIndex: this.state.currentAttemptIndex + 1, isRest: false, timer: 0 })
 

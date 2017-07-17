@@ -11,11 +11,12 @@ import { s, sizes, colors } from './../styles'
 interface ExerciseListProps {
   onClose: () => void
   onSelect: (exercise: Model.Exercise) => void
+  completedExercises: Model.Exercise[]
 }
 
 interface ExerciseListState {
   filter: string | null
-  exercises: Model.ExerciseTemplate[]
+  exerciseTemplates: Model.ExerciseTemplate[]
 }
 
 export default class ExerciseListScreen extends React.PureComponent<ExerciseListProps, ExerciseListState> {
@@ -23,17 +24,21 @@ export default class ExerciseListScreen extends React.PureComponent<ExerciseList
     super(props)
     this.state = {
       filter: null,
-      exercises: generateDefaultExersices(ExerciseData.exercises, ExerciseData.muscles)
+      exerciseTemplates: generateDefaultExersices(ExerciseData.exercises, ExerciseData.muscles)
     }
   }
 
-  handleSelect = (exerciseTemplate: Model.ExerciseTemplate) => {
-    this.props.onSelect(convertTemplateToGenericExercise(exerciseTemplate))
-  }
-
   render() {
-    const { filter, exercises } = this.state
-    const { onClose } = this.props
+    const { filter, exerciseTemplates } = this.state
+    const { onClose, completedExercises, onSelect } = this.props
+
+    const completedExercisesTitles = completedExercises.map(e => e.title)
+    const exercises = completedExercises.concat(
+      exerciseTemplates
+        .filter(e => completedExercisesTitles.indexOf(e.title) === -1)
+        .map(e => convertTemplateToGenericExercise(e))
+    )
+
     return (
       <RN.View style={[s.flx_i, s.jcsb, s.bg_greyLightest]}>
         <RN.View style={[s.bg_blue, s.pt2, s.ph05, s.pb05]}>
@@ -55,7 +60,7 @@ export default class ExerciseListScreen extends React.PureComponent<ExerciseList
         </RN.View>
         <RN.ScrollView style={[s.flx_i]}>
           {exercises.filter(exercise => (filter ? exercise.title.includes(filter) : true)).map(exercise =>
-            <RN.TouchableOpacity key={exercise.title} onPress={() => this.handleSelect(exercise)}>
+            <RN.TouchableOpacity key={exercise.title} onPress={() => onSelect(exercise)}>
               <RN.View style={[s.pv1, s.bbw1, s.b_black_5, s.pr1, s.ml125]}>
                 <RN.View style={[s.flx_row, s.jcsb, s.aifs]}>
                   <RN.Text style={[s.f4, s.fw3, s.bg_t, s.blue, s.flx_i, s.mb025, s.lh125]}>

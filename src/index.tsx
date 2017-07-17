@@ -199,6 +199,15 @@ class App extends React.Component<AppProps, AppState> {
   render() {
     const { history, location } = this.props
     const { currentTraining, finishedTrainings, editingTrainingIndex } = this.state
+
+    const uniqeCompletedExercises = finishedTrainings.reduce((completedExercises, training) => {
+      const completedExercisesTitles: string[] = completedExercises.map(e => e.title)
+      return [
+        ...completedExercises,
+        ...training.completedExercises.filter(e => completedExercisesTitles.indexOf(e.title) === -1)
+      ] as Model.Exercise[]
+    }, [] as Model.Exercise[])
+
     return (
       <AnimatedChildRoute location={location} history={history}>
         <ReactRouterNative.Switch location={this.props.location}>
@@ -227,6 +236,7 @@ class App extends React.Component<AppProps, AppState> {
               currentTraining
                 ? <TrainingScreen
                     training={currentTraining}
+                    completedExercises={uniqeCompletedExercises}
                     onFinish={() => {
                       this.finishTraining()
                       history.goBack()
