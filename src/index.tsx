@@ -13,7 +13,7 @@ import TrainingScreen from './screens/TrainingScreen'
 import * as Util from './Util'
 import * as Model from './Model'
 import bs, { Palette, Multiplicators, Options } from './styles'
-const { s } = bs
+const { s, colors } = bs
 
 const { width } = RN.Dimensions.get('window')
 
@@ -61,7 +61,7 @@ interface AppState {
   finishedTrainings: Model.FinishedTraining[]
 }
 
-type AppProps = ReactRouter.RouteComponentProps<{ isExact: boolean }>
+type AppProps = ReactRouter.RouteComponentProps<{}>
 
 class App extends React.Component<AppProps, AppState> {
   constructor(props: AppProps) {
@@ -197,17 +197,16 @@ class App extends React.Component<AppProps, AppState> {
   }
 
   render() {
-    const { history } = this.props
+    const { history, location } = this.props
     const { currentTraining, finishedTrainings, editingTrainingIndex } = this.state
     return (
-      <AnimatedChildRoute location={this.props.location}>
+      <AnimatedChildRoute location={location} history={history}>
         <ReactRouterNative.Switch location={this.props.location}>
           <ReactRouterNative.Route
             exact
             path="/"
             render={() =>
               <TrainingListScreen
-                hasCurrentTraining={!!currentTraining}
                 editingTrainingIndex={editingTrainingIndex}
                 finishedTrainings={finishedTrainings}
                 onStartNewTraining={() => {
@@ -230,7 +229,7 @@ class App extends React.Component<AppProps, AppState> {
                     training={currentTraining}
                     onFinish={() => {
                       this.finishTraining()
-                      history.push('/')
+                      history.goBack()
                     }}
                     onRestartFinished={this.restartFinishedTraining}
                     onUpdate={training => this.updateCurrentTraining(training, editingTrainingIndex)}
@@ -245,11 +244,12 @@ class App extends React.Component<AppProps, AppState> {
 
 interface AnimatedChildRouteProps {
   location: H.Location
+  history: H.History
   children: React.ReactNode
 }
 
 interface AnimatedChildRouteState {
-  previousChildren: React.ReactNode | null
+  prevChildren: React.ReactNode | null
   anim: RN.Animated.Value
 }
 
@@ -258,17 +258,16 @@ class AnimatedChildRoute extends React.Component<AnimatedChildRouteProps, Animat
     super(props)
     this.state = {
       anim: new RN.Animated.Value(100),
-      previousChildren: null
+      prevChildren: null
     }
   }
 
   componentWillReceiveProps(nextProps: AnimatedChildRouteProps) {
     if (this.props.location.pathname !== nextProps.location.pathname) {
       this.state.anim.setValue(0)
-
       this.setState(
         {
-          previousChildren: this.props.children
+          prevChildren: this.props.children
         },
         () => {
           RN.Animated
@@ -279,7 +278,7 @@ class AnimatedChildRoute extends React.Component<AnimatedChildRouteProps, Animat
             })
             .start(() => {
               this.setState({
-                previousChildren: null
+                prevChildren: null
               })
             })
         }
@@ -288,39 +287,63 @@ class AnimatedChildRoute extends React.Component<AnimatedChildRouteProps, Animat
   }
 
   render() {
-    const { previousChildren, anim } = this.state
-    const { children } = this.props
+    const { prevChildren, anim } = this.state
+    const { children, history } = this.props
 
+    if (history.action === 'POP')
+      return (
+        <RN.View style={{ flex: 1 }}>
+          <RN.View style={[s.absolute, s.absolute__fill]}>
+            {children}
+          </RN.View>
+          {prevChildren &&
+            <RN.Animated.View
+              style={[
+                s.absolute,
+                s.absolute__fill,
+                {
+                  shadowColor: colors.black_20,
+                  shadowOpacity: 0.4,
+                  shadowRadius: 40,
+                  transform: [
+                    {
+                      translateX: anim.interpolate({
+                        inputRange: [0, 100],
+                        outputRange: [0, width]
+                      })
+                    }
+                  ]
+                }
+              ]}
+            >
+              {prevChildren}
+            </RN.Animated.View>}
+        </RN.View>
+      )
     return (
       <RN.View style={{ flex: 1 }}>
-        {previousChildren &&
-          <RN.Animated.View
-            style={{
-              bottom: 0,
-              position: 'absolute',
-              top: 0,
-              left: 0,
-              right: 0
-            }}
-          >
-            {previousChildren}
-          </RN.Animated.View>}
+        {prevChildren &&
+          <RN.View style={[s.absolute, s.absolute__fill]}>
+            {prevChildren}
+          </RN.View>}
         <RN.Animated.View
-          style={{
-            bottom: 0,
-            position: 'absolute',
-            left: 0,
-            right: 0,
-            top: 0,
-            transform: [
-              {
-                translateX: anim.interpolate({
-                  inputRange: [0, 100],
-                  outputRange: [width, 0]
-                })
-              }
-            ]
-          }}
+          style={[
+            s.absolute,
+            s.absolute__fill,
+            {
+              shadowColor: colors.black_20,
+              shadowOpacity: 0.4,
+              shadowRadius: 40,
+              transform: [
+                {
+                  translateX: anim.interpolate({
+                    inputRange: [0, 100],
+                    outputRange: [width, 0]
+                  })
+                }
+              ]
+            }
+          ]}
         >
           {children}
         </RN.Animated.View>

@@ -353,7 +353,8 @@ class NotstartedTrainingScreen extends React.PureComponent<
                           </RN.View>
                         )
                       }
-                    ]}>
+                    ]}
+                  >
                     <RN.TouchableOpacity onPress={() => onSetEditingExercise(exercise, i)}>
                       <ExerciseListItem exercise={exercise} />
                     </RN.TouchableOpacity>
@@ -369,7 +370,8 @@ class NotstartedTrainingScreen extends React.PureComponent<
               <RN.View style={s.pb175}>
                 <RN.TouchableOpacity
                   style={[s.asc, s.bg_green, s.br2, s.h325, s.jcc, s.ph3, s.mt075]}
-                  onPress={onStartTraining}>
+                  onPress={onStartTraining}
+                >
                   <RN.Text style={[s.f4, s.white, s.tc, s.b]}>Start Training</RN.Text>
                 </RN.TouchableOpacity>
               </RN.View>
@@ -380,7 +382,8 @@ class NotstartedTrainingScreen extends React.PureComponent<
               </RN.Text>
               <RN.TouchableOpacity
                 style={[s.asc, s.bg_green, s.br2, s.h325, s.jcc, s.ph3, s.mt075]}
-                onPress={() => this.toggleModalOpen(true)}>
+                onPress={() => this.toggleModalOpen(true)}
+              >
                 <RN.Text style={[s.f4, s.white, s.tc, s.b]}>Add First Exercise</RN.Text>
               </RN.TouchableOpacity>
             </RN.View>}
@@ -391,7 +394,8 @@ class NotstartedTrainingScreen extends React.PureComponent<
           onRequestClose={() => {
             this.toggleModalOpen(false)
             onSetEditingExercise(null, null)
-          }}>
+          }}
+        >
           {editingExercise
             ? <ExerciseSettings
                 onUpdate={(exercise: Model.Exercise) => onSetEditingExercise(exercise, editingExerciseIndex)}
@@ -415,7 +419,8 @@ class NotstartedTrainingScreen extends React.PureComponent<
           animationType="slide"
           transparent={false}
           visible={isEditingTitle}
-          onRequestClose={() => this.setState({ isEditingTitle: false })}>
+          onRequestClose={() => this.setState({ isEditingTitle: false })}
+        >
           <InputScreen
             placeholder="Training Title"
             onChange={onSetTrainingTitle}
@@ -488,8 +493,11 @@ class FinishedTrainingScreen extends React.PureComponent<FinishedTrainingScreenP
                     </RN.View>
                   )
                 }
-              ]}>
-              <CompletedExerciseListItem exercise={exercise} />
+              ]}
+            >
+              <RN.View style={[s.ass, s.brw5, s.b_green]}>
+                <CompletedExerciseListItem exercise={exercise} />
+              </RN.View>
             </Swipeout>
           )}
         </RN.ScrollView>
@@ -502,7 +510,8 @@ class FinishedTrainingScreen extends React.PureComponent<FinishedTrainingScreenP
           animationType="slide"
           transparent={false}
           visible={isEditingTitle}
-          onRequestClose={() => this.setState({ isEditingTitle: false })}>
+          onRequestClose={() => this.setState({ isEditingTitle: false })}
+        >
           <InputScreen
             placeholder="Training Title"
             onChange={onSetTrainingTitle}
@@ -613,7 +622,8 @@ class OngoingTrainingScreen extends React.PureComponent<OngoingTrainingScreenPro
                     </RN.View>
                   )
                 }
-              ]}>
+              ]}
+            >
               <RN.TouchableOpacity onPress={() => onRestartExercise(i)} style={[s.ass, s.brw5, s.b_green]}>
                 <CompletedExerciseListItem exercise={exercise} />
               </RN.TouchableOpacity>
@@ -635,7 +645,8 @@ class OngoingTrainingScreen extends React.PureComponent<OngoingTrainingScreenPro
                     </RN.View>
                   )
                 }
-              ]}>
+              ]}
+            >
               <RN.TouchableOpacity onPress={() => onStartExercise(i)} style={[s.ass]}>
                 <ExerciseListItem exercise={exercise} />
               </RN.TouchableOpacity>
@@ -646,7 +657,8 @@ class OngoingTrainingScreen extends React.PureComponent<OngoingTrainingScreenPro
           {training.plannedExercises.length > 0
             ? <RN.TouchableOpacity
                 style={[s.asc, s.bg_green, s.br2, s.h325, s.jcc, s.ph3, s.mt075]}
-                onPress={() => onStartExercise(0)}>
+                onPress={() => onStartExercise(0)}
+              >
                 <RN.Text style={[s.f4, s.white, s.tc, s.b]}>Start next Exercise</RN.Text>
               </RN.TouchableOpacity>
             : <RN.TouchableOpacity style={[s.asc, s.bg_green, s.br2, s.h325, s.jcc, s.ph3, s.mt075]} onPress={onFinish}>
@@ -657,7 +669,8 @@ class OngoingTrainingScreen extends React.PureComponent<OngoingTrainingScreenPro
           animationType="slide"
           transparent={false}
           visible={!!currentExercise}
-          onRequestClose={() => onStartExercise(null)}>
+          onRequestClose={() => onStartExercise(null)}
+        >
           {startCountDown > 0 &&
             currentExercise &&
             <RN.View style={[s.flx_i, s.jcc, s.bg_blue, s.aic, s.ph4]}>
@@ -684,7 +697,8 @@ class OngoingTrainingScreen extends React.PureComponent<OngoingTrainingScreenPro
           animationType="slide"
           transparent={false}
           visible={isEditingTitle}
-          onRequestClose={() => this.setState({ isEditingTitle: false })}>
+          onRequestClose={() => this.setState({ isEditingTitle: false })}
+        >
           <InputScreen
             placeholder="Training Title"
             onChange={onSetTrainingTitle}
@@ -798,7 +812,8 @@ class InputScreen extends React.PureComponent<InputScreenProps, { value: string 
         <RN.TouchableOpacity
           disabled={isSubmitDisable}
           style={[s.asc, s.br2, s.h325, s.jcc, s.ph3, s.mt075, s.mb1, isSubmitDisable ? s.bg_green_30 : s.bg_green]}
-          onPress={this.onSubmit}>
+          onPress={this.onSubmit}
+        >
           <RN.Text style={[s.f4, s.tc, s.b, isSubmitDisable ? s.white_30 : s.white]}>Done</RN.Text>
         </RN.TouchableOpacity>
       </RN.KeyboardAvoidingView>

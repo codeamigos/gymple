@@ -3,7 +3,6 @@ import * as RN from 'react-native'
 import Icon from 'react-native-vector-icons/Ionicons'
 import Swipeout from 'react-native-swipeout'
 import * as moment from 'moment'
-import * as ReactRouterNative from 'react-router-native'
 // import TrainingScreen from './TrainingScreen'
 import * as Model from '../Model'
 
@@ -15,7 +14,6 @@ interface TrainingsListState {
 
 interface TrainingsListProps {
   editingTrainingIndex: number | null
-  hasCurrentTraining: boolean
   finishedTrainings: Model.FinishedTraining[]
   onStartNewTraining: () => void
   onRemoveFinishedTraining: (i: number) => void
