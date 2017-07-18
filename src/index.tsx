@@ -59,6 +59,7 @@ interface AppState {
   editingTrainingIndex: number | null
   currentTraining: Model.OngoingTraining | Model.NotStartedTraining | Model.FinishedTraining | null
   finishedTrainings: Model.FinishedTraining[]
+  animationCallback?: () => void
 }
 
 type AppProps = ReactRouter.RouteComponentProps<{}>
@@ -73,8 +74,9 @@ class App extends React.Component<AppProps, AppState> {
     }
   }
 
-  componentDidMount() {
-    this.fetchData()
+  async componentDidMount() {
+    await this.fetchData()
+    if (!!this.state.currentTraining) this.props.history.push('/training')
   }
 
   componentDidUpdate() {
@@ -153,7 +155,7 @@ class App extends React.Component<AppProps, AppState> {
     })
   }
 
-  finishTraining = () => {
+  finishCurrentTraining = () => {
     const { currentTraining, finishedTrainings, editingTrainingIndex } = this.state
     if (currentTraining) {
       switch (currentTraining.kind) {
@@ -166,6 +168,7 @@ class App extends React.Component<AppProps, AppState> {
             completedExercises: currentTraining.completedExercises
           }
           this.setState({
+            currentTraining: null,
             finishedTrainings:
               newFinishedTraining.completedExercises.length > 0
                 ? [newFinishedTraining, ...finishedTrainings]
@@ -174,6 +177,7 @@ class App extends React.Component<AppProps, AppState> {
           break
         case 'FinishedTraining':
           this.setState({
+            currentTraining: null,
             editingTrainingIndex: null,
             finishedTrainings:
               currentTraining.completedExercises.length > 0
@@ -182,6 +186,7 @@ class App extends React.Component<AppProps, AppState> {
           })
           break
         case 'NotStartedTraining':
+          this.setState({ currentTraining: null })
           break
         default:
           Util.shouldNeverHappen(currentTraining)
@@ -198,7 +203,7 @@ class App extends React.Component<AppProps, AppState> {
 
   render() {
     const { history, location } = this.props
-    const { currentTraining, finishedTrainings, editingTrainingIndex } = this.state
+    const { currentTraining, finishedTrainings, editingTrainingIndex, animationCallback } = this.state
 
     const uniqeCompletedExercises = finishedTrainings.reduce((completedExercises, training) => {
       const completedExercisesTitles: string[] = completedExercises.map(e => e.title)
@@ -209,7 +214,7 @@ class App extends React.Component<AppProps, AppState> {
     }, [] as Model.Exercise[])
 
     return (
-      <AnimatedChildRoute location={location} history={history}>
+      <AnimatedChildRoute animationCallback={animationCallback} location={location} history={history}>
         <ReactRouterNative.Switch location={this.props.location}>
           <ReactRouterNative.Route
             exact
@@ -238,8 +243,15 @@ class App extends React.Component<AppProps, AppState> {
                     training={currentTraining}
                     completedExercises={uniqeCompletedExercises}
                     onFinish={() => {
-                      this.finishTraining()
-                      history.goBack()
+                      this.setState(
+                        {
+                          animationCallback: () => {
+                            this.finishCurrentTraining()
+                            this.setState({ animationCallback: undefined })
+                          }
+                        },
+                        () => history.goBack()
+                      )
                     }}
                     onRestartFinished={this.restartFinishedTraining}
                     onUpdate={training => this.updateCurrentTraining(training, editingTrainingIndex)}
@@ -256,6 +268,7 @@ interface AnimatedChildRouteProps {
   location: H.Location
   history: H.History
   children: React.ReactNode
+  animationCallback?: () => void
 }
 
 interface AnimatedChildRouteState {
@@ -273,6 +286,7 @@ class AnimatedChildRoute extends React.Component<AnimatedChildRouteProps, Animat
   }
 
   componentWillReceiveProps(nextProps: AnimatedChildRouteProps) {
+    const { animationCallback } = this.props
     if (this.props.location.pathname !== nextProps.location.pathname) {
       this.state.anim.setValue(0)
       this.setState(
@@ -287,9 +301,12 @@ class AnimatedChildRoute extends React.Component<AnimatedChildRouteProps, Animat
               duration: 300
             })
             .start(() => {
-              this.setState({
-                prevChildren: null
-              })
+              this.setState(
+                {
+                  prevChildren: null
+                },
+                () => !!animationCallback && animationCallback()
+              )
             })
         }
       )
