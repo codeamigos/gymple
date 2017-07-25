@@ -3,11 +3,12 @@ import * as RN from 'react-native'
 import Icon from 'react-native-vector-icons/Ionicons'
 
 import * as Model from '../Model'
-
+import Popup from '../components/Popup'
 import { s, sizes, colors } from './../styles'
 
 interface ActiveExerciseProps {
   onClose: () => void
+  onUpdate: (exercise: Model.Exercise) => void
   onDone: () => void
   exercise: Model.Exercise
 }
@@ -15,6 +16,7 @@ interface ActiveExerciseProps {
 interface ActiveExerciseState {
   isRest: boolean
   currentAttemptIndex: number
+  isAtteptSettingsPopupVisible: boolean
   timer: number
 }
 
@@ -23,6 +25,7 @@ export default class RunningExercise extends React.PureComponent<ActiveExerciseP
     super(props)
     this.state = {
       isRest: false,
+      isAtteptSettingsPopupVisible: false,
       currentAttemptIndex: 0,
       timer: 0
     }
@@ -41,17 +44,31 @@ export default class RunningExercise extends React.PureComponent<ActiveExerciseP
   }
 
   componentDidUpdate(_: ActiveExerciseProps, prevState: ActiveExerciseState) {
-    const { isRest, timer } = this.state
+    const { isRest, timer, isAtteptSettingsPopupVisible } = this.state
     const { exercise } = this.props
-    if (isRest && exercise.restSeconds - timer <= 0 && exercise.restSeconds - prevState.timer > 0)
+    if (
+      !isAtteptSettingsPopupVisible &&
+      isRest &&
+      exercise.restSeconds - timer <= 0 &&
+      exercise.restSeconds - prevState.timer > 0
+    )
       RN.Vibration.vibrate(50, true)
     else if (!isRest) RN.Vibration.cancel()
   }
 
   handleNextAttempt = () =>
-    this.setState({ currentAttemptIndex: this.state.currentAttemptIndex + 1, isRest: false, timer: 0 })
+    this.setState({
+      currentAttemptIndex: this.state.currentAttemptIndex + 1,
+      isRest: false,
+      timer: 0,
+      isAtteptSettingsPopupVisible: false
+    })
 
-  handleRest = () => this.setState({ isRest: true, timer: 0 })
+  handleRest = () => this.setState({ isRest: true, timer: 0, isAtteptSettingsPopupVisible: true })
+
+  updateAttemptAndCloseModal = (_attempt: Model.Attempt) => {
+    this.setState({ isAtteptSettingsPopupVisible: false })
+  }
 
   renderTimer = () => {
     const { timer, isRest } = this.state
@@ -64,7 +81,7 @@ export default class RunningExercise extends React.PureComponent<ActiveExerciseP
 
   render() {
     const { onClose, onDone, exercise } = this.props
-    const { currentAttemptIndex, isRest } = this.state
+    const { currentAttemptIndex, isRest, isAtteptSettingsPopupVisible } = this.state
 
     const exerciseAttempts: Model.Attempt[] = [exercise.attempts.first, ...exercise.attempts.other]
     const currentAttempt = exerciseAttempts[currentAttemptIndex]
@@ -152,6 +169,11 @@ export default class RunningExercise extends React.PureComponent<ActiveExerciseP
               )}
           </RN.ScrollView>
         </RN.View>
+        <Popup style={s.bg_black_30} isExpanded={isAtteptSettingsPopupVisible}>
+          <RN.View style={[s.flx_i, s.jcc, s.aic, s.ph3]}>
+            <AttemptEditor attempt={currentAttempt} onDone={this.updateAttemptAndCloseModal} />
+          </RN.View>
+        </Popup>
       </RN.View>
     )
   }
@@ -194,6 +216,59 @@ const AttemptListItem = ({ attempt, num, restSeconds, isActive }: AttemptListIte
         </RN.View>
       </RN.View>}
   </RN.View>
+
+interface AttemptEditorProps {
+  attempt: Model.Attempt
+  onDone: (attempt: Model.Attempt) => void
+}
+
+interface AttemptEditorState {
+  attempt: Model.Attempt
+}
+
+class AttemptEditor extends React.PureComponent<AttemptEditorProps, AttemptEditorState> {
+  constructor(props: AttemptEditorProps) {
+    super(props)
+    this.state = {
+      attempt: props.attempt
+    }
+  }
+
+  onChangeWeight = (weight: number) =>
+    this.setState({
+      attempt: {
+        weight,
+        repetitions: this.state.attempt.repetitions
+      }
+    })
+
+  onChangeRepetitions = (repetitions: number) =>
+    this.setState({
+      attempt: {
+        weight: this.state.attempt.weight,
+        repetitions
+      }
+    })
+
+  onClose = () => this.props.onDone(this.state.attempt)
+
+  render() {
+    const { attempt } = this.state
+    return (
+      <RN.View style={[s.bg_white, s.br0125, s.ass, s.pa2, s.jcc, s.aic]}>
+        <RN.Text style={[s.fw3, s.f4, s.bg_t]}>
+          {attempt.weight} x {attempt.repetitions}
+        </RN.Text>
+        <RN.TouchableOpacity
+          style={[s.asfs, s.bg_green, s.br0125, s.h325, s.jcc, s.ph3, s.mv075]}
+          onPress={this.onClose}
+        >
+          <RN.Text style={[s.f4, s.white, s.tc, s.b]}>Done</RN.Text>
+        </RN.TouchableOpacity>
+      </RN.View>
+    )
+  }
+}
 
 const secondsToMinutes = (seconds: number): string => {
   const min = String(Math.floor(seconds / 60))

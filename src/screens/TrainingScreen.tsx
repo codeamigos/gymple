@@ -226,6 +226,27 @@ export default class TrainingScreen extends React.PureComponent<TrainingScreenPr
     }
   }
 
+  updateCurrentExercise = (updatedExercise: Model.Exercise) => {
+    const { onUpdate, training } = this.props
+    switch (training.kind) {
+      case 'NotStartedTraining':
+      case 'FinishedTraining':
+        break
+      case 'OngoingTraining':
+        if (training.currentExerciseIndex !== null) {
+          onUpdate({
+            ...training,
+            plannedExercises: training.plannedExercises.map(
+              (e, i) => (i !== training.currentExerciseIndex ? updatedExercise : e)
+            )
+          })
+        }
+        break
+      default:
+        Util.shouldNeverHappen(training)
+    }
+  }
+
   toggleModalOpen = (isAddingModalOpened: boolean) => {
     this.setState({ isAddingModalOpened })
   }
@@ -253,6 +274,7 @@ export default class TrainingScreen extends React.PureComponent<TrainingScreenPr
             onFinish={onFinish}
             onSelectExerciseToAdd={() => this.toggleModalOpen(true)}
             onRemoveCompletedExercise={this.removeCompletedExercise}
+            onUpdateCurrentExercise={this.updateCurrentExercise}
             onCompleteExercise={this.completeExercise}
             onRemoveExercise={this.removeExercise}
             onRestartExercise={this.restartExercise}
@@ -454,6 +476,7 @@ interface OngoingTrainingScreenProps {
   onStartExercise: (i: number | null) => void
   onRestartExercise: (i: number) => void
   onRemoveExercise: (i: number) => void
+  onUpdateCurrentExercise: (exercise: Model.Exercise) => void
   onRemoveCompletedExercise: (i: number) => void
   onCompleteExercise: () => void
   onSetTrainingTitle: (title: string) => void
@@ -502,6 +525,7 @@ class OngoingTrainingScreen extends React.PureComponent<OngoingTrainingScreenPro
       onCompleteExercise,
       onStartExercise,
       onRestartExercise,
+      onUpdateCurrentExercise,
       onRemoveExercise,
       onSetTrainingTitle,
       onSelectExerciseToAdd
@@ -618,6 +642,7 @@ class OngoingTrainingScreen extends React.PureComponent<OngoingTrainingScreenPro
           {startCountDown <= 0 &&
             currentExercise &&
             <RunningExercise
+              onUpdate={(exercise: Model.Exercise) => onUpdateCurrentExercise(exercise)}
               onClose={() => onStartExercise(null)}
               onDone={onCompleteExercise}
               exercise={currentExercise}
