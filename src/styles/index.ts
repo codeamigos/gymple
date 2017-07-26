@@ -12,12 +12,40 @@ export interface Palette {
 
 type FontWeight = 'normal' | 'bold' | '100' | '200' | '300' | '400' | '500' | '600' | '700' | '800' | '900'
 
+type NumericStyleKey =
+  | 'marginTop'
+  | 'marginBottom'
+  | 'marginRight'
+  | 'marginLeft'
+  | 'paddingTop'
+  | 'paddingBottom'
+  | 'paddingRight'
+  | 'paddingLeft'
+  | 'height'
+  | 'width'
+  | 'minHeight'
+  | 'minWidth'
+  | 'maxHeight'
+  | 'maxWidth'
+  | 'right'
+  | 'left'
+  | 'top'
+  | 'bottom'
+  | 'borderRadius'
+  | 'borderWidth'
+  | 'borderTopWidth'
+  | 'borderRightWidth'
+  | 'borderBottomWidth'
+  | 'borderLeftWidth'
+  | 'lineHeight'
+  | 'fontSize'
+
 export interface FontWeightPalette {
   [key: string]: FontWeight
 }
 
-export interface Style {
-  [key: string]: number | string
+export interface NumericStyle {
+  [key: string]: NumericStyleKey
 }
 
 export interface TextStyleResult {
@@ -30,109 +58,41 @@ export interface ImageStyleResult {
   [key: string]: RN.ImageStyle
 }
 
-export type StyleResult = ImageStyleResult | ViewStyleResult | ImageStyleResult
+type StyleResult = ImageStyleResult | ViewStyleResult | ImageStyleResult
 
-const genericRemStyles: StyleResult = {
-  mt: {
-    marginTop: 1
-  },
-  mb: {
-    marginBottom: 1
-  },
-  mr: {
-    marginRight: 1
-  },
-  ml: {
-    marginLeft: 1
-  },
-  mh: {
-    marginLeft: 1,
-    marginRight: 1
-  },
-  mv: {
-    marginTop: 1,
-    marginBottom: 1
-  },
-  pt: {
-    paddingTop: 1
-  },
-  pb: {
-    paddingBottom: 1
-  },
-  pr: {
-    paddingRight: 1
-  },
-  pl: {
-    paddingLeft: 1
-  },
-  ph: {
-    paddingLeft: 1,
-    paddingRight: 1
-  },
-  pv: {
-    paddingTop: 1,
-    paddingBottom: 1
-  },
-  h: {
-    height: 1
-  },
-  w: {
-    width: 1
-  },
-  minh: {
-    minHeight: 1
-  },
-  minw: {
-    minWidth: 1
-  },
-  maxh: {
-    maxHeight: 1
-  },
-  maxw: {
-    maxWidth: 1
-  },
-  r: {
-    right: 1
-  },
-  l: {
-    left: 1
-  },
-  t: {
-    top: 1
-  },
-  b: {
-    bottom: 1
-  },
-  br: {
-    borderRadius: 1
-  }
+const genericRemStyles: NumericStyle = {
+  mt: 'marginTop',
+  mb: 'marginBottom',
+  mr: 'marginRight',
+  ml: 'marginLeft',
+  pt: 'paddingTop',
+  pb: 'paddingBottom',
+  pr: 'paddingRight',
+  pl: 'paddingLeft',
+  h: 'height',
+  w: 'width',
+  minh: 'minHeight',
+  minw: 'minWidth',
+  maxh: 'maxHeight',
+  maxw: 'maxWidth',
+  r: 'right',
+  l: 'left',
+  t: 'top',
+  b: 'bottom',
+  br: 'borderRadius'
 }
 
-const pointStyles: StyleResult = {
-  bw: {
-    borderWidth: 1
-  },
-  btw: {
-    borderTopWidth: 1
-  },
-  brw: {
-    borderRightWidth: 1
-  },
-  bbw: {
-    borderBottomWidth: 1
-  },
-  blw: {
-    borderLeftWidth: 1
-  }
+const pointStyles: NumericStyle = {
+  bw: 'borderWidth',
+  btw: 'borderTopWidth',
+  brw: 'borderRightWidth',
+  bbw: 'borderBottomWidth',
+  blw: 'borderLeftWidth'
 }
 
-const textRemStyles: TextStyleResult = {
-  lh: {
-    lineHeight: 1
-  },
-  fs: {
-    fontSize: 1
-  }
+const textRemStyles: NumericStyle = {
+  lh: 'lineHeight',
+  fs: 'fontSize'
 }
 
 const textStaticStyles: TextStyleResult = {
@@ -246,28 +206,16 @@ const genericStaticStyles: StyleResult = {
   }
 }
 
-const multiplyStylesValues = (styles: StyleResult, multiplicators: Multiplicators): StyleResult => {
-  const resultStyles: StyleResult = {}
+const multiplyStylesValues = (styles: NumericStyle, multiplicators: Multiplicators): ViewStyleResult => {
+  const resultStyles: ViewStyleResult = {}
   Object.keys(styles).map(key => {
-    if (key.includes('__')) {
-      resultStyles[key] = styles[key]
-    } else {
-      Object.keys(multiplicators).map(prefix => {
-        const multiplicatorValue: number = multiplicators[prefix]
-        const multiplyedStyle: Style = {}
-
-        Object.keys(styles[key]).map((styleKey: string) => {
-          const oldStyleValue = styles[key][styleKey]
-          if (typeof oldStyleValue === 'number') {
-            multiplyedStyle[styleKey] = oldStyleValue * multiplicatorValue
-          } else {
-            multiplyedStyle[styleKey] = oldStyleValue
-          }
-        })
-
-        resultStyles[key + prefix] = multiplyedStyle
-      })
-    }
+    Object.keys(multiplicators).map(prefix => {
+      const multiplicatorValue: number = multiplicators[prefix]
+      const styleName: NumericStyleKey = styles[key]
+      resultStyles[key + prefix] = {
+        [styleName]: multiplicatorValue
+      }
+    })
   })
   return resultStyles
 }
@@ -295,8 +243,8 @@ const generatePalette = (colors: Palette): Palette => {
   return resultPalette
 }
 
-const generateColorsPalette = (colors: Palette): ImageStyleResult | ViewStyleResult => {
-  const resultStyles: ImageStyleResult | ViewStyleResult = {}
+const generateColorsPalette = (colors: Palette): ImageStyleResult | ImageStyleResult => {
+  const resultStyles: ImageStyleResult | ImageStyleResult = {}
   Object.keys(colors).map(name => {
     const color: string = colors[name]
     resultStyles[`bg_${name}`] = { backgroundColor: color }
@@ -359,7 +307,7 @@ export interface Options {
   fontWeights?: FontWeightPalette
 }
 
-interface BuildStyles {
+export interface BuildStyles {
   s: StyleResult
   sizes: Multiplicators
   colors: Palette
@@ -386,7 +334,7 @@ const buildStyles: BuildStyles = {
         ...multiplyStylesValues(pointStyles, multiplicators),
         ...multiplyStylesValues(genericRemStyles, multiplyToRem(remSize, multiplicators)),
         ...multiplyStylesValues(textRemStyles, multiplyToRem(remSize, multiplicators)),
-        ...multiplyStylesValues({ f: { fontSize: 1 } }, multiplyToRem(remSize, headings)),
+        ...multiplyStylesValues({ f: 'fontSize' }, multiplyToRem(remSize, headings)),
         ...generateColorsPalette(palette),
         ...generateTextColorsPalette(palette),
         ...generateFonts(fonts),
