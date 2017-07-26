@@ -82,7 +82,7 @@ const genericRemStyles: NumericStyle = {
   br: 'borderRadius'
 }
 
-const pointStyles: NumericStyle = {
+const genericPointStyles: NumericStyle = {
   bw: 'borderWidth',
   btw: 'borderTopWidth',
   brw: 'borderRightWidth',
@@ -331,7 +331,7 @@ const buildStyles: BuildStyles = {
     assign(
       buildStyles.s,
       RN.StyleSheet.create({
-        ...multiplyStylesValues(pointStyles, multiplicators),
+        ...multiplyStylesValues(genericPointStyles, multiplicators),
         ...multiplyStylesValues(genericRemStyles, multiplyToRem(remSize, multiplicators)),
         ...multiplyStylesValues(textRemStyles, multiplyToRem(remSize, multiplicators)),
         ...multiplyStylesValues({ f: 'fontSize' }, multiplyToRem(remSize, headings)),
