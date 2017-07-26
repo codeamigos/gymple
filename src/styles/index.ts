@@ -10,18 +10,29 @@ export interface Palette {
   [key: string]: string
 }
 
+type FontWeight = 'normal' | 'bold' | '100' | '200' | '300' | '400' | '500' | '600' | '700' | '800' | '900'
+
+export interface FontWeightPalette {
+  [key: string]: FontWeight
+}
+
 export interface Style {
   [key: string]: number | string
 }
 
-export interface StylesResult {
-  [key: string]: Style
+export interface TextStyleResult {
+  [key: string]: RN.TextStyle
+}
+export interface ViewStyleResult {
+  [key: string]: RN.ViewStyle
+}
+export interface ImageStyleResult {
+  [key: string]: RN.ImageStyle
 }
 
-const remStyles: StylesResult = {
-  fs: {
-    fontSize: 1
-  },
+export type StyleResult = ImageStyleResult | ViewStyleResult | ImageStyleResult
+
+const genericRemStyles: StyleResult = {
   mt: {
     marginTop: 1
   },
@@ -92,15 +103,12 @@ const remStyles: StylesResult = {
   b: {
     bottom: 1
   },
-  lh: {
-    lineHeight: 1
-  },
   br: {
     borderRadius: 1
   }
 }
 
-const pointStyles: StylesResult = {
+const pointStyles: StyleResult = {
   bw: {
     borderWidth: 1
   },
@@ -118,7 +126,32 @@ const pointStyles: StylesResult = {
   }
 }
 
-const staticStyles: StylesResult = {
+const textRemStyles: TextStyleResult = {
+  lh: {
+    lineHeight: 1
+  },
+  fs: {
+    fontSize: 1
+  }
+}
+
+const textStaticStyles: TextStyleResult = {
+  // Text
+  i: {
+    fontStyle: 'italic'
+  },
+  tl: {
+    textAlign: 'left'
+  },
+  tc: {
+    textAlign: 'center'
+  },
+  tr: {
+    textAlign: 'right'
+  }
+}
+
+const genericStaticStyles: StyleResult = {
   // No border radius
   br__bottom: {
     borderTopLeftRadius: 0,
@@ -210,28 +243,11 @@ const staticStyles: StylesResult = {
   },
   rm_stretch: {
     resizeMode: 'stretch'
-  },
-
-  // Text
-  i: {
-    fontStyle: 'italic'
-  },
-  tl: {
-    textAlign: 'left'
-  },
-  tc: {
-    textAlign: 'center'
-  },
-  tr: {
-    textAlign: 'right'
-  },
-  tj: {
-    textAlign: 'justify'
   }
 }
 
-const multiplyStylesValues = (styles: StylesResult, multiplicators: Multiplicators): StylesResult => {
-  const resultStyles: StylesResult = {}
+const multiplyStylesValues = (styles: StyleResult, multiplicators: Multiplicators): StyleResult => {
+  const resultStyles: StyleResult = {}
   Object.keys(styles).map(key => {
     if (key.includes('__')) {
       resultStyles[key] = styles[key]
@@ -279,25 +295,36 @@ const generatePalette = (colors: Palette): Palette => {
   return resultPalette
 }
 
-const generateStylesPalette = (colors: Palette): StylesResult => {
-  const resultStyles: StylesResult = {}
+const generateColorsPalette = (colors: Palette): ImageStyleResult | ViewStyleResult => {
+  const resultStyles: ImageStyleResult | ViewStyleResult = {}
   Object.keys(colors).map(name => {
     const color: string = colors[name]
     resultStyles[`bg_${name}`] = { backgroundColor: color }
-    resultStyles[name] = { color: color }
     resultStyles[`b_${name}`] = { borderColor: color }
     for (let i: number = 5; i < 100; i += 5) {
       const rgbString: string = Color(color).alpha(i / 100).rgb().string()
       resultStyles[`bg_${name}_${i}`] = { backgroundColor: rgbString }
-      resultStyles[`${name}_${i}`] = { color: rgbString }
       resultStyles[`b_${name}_${i}`] = { borderColor: rgbString }
     }
   })
   return resultStyles
 }
 
-const generateOpacity = (): StylesResult => {
-  const resultStyles: StylesResult = {}
+const generateTextColorsPalette = (colors: Palette): TextStyleResult => {
+  const resultStyles: TextStyleResult = {}
+  Object.keys(colors).map(name => {
+    const color: string = colors[name]
+    resultStyles[name] = { color: color }
+    for (let i: number = 5; i < 100; i += 5) {
+      const rgbString: string = Color(color).alpha(i / 100).rgb().string()
+      resultStyles[`${name}_${i}`] = { color: rgbString }
+    }
+  })
+  return resultStyles
+}
+
+const generateOpacity = (): StyleResult => {
+  const resultStyles: StyleResult = {}
   for (let i: number = 5; i < 100; i += 5) {
     const opacity: number = i / 100
     resultStyles[`o_${i}`] = { opacity }
@@ -305,8 +332,8 @@ const generateOpacity = (): StylesResult => {
   return resultStyles
 }
 
-const generateFonts = (fonts: Palette): StylesResult => {
-  const resultStyles: StylesResult = {}
+const generateFonts = (fonts: Palette): TextStyleResult => {
+  const resultStyles: TextStyleResult = {}
   Object.keys(fonts).map(name => {
     const fontFamily: string = fonts[name]
     resultStyles[`f_${name}`] = { fontFamily }
@@ -314,10 +341,10 @@ const generateFonts = (fonts: Palette): StylesResult => {
   return resultStyles
 }
 
-const generateFontWeights = (weights: Palette): StylesResult => {
-  const resultStyles: StylesResult = {}
+const generateFontWeights = (weights: FontWeightPalette): TextStyleResult => {
+  const resultStyles: TextStyleResult = {}
   Object.keys(weights).map(name => {
-    const fontWeight: string = weights[name]
+    const fontWeight: FontWeight = weights[name]
     resultStyles[`${name}`] = { fontWeight }
   })
   return resultStyles
@@ -329,11 +356,11 @@ export interface Options {
   headings?: Multiplicators
   palette?: Palette
   fonts?: Palette
-  fontWeights?: Palette
+  fontWeights?: FontWeightPalette
 }
 
 interface BuildStyles {
-  s: StylesResult
+  s: StyleResult
   sizes: Multiplicators
   colors: Palette
   build: (defaultOptions: Options, callback?: () => any) => void
@@ -357,13 +384,16 @@ const buildStyles: BuildStyles = {
       buildStyles.s,
       RN.StyleSheet.create({
         ...multiplyStylesValues(pointStyles, multiplicators),
-        ...multiplyStylesValues(remStyles, multiplyToRem(remSize, multiplicators)),
+        ...multiplyStylesValues(genericRemStyles, multiplyToRem(remSize, multiplicators)),
+        ...multiplyStylesValues(textRemStyles, multiplyToRem(remSize, multiplicators)),
         ...multiplyStylesValues({ f: { fontSize: 1 } }, multiplyToRem(remSize, headings)),
-        ...generateStylesPalette(palette),
+        ...generateColorsPalette(palette),
+        ...generateTextColorsPalette(palette),
         ...generateFonts(fonts),
         ...generateFontWeights(fontWeights),
         ...generateOpacity(),
-        ...staticStyles
+        ...genericStaticStyles,
+        ...textStaticStyles
       })
     )
     callback()
@@ -415,7 +445,7 @@ export const defaultPalette: Palette = {
   black: 'rgb(0,0,0)'
 }
 
-export const defaultFontWeights: Palette = {
+export const defaultFontWeights: FontWeightPalette = {
   normal: 'normal',
   b: 'bold',
   fw1: '100',
