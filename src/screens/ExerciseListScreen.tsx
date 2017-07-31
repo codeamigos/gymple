@@ -33,11 +33,13 @@ export default class ExerciseListScreen extends React.PureComponent<ExerciseList
     const { onClose, completedExercises, onSelect } = this.props
 
     const completedExercisesTitles = completedExercises.map(e => e.title)
-    const exercises = completedExercises.concat(
-      exerciseTemplates
-        .filter(e => completedExercisesTitles.indexOf(e.title) === -1)
-        .map(e => convertTemplateToGenericExercise(e))
-    )
+    const exercises = completedExercises
+      .map(e => setExerciseAttemptsToAverage(e))
+      .concat(
+        exerciseTemplates
+          .filter(e => completedExercisesTitles.indexOf(e.title) === -1)
+          .map(e => convertTemplateToGenericExercise(e))
+      )
 
     return (
       <RN.View style={[s.flx_i, s.jcsb, s.bg_greyLightest]}>
@@ -118,5 +120,20 @@ const convertTemplateToGenericExercise = (exercise: Model.Exercise | Model.Exerc
       }
     default:
       return Util.shouldNeverHappen(exercise)
+  }
+}
+
+const setExerciseAttemptsToAverage = (exercise: Model.Exercise): Model.Exercise => {
+  const attempts = [exercise.attempts.first, ...exercise.attempts.other]
+  const averageAttempt: Model.Attempt = {
+    repetitions: Math.round(attempts.reduce((acc, a) => acc + a.repetitions, 0) / attempts.length),
+    weight: Math.round(attempts.reduce((acc, a) => acc + a.weight, 0) / attempts.length)
+  }
+  return {
+    ...exercise,
+    attempts: {
+      first: averageAttempt,
+      other: exercise.attempts.other.map(_ => averageAttempt)
+    }
   }
 }
