@@ -4,7 +4,7 @@ import Icon from 'react-native-vector-icons/Ionicons'
 
 import * as Model from '../Model'
 
-import { s, sizes, colors } from './../styles'
+import { s, sizes, colors } from 'react-native-better-styles'
 
 interface ExerciseSettingsProps {
   onClose: () => void

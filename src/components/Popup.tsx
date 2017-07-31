@@ -1,7 +1,7 @@
 import * as React from 'react'
 import * as RN from 'react-native'
 
-import { s } from './../styles'
+import { s } from 'react-native-better-styles'
 const { height } = RN.Dimensions.get('window')
 
 interface PopupState {

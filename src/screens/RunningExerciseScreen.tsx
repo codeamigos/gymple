@@ -4,7 +4,7 @@ import Icon from 'react-native-vector-icons/Ionicons'
 
 import * as Model from '../Model'
 import Popup from '../components/Popup'
-import { s, sizes, colors } from './../styles'
+import { s, sizes, colors } from 'react-native-better-styles'
 
 interface ActiveExerciseProps {
   onClose: () => void

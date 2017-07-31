@@ -10,7 +10,7 @@ import RunningExercise from './RunningExerciseScreen'
 import * as Util from '../Util'
 import * as Model from '../Model'
 
-import { colors, sizes, s } from './../styles'
+import { colors, sizes, s } from 'react-native-better-styles'
 
 interface TrainingScreenState {
   editingExercise: Model.Exercise | null

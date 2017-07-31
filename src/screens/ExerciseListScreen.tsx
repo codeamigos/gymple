@@ -6,7 +6,7 @@ import * as Util from '../Util'
 import * as Model from '../Model'
 import * as ExerciseData from '../ExercisesData'
 
-import { s, sizes, colors } from './../styles'
+import { s, sizes, colors } from 'react-native-better-styles'
 
 interface ExerciseListProps {
   onClose: () => void

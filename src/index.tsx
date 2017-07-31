@@ -12,12 +12,12 @@ import TrainingListScreen from './screens/TrainingListScreen'
 import TrainingScreen from './screens/TrainingScreen'
 import * as Util from './Util'
 import * as Model from './Model'
-import bs, { Palette, Multiplicators, Options } from './styles'
-const { s, colors } = bs
+import * as BS from 'react-native-better-styles'
+const { s, colors } = BS
 
 const { width } = RN.Dimensions.get('window')
 
-const palette: Palette = {
+const palette: BS.Palette = {
   greyDarkest: '#2e333d',
   greyDarker: '#434b55',
   greyDark: '#555b65',
@@ -37,7 +37,7 @@ const palette: Palette = {
   t: 'rgba(0,0,0,0)'
 }
 
-const headings: Multiplicators = {
+const headings: BS.Multiplicators = {
   '7': 0.75,
   '6': 0.85,
   '5': 1,
@@ -47,12 +47,12 @@ const headings: Multiplicators = {
   '1': 3.25
 }
 
-bs.build(
+BS.build(
   {
     remSize: 15,
     palette,
     headings
-  } as Options
+  } as BS.Options
 )
 
 interface AppState {

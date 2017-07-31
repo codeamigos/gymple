@@ -6,7 +6,7 @@ import * as moment from 'moment'
 // import TrainingScreen from './TrainingScreen'
 import * as Model from '../Model'
 
-import { s, colors, sizes } from './../styles'
+import { s, colors, sizes } from 'react-native-better-styles'
 
 interface TrainingsListState {
   isScrollEnabled: boolean
