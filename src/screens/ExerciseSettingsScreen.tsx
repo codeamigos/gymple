@@ -149,6 +149,7 @@ export default class ExerciseSettingsScreen extends React.PureComponent<Exercise
                     placeholderTextColor={colors.white_20}
                     style={[s.bg_t, s.f2, s.b, s.white, s.h3, s.tc]}
                     placeholder="12"
+                    maxLength={3}
                     onChangeText={repeatsString => this.handleChangeOverallRepeats(repeatsString)}
                     onBlur={() => RN.Keyboard.dismiss()}
                   />
@@ -168,6 +169,7 @@ export default class ExerciseSettingsScreen extends React.PureComponent<Exercise
                     placeholderTextColor={colors.white_20}
                     style={[s.bg_t, s.f2, s.b, s.white, s.h3, s.tc]}
                     placeholder="25"
+                    maxLength={3}
                     onChangeText={weightString => this.handleChangeOverallWeight(weightString)}
                     onBlur={() => RN.Keyboard.dismiss()}
                   />

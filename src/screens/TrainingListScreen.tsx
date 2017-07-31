@@ -112,7 +112,7 @@ const TrainingsListItem = ({ training }: { training: Model.FinishedTraining }) =
         </RN.Text>
       </RN.View>
       <RN.Text style={[s.f6, s.black_50, s.fw3]}>
-        {moment(training.finishedAt).format('dddd (MMMM Do)')}
+        {moment(training.finishedAt).format('MMMM Do')} ({moment(training.finishedAt).fromNow()})
       </RN.Text>
     </RN.View>
   )

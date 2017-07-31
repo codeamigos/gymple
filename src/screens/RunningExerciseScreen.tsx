@@ -66,8 +66,24 @@ export default class RunningExercise extends React.PureComponent<ActiveExerciseP
 
   handleRest = () => this.setState({ isRest: true, timer: 0, isAtteptSettingsPopupVisible: true })
 
-  updateAttemptAndCloseModal = (_attempt: Model.Attempt) => {
-    this.setState({ isAtteptSettingsPopupVisible: false })
+  updateAttemptAndCloseModal = (attempt: Model.Attempt) => {
+    const { onUpdate, exercise, onDone } = this.props
+    const { currentAttemptIndex } = this.state
+    const firstAttempt = currentAttemptIndex === 0 ? attempt : exercise.attempts.first
+    const otherAttempts =
+      currentAttemptIndex > 0
+        ? exercise.attempts.other.map((a, i) => (i === currentAttemptIndex - 1 ? attempt : a))
+        : exercise.attempts.other
+    onUpdate({
+      ...exercise,
+      attempts: {
+        first: firstAttempt,
+        other: otherAttempts
+      }
+    })
+    this.setState({ isAtteptSettingsPopupVisible: false }, () => {
+      if (currentAttemptIndex === exercise.attempts.other.length) onDone()
+    })
   }
 
   renderTimer = () => {
@@ -80,7 +96,7 @@ export default class RunningExercise extends React.PureComponent<ActiveExerciseP
   }
 
   render() {
-    const { onClose, onDone, exercise } = this.props
+    const { onClose, exercise } = this.props
     const { currentAttemptIndex, isRest, isAtteptSettingsPopupVisible } = this.state
 
     const exerciseAttempts: Model.Attempt[] = [exercise.attempts.first, ...exercise.attempts.other]
@@ -137,21 +153,12 @@ export default class RunningExercise extends React.PureComponent<ActiveExerciseP
           </RN.Text>
           {currentAttemptIndex < exerciseAttempts.length - 1
             ? !isRest
-              ? <RN.TouchableOpacity
-                  style={[s.asfs, s.bg_green, s.br2, s.h325, s.jcc, s.ph3, s.mv075]}
-                  onPress={this.handleRest}
-                >
-                  <RN.Text style={[s.f4, s.white, s.tc, s.b]}>Done with it</RN.Text>
-                </RN.TouchableOpacity>
-              : <RN.TouchableOpacity
-                  style={[s.asfs, s.bg_green, s.br2, s.h325, s.jcc, s.ph3, s.mv075]}
-                  onPress={this.handleNextAttempt}
-                >
-                  <RN.Text style={[s.f4, s.white, s.tc, s.b]}>Start next Attempt</RN.Text>
-                </RN.TouchableOpacity>
-            : <RN.TouchableOpacity style={[s.asfs, s.bg_green, s.br2, s.h325, s.jcc, s.ph3, s.mv075]} onPress={onDone}>
-                <RN.Text style={[s.f4, s.white, s.tc, s.b]}>Complete Exercise</RN.Text>
-              </RN.TouchableOpacity>}
+              ? <Button onPress={this.handleRest} label="Done with it" />
+              : <Button onPress={this.handleNextAttempt} label="Start next Attempt" />
+            : <Button
+                onPress={() => this.setState({ isAtteptSettingsPopupVisible: true })}
+                label="Complete Exercise"
+              />}
         </RN.View>
         <RN.View style={[s.flx_i, s.bg_blueDark, s.jcsb, s.pl125]}>
           <RN.ScrollView style={s.flx_i}>
@@ -175,6 +182,19 @@ export default class RunningExercise extends React.PureComponent<ActiveExerciseP
           </RN.View>
         </Popup>
       </RN.View>
+    )
+  }
+}
+
+class Button extends React.PureComponent<{ onPress: () => void; label: string }> {
+  render() {
+    const { onPress, label } = this.props
+    return (
+      <RN.TouchableOpacity style={[s.asfs, s.bg_green, s.br2, s.h325, s.jcc, s.ph3, s.mv075]} onPress={onPress}>
+        <RN.Text style={[s.f4, s.white, s.tc, s.b]}>
+          {label}
+        </RN.Text>
+      </RN.TouchableOpacity>
     )
   }
 }
@@ -234,36 +254,77 @@ class AttemptEditor extends React.PureComponent<AttemptEditorProps, AttemptEdito
     }
   }
 
-  onChangeWeight = (weight: number) =>
+  onChangeWeight = (weightString: string) => {
+    const weight = isNaN(parseInt(weightString, 10)) ? 0 : parseInt(weightString, 10)
     this.setState({
       attempt: {
         weight,
         repetitions: this.state.attempt.repetitions
       }
     })
+  }
 
-  onChangeRepetitions = (repetitions: number) =>
+  onChangeRepetitions = (repetitionsString: string) => {
+    const repetitions = isNaN(parseInt(repetitionsString, 10)) ? 0 : parseInt(repetitionsString, 10)
     this.setState({
       attempt: {
         weight: this.state.attempt.weight,
         repetitions
       }
     })
+  }
 
-  onClose = () => this.props.onDone(this.state.attempt)
+  onClose = () => {
+    this.props.onDone(this.state.attempt)
+    RN.Keyboard.dismiss()
+  }
 
   render() {
     const { attempt } = this.state
     return (
-      <RN.View style={[s.bg_white, s.br0125, s.ass, s.pa2, s.jcc, s.aic]}>
-        <RN.Text style={[s.fw3, s.f4, s.bg_t]}>
-          {attempt.weight} x {attempt.repetitions}
-        </RN.Text>
-        <RN.TouchableOpacity
-          style={[s.asfs, s.bg_green, s.br0125, s.h325, s.jcc, s.ph3, s.mv075]}
-          onPress={this.onClose}
-        >
-          <RN.Text style={[s.f4, s.white, s.tc, s.b]}>Done</RN.Text>
+      <RN.View style={[s.bg_white, s.br025, s.ass, s.jcc, s.aic]}>
+        <RN.View style={[s.pt1, s.pb05, s.bbw1, s.b_black_10, s.ass, s.ph3]}>
+          <RN.Text style={[s.fw3, s.f3, s.bg_t, s.tc, s.black, s.mb05]}>Done, right?</RN.Text>
+          <RN.View style={[s.flx_row, s.ass]}>
+            <RN.View style={[s.flx_i, s.mr05]}>
+              <RN.Text style={[s.fw3, s.f6, s.bg_t, s.tc, s.grey]}>Repetitions</RN.Text>
+              <RN.View style={[s.bg_black_10, s.ph075, s.h3, s.br025, s.mt025, s.jcc]}>
+                <RN.TextInput
+                  value={String(attempt.repetitions || '')}
+                  keyboardType="numeric"
+                  maxLength={3}
+                  underlineColorAndroid={colors.t}
+                  placeholderTextColor={colors.black_20}
+                  style={[s.bg_t, s.f2, s.b, s.black, s.h25, s.tc, s.p0, s.m0]}
+                  placeholder={String(this.props.attempt.repetitions)}
+                  onChangeText={this.onChangeRepetitions}
+                  onBlur={() => RN.Keyboard.dismiss()}
+                />
+              </RN.View>
+            </RN.View>
+            <RN.View style={[s.jcfe]}>
+              <RN.Text style={[s.fw3, s.f3, s.bg_t, s.tc, s.greyLight, s.mb075]}>&times;</RN.Text>
+            </RN.View>
+            <RN.View style={[s.flx_i, s.ml05]}>
+              <RN.Text style={[s.fw3, s.f6, s.bg_t, s.tc, s.grey]}>Weight</RN.Text>
+              <RN.View style={[s.bg_black_10, s.ph075, s.h3, s.br025, s.mt025, s.jcc]}>
+                <RN.TextInput
+                  value={String(attempt.weight || '')}
+                  keyboardType="numeric"
+                  maxLength={3}
+                  underlineColorAndroid={colors.t}
+                  placeholderTextColor={colors.black_20}
+                  style={[s.bg_t, s.f2, s.b, s.black, s.h25, s.tc, s.p0, s.m0]}
+                  placeholder={String(this.props.attempt.weight)}
+                  onChangeText={this.onChangeWeight}
+                  onBlur={() => RN.Keyboard.dismiss()}
+                />
+              </RN.View>
+            </RN.View>
+          </RN.View>
+        </RN.View>
+        <RN.TouchableOpacity style={[s.h325, s.jcc, s.ass]} onPress={this.onClose}>
+          <RN.Text style={[s.f4, s.green, s.tc, s.b]}>Done</RN.Text>
         </RN.TouchableOpacity>
       </RN.View>
     )

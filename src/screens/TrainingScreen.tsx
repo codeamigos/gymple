@@ -2,6 +2,7 @@ import * as React from 'react'
 import * as RN from 'react-native'
 import Icon from 'react-native-vector-icons/Ionicons'
 import Swipeout from 'react-native-swipeout'
+import * as moment from 'moment'
 
 import ExerciseList from './ExerciseListScreen'
 import ExerciseSettings from './ExerciseSettingsScreen'
@@ -237,7 +238,7 @@ export default class TrainingScreen extends React.PureComponent<TrainingScreenPr
           onUpdate({
             ...training,
             plannedExercises: training.plannedExercises.map(
-              (e, i) => (i !== training.currentExerciseIndex ? updatedExercise : e)
+              (e, i) => (i === training.currentExerciseIndex ? updatedExercise : e)
             )
           })
         }
@@ -715,7 +716,9 @@ class FinishedTrainingScreen extends React.PureComponent<FinishedTrainingScreenP
               {training.title}
             </RN.Text>
           </RN.TouchableOpacity>
-          <RN.Text style={[s.white, s.f5, s.mb05]}>Today</RN.Text>
+          <RN.Text style={[s.white, s.f5, s.mb05]}>
+            {moment(training.finishedAt).fromNow()}
+          </RN.Text>
         </RN.View>
         <RN.ScrollView style={[s.flx_i]} scrollEnabled={isScrollEnabled}>
           {training.completedExercises.map((exercise, i) =>
@@ -789,6 +792,7 @@ const CompletedExerciseListItem = ({ exercise }: { exercise: Model.Exercise }) =
   const attempts = [exercise.attempts.first, ...exercise.attempts.other]
 
   const repetitionsAvg = Math.round(attempts.reduce((acc, a) => acc + a.repetitions, 0) / attempts.length)
+  const weightAvg = Math.round(attempts.reduce((acc, a) => acc + a.weight, 0) / attempts.length)
 
   return (
     <RN.View style={[s.pv1, s.bbw1, s.b_black_5, s.pr1, s.ml125]}>
@@ -808,8 +812,7 @@ const CompletedExerciseListItem = ({ exercise }: { exercise: Model.Exercise }) =
         </RN.Text>
         <Icon name="ios-close" color={colors.black_20} style={[s.f5, s.ph025]} />
         <RN.Text style={[s.f5, s.fw3]}>
-          {Math.round(attempts.reduce((acc, a) => acc + a.weight, 0) / attempts.length)}{' '}
-          <RN.Text style={[s.f7, s.black_40]}>KG</RN.Text>
+          {weightAvg} <RN.Text style={[s.f7, s.black_40]}>KG</RN.Text>
         </RN.Text>
       </RN.View>
     </RN.View>
