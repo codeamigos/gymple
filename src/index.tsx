@@ -37,7 +37,7 @@ const palette: BS.Palette = {
   t: 'rgba(0,0,0,0)'
 }
 
-const headings: BS.Multiplicators = {
+const headings: BS.Multipliers = {
   '7': 0.75,
   '6': 0.85,
   '5': 1,
