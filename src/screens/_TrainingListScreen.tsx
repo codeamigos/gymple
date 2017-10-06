@@ -4,7 +4,7 @@ import Icon from 'react-native-vector-icons/Ionicons'
 import Swipeout from 'react-native-swipeout'
 import * as moment from 'moment'
 // import TrainingScreen from './TrainingScreen'
-import * as Model from '../Model'
+import * as Model from '../Models'
 
 import { s, colors, sizes } from 'react-native-better-styles'
 
@@ -61,7 +61,7 @@ export default class TrainingsListScreen extends React.PureComponent<TrainingsLi
         </RN.View>
         <RN.View style={[s.flx_i, s.jcsb]}>
           <RN.ScrollView style={[s.flx_i]} scrollEnabled={isScrollEnabled}>
-            {finishedTrainings.map((training, i) =>
+            {finishedTrainings.map((training, i) => (
               <Swipeout
                 autoClose={true}
                 key={String(training.finishedAt)}
@@ -87,7 +87,7 @@ export default class TrainingsListScreen extends React.PureComponent<TrainingsLi
                   <TrainingsListItem training={training} />
                 </RN.TouchableOpacity>
               </Swipeout>
-            )}
+            ))}
           </RN.ScrollView>
           <RN.View style={s.pb175}>
             <RN.TouchableOpacity
@@ -107,9 +107,7 @@ const TrainingsListItem = ({ training }: { training: Model.FinishedTraining }) =
   return (
     <RN.View style={[s.pv1, s.bbw1, s.b_black_5, s.pr1, s.ml125]}>
       <RN.View style={[s.flx_row, s.jcsb, s.aifs]}>
-        <RN.Text style={[s.f3, s.fw2, s.bg_t, s.blue, s.flx_i, s.mb025]}>
-          {training.title}
-        </RN.Text>
+        <RN.Text style={[s.f3, s.fw2, s.bg_t, s.blue, s.flx_i, s.mb025]}>{training.title}</RN.Text>
       </RN.View>
       <RN.Text style={[s.f6, s.black_50, s.fw3]}>
         {moment(training.finishedAt).format('MMMM Do')} ({moment(training.finishedAt).fromNow()})

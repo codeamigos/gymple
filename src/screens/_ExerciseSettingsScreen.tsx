@@ -2,7 +2,7 @@ import * as React from 'react'
 import * as RN from 'react-native'
 import Icon from 'react-native-vector-icons/Ionicons'
 
-import * as Model from '../Model'
+import * as Model from '../Models'
 
 import { s, sizes, colors } from 'react-native-better-styles'
 
@@ -99,9 +99,7 @@ export default class ExerciseSettingsScreen extends React.PureComponent<Exercise
           <RN.TouchableOpacity onPress={onClose}>
             <Icon name="md-arrow-back" size={sizes[175]} color={colors.white} />
           </RN.TouchableOpacity>
-          <RN.Text style={[s.white, s.fw3, s.f2, s.mv05, s.lh2]}>
-            {exercise.title}
-          </RN.Text>
+          <RN.Text style={[s.white, s.fw3, s.f2, s.mv05, s.lh2]}>{exercise.title}</RN.Text>
           <RN.Text style={[s.white, s.f5, s.mb05]}>
             {exercise.targetMuscles.map(({ title }) => title).join(', ')}
           </RN.Text>
@@ -122,9 +120,7 @@ export default class ExerciseSettingsScreen extends React.PureComponent<Exercise
                     color={exercise.attempts.other.length === 0 ? colors.blueDark : colors.white}
                   />
                 </RN.TouchableOpacity>
-                <RN.Text style={[s.f2, s.white, s.bg_t, s.b, s.tc, s.w3]}>
-                  {exercise.attempts.other.length + 1}
-                </RN.Text>
+                <RN.Text style={[s.f2, s.white, s.bg_t, s.b, s.tc, s.w3]}>{exercise.attempts.other.length + 1}</RN.Text>
                 <RN.TouchableOpacity
                   onPress={this.handleAddAttempt}
                   disabled={exercise.attempts.other.length === 99}
