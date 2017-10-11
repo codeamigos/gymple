@@ -23,60 +23,60 @@ export type RemoteData<T> =
     }
   | { kind: 'Fetched'; data: T; fetchedAt: Date }
 
-export const TMuscle = t.interface({
-  id: t.number,
+export const TRemoteDataMuscle = t.interface({
+  id: t.string,
+  title: t.string,
+  bodyPart: t.union([t.literal('upper'), t.literal('lower')])
+})
+export type RemoteDataMuscle = t.TypeOf<typeof TRemoteDataMuscle>
+
+export const TRemoteDataInventory = t.interface({
+  id: t.string,
   title: t.string
 })
-export type Muscle = t.TypeOf<typeof TMuscle>
+export type RemoteDataInventory = t.TypeOf<typeof TRemoteDataInventory>
 
-export const TAttempt = t.interface({
-  weight: t.number,
-  repetitions: t.number
-})
-export type Attempt = t.TypeOf<typeof TAttempt>
-
-export const TExercise = t.interface({
-  kind: t.literal('Exercise'),
-  title: t.string,
-  restSeconds: t.number,
-  attempts: t.interface({
-    first: TAttempt,
-    other: t.array(TAttempt)
+export const TExerciseType = t.union([
+  t.interface({
+    kind: t.literal('repetitions'),
+    count: t.number
   }),
-  targetMuscles: t.array(TMuscle)
-})
-export type Exercise = t.TypeOf<typeof TExercise>
+  t.interface({
+    kind: t.literal('distance'),
+    meters: t.number
+  }),
+  t.interface({
+    kind: t.literal('time'),
+    seconds: t.number
+  })
+])
+export type ExerciseType = t.TypeOf<typeof TExerciseType>
 
-export const TExerciseTemplate = t.interface({
-  kind: t.literal('ExerciseTemplate'),
+export const TRemoteDataExercise = t.interface({
+  id: t.string,
   title: t.string,
-  restSeconds: t.number,
-  targetMuscles: t.array(TMuscle)
+  imgSrc: t.string,
+  inventoryIds: t.array(t.string),
+  primaryMusclesIds: t.array(t.string),
+  secondaryMusclesIds: t.array(t.string),
+  weight: t.number,
+  type: TExerciseType
 })
-export type ExerciseTemplate = t.TypeOf<typeof TExerciseTemplate>
+export type RemoteDataExercise = t.TypeOf<typeof TRemoteDataExercise>
 
-export const TNotStartedTraining = t.interface({
-  kind: t.literal('NotStartedTraining'),
-  title: t.string,
-  plannedExercises: t.array(TExercise)
+export const TRemoteDataSet = t.interface({
+  id: t.string,
+  attemptsAmount: t.number,
+  recoverSec: t.number,
+  exercises: t.array(TRemoteDataExercise)
 })
-export type NotStartedTraining = t.TypeOf<typeof TNotStartedTraining>
-
-export const TOngoingTraining = t.interface({
-  kind: t.literal('OngoingTraining'),
-  title: t.string,
-  startedAt: DateFromString,
-  plannedExercises: t.array(TExercise),
-  currentExerciseIndex: t.union([t.number, t.null]),
-  completedExercises: t.array(TExercise)
-})
-export type OngoingTraining = t.TypeOf<typeof TOngoingTraining>
+export type RemoteDataSet = t.TypeOf<typeof TRemoteDataSet>
 
 export const TFinishedTraining = t.interface({
   kind: t.literal('FinishedTraining'),
   title: t.string,
   startedAt: DateFromString,
   finishedAt: DateFromString,
-  completedExercises: t.array(TExercise)
+  completedSets: t.array(TRemoteDataSet)
 })
 export type FinishedTraining = t.TypeOf<typeof TFinishedTraining>
