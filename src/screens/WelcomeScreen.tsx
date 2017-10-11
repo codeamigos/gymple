@@ -2,7 +2,6 @@ import * as React from 'react'
 import * as RN from 'react-native'
 import * as MobxReact from 'mobx-react/native'
 import { s } from 'react-native-better-styles'
-import * as Orientation from 'react-native-orientation'
 
 // import { Link, Redirect } from '../components/Router'
 import ScreenContainer from '../components/ScreenContainer'
@@ -15,10 +14,6 @@ type WelcomeScreenProps = {
 @MobxReact.inject('dataStore')
 @MobxReact.observer
 export default class WelcomeScreen extends React.Component<WelcomeScreenProps> {
-  componentWillMount() {
-    Orientation.lockToPortrait()
-  }
-
   render() {
     return (
       <ScreenContainer

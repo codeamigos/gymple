@@ -6,6 +6,7 @@ export interface InventoryData {
 export interface MuscleData {
   id: number
   title: string
+  bodyPart: 'upper' | 'lower'
 }
 export interface ExerciseData {
   id: number
@@ -16,7 +17,7 @@ export interface ExerciseData {
   inventoryIds: number[]
 }
 
-export const exercises = [
+export const exercises: ExerciseData[] = [
   {
     id: 1,
     title: 'Сгибание рук со штангой стоя',
@@ -921,72 +922,87 @@ export const exercises = [
     additionalMusclesIds: [12, 13],
     inventoryIds: [3]
   }
-] as ExerciseData[]
+]
 
-export const muscles = [
+export const muscles: MuscleData[] = [
   {
     id: 0,
-    title: 'Бицепс'
+    title: 'Biceps',
+    bodyPart: 'upper'
   },
   {
     id: 1,
-    title: 'Предплечья'
+    title: 'Forearm',
+    bodyPart: 'upper'
   },
   {
     id: 2,
-    title: 'Шея'
+    title: 'Neck',
+    bodyPart: 'upper'
   },
   {
     id: 3,
-    title: 'Плечи'
+    title: 'Shoulders',
+    bodyPart: 'upper'
   },
   {
     id: 4,
-    title: 'Трицепс'
+    title: 'Triceps',
+    bodyPart: 'upper'
   },
   {
     id: 5,
-    title: 'Трапеции'
+    title: 'Trapezius',
+    bodyPart: 'upper'
   },
   {
     id: 6,
-    title: 'Грудь'
+    title: 'Chest',
+    bodyPart: 'upper'
   },
   {
     id: 7,
-    title: 'Широчайшие мышцы спины'
+    title: 'Lats',
+    bodyPart: 'upper'
   },
   {
     id: 8,
-    title: 'Пресс'
+    title: 'Abs',
+    bodyPart: 'upper'
   },
   {
     id: 9,
-    title: 'Средняя часть спины'
+    title: 'Back',
+    bodyPart: 'upper'
   },
   {
     id: 10,
-    title: 'Нижняя часть спины'
+    title: 'Lower back',
+    bodyPart: 'upper'
   },
   {
     id: 11,
-    title: 'Квадрицепс'
+    title: 'Quads',
+    bodyPart: 'lower'
   },
   {
     id: 12,
-    title: 'Ягодицы'
+    title: 'Glutes',
+    bodyPart: 'lower'
   },
   {
     id: 13,
-    title: 'Бедра'
+    title: 'Thighs',
+    bodyPart: 'lower'
   },
   {
     id: 14,
-    title: 'Икры'
+    title: 'Calves',
+    bodyPart: 'lower'
   }
-] as MuscleData[]
+]
 
-export const inventory = [
+export const inventory: InventoryData[] = [
   {
     id: 0,
     title: 'Штанга'
@@ -1031,4 +1047,4 @@ export const inventory = [
     id: 10,
     title: 'Силовая рама'
   }
-] as InventoryData[]
+]

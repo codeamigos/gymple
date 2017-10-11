@@ -24,7 +24,6 @@ interface AnimatedChildRouteProps {
 
 interface AnimatedChildRouteState {
   isAnimation: boolean
-  prevChildren: React.ReactNode | null
   prevPath: string | null
   anim: RN.Animated.Value
 }
@@ -35,43 +34,47 @@ export class AnimatedChildRoute extends React.PureComponent<AnimatedChildRoutePr
     this.state = {
       isAnimation: false,
       anim: new RN.Animated.Value(100),
-      prevChildren: null,
       prevPath: null
     }
   }
 
-  componentWillReceiveProps(nextProps: AnimatedChildRouteProps) {
-    const { animationCallback } = this.props
-    const { prevPath, isAnimation } = this.state
+  componentDidMount() {
+    this.startAnimation(this.props.history.location.pathname)
+  }
 
+  componentWillReceiveProps(nextProps: AnimatedChildRouteProps) {
+    const { prevPath, isAnimation } = this.state
     if (!isAnimation)
       if (prevPath !== nextProps.history.location.pathname) {
-        this.state.anim.setValue(0)
-        this.setState(
-          {
-            isAnimation: true,
-            prevChildren: this.props.children
-          },
-          () => {
-            RN.Animated
-              .timing(this.state.anim, {
-                easing: RN.Easing.quad,
-                toValue: 100,
-                duration: 400
-              })
-              .start(() => {
-                this.setState(
-                  {
-                    prevChildren: null,
-                    prevPath: nextProps.history.location.pathname,
-                    isAnimation: false
-                  },
-                  () => !!animationCallback && animationCallback()
-                )
-              })
-          }
-        )
+        this.startAnimation(nextProps.history.location.pathname)
       }
+  }
+
+  startAnimation = (prevPath: string) => {
+    const { animationCallback } = this.props
+    this.state.anim.setValue(0)
+    this.setState(
+      {
+        isAnimation: true
+      },
+      () => {
+        RN.Animated
+          .timing(this.state.anim, {
+            easing: RN.Easing.quad,
+            toValue: 100,
+            duration: 400
+          })
+          .start(() => {
+            this.setState(
+              {
+                prevPath,
+                isAnimation: false
+              },
+              () => !!animationCallback && animationCallback()
+            )
+          })
+      }
+    )
   }
 
   render() {

@@ -31,6 +31,8 @@ export default class RouterStore {
 
   @Mobx.computed
   get activeRouteProps() {
+    if (!this.location) return console.error('location is not defined activeRouteProps')
+    if (!this.location.route) return console.error('Location.route is not defined activeRouteProps')
     return this.location.route.props
   }
 

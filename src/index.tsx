@@ -396,7 +396,7 @@ import * as BS from 'react-native-better-styles'
 import * as ReactRouterNative from 'react-router-native'
 import * as MobxReact from 'mobx-react/native'
 
-import { stores, history } from './store/index'
+import { stores } from './store/index'
 
 import { palette, multipliers, headings, fonts } from './stylesSettings'
 import { AnimatedChildRoute, Route, Redirect } from './components/Router'
@@ -426,7 +426,7 @@ class App extends React.Component<{}> {
   render() {
     return (
       <MobxReact.Provider {...stores}>
-        <ReactRouterNative.Router history={history}>
+        <ReactRouterNative.Router history={stores.routing.history}>
           <AnimatedChildRoute history={stores.routing.history}>
             <ReactRouterNative.Switch>
               <Route exact path="/" render={() => <Redirect to={{ path: '/welcome' }} />} />

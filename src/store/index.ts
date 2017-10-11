@@ -20,7 +20,7 @@ export const stores = {
   uiStore
 }
 
-// window['store'] = stores
-// window['mobx'] = Mobx
+window['store'] = stores
+window['mobx'] = Mobx
 
 export default stores
