@@ -4,12 +4,12 @@ import Icon from 'react-native-vector-icons/Ionicons'
 import Swipeout from 'react-native-swipeout'
 import * as moment from 'moment'
 
-import ExerciseList from './ExerciseListScreen'
-import ExerciseSettings from './ExerciseSettingsScreen'
-import RunningExercise from './RunningExerciseScreen'
+import ExerciseList from './_ExerciseListScreen'
+import ExerciseSettings from './_ExerciseSettingsScreen'
+import RunningExercise from './_RunningExerciseScreen'
 
-import * as Util from '../Util'
-import * as Model from '../Model'
+import * as Util from '../Utils'
+import * as Model from '../Models'
 
 import { colors, sizes, s } from 'react-native-better-styles'
 
@@ -315,25 +315,27 @@ export default class TrainingScreen extends React.PureComponent<TrainingScreenPr
             this.setEditingExercise(null, null)
           }}
         >
-          {editingExercise
-            ? <ExerciseSettings
-                onUpdate={(exercise: Model.Exercise) => this.setEditingExercise(exercise, editingExerciseIndex)}
-                onClose={() => this.setEditingExercise(null, null)}
-                onDone={() => {
-                  if (editingExerciseIndex !== null) {
-                    this.updateExercise(editingExercise, editingExerciseIndex)
-                  } else {
-                    this.addExercise(editingExercise)
-                  }
-                  this.toggleModalOpen(false)
-                }}
-                exercise={editingExercise}
-              />
-            : <ExerciseList
-                completedExercises={completedExercises}
-                onSelect={(exercise: Model.Exercise) => this.setEditingExercise(exercise, null)}
-                onClose={() => this.toggleModalOpen(false)}
-              />}
+          {editingExercise ? (
+            <ExerciseSettings
+              onUpdate={(exercise: Model.Exercise) => this.setEditingExercise(exercise, editingExerciseIndex)}
+              onClose={() => this.setEditingExercise(null, null)}
+              onDone={() => {
+                if (editingExerciseIndex !== null) {
+                  this.updateExercise(editingExercise, editingExerciseIndex)
+                } else {
+                  this.addExercise(editingExercise)
+                }
+                this.toggleModalOpen(false)
+              }}
+              exercise={editingExercise}
+            />
+          ) : (
+            <ExerciseList
+              completedExercises={completedExercises}
+              onSelect={(exercise: Model.Exercise) => this.setEditingExercise(exercise, null)}
+              onClose={() => this.toggleModalOpen(false)}
+            />
+          )}
         </RN.Modal>
       </RN.View>
     )
@@ -398,59 +400,61 @@ class NotstartedTrainingScreen extends React.PureComponent<
             </RN.Text>
           </RN.TouchableOpacity>
         </RN.View>
-        {training.plannedExercises.length > 0
-          ? <RN.View style={[s.flx_i, s.jcsb]}>
-              <RN.ScrollView style={[s.flx_i]} scrollEnabled={isScrollEnabled}>
-                {training.plannedExercises.map((exercise, i) =>
-                  <Swipeout
-                    autoClose={true}
-                    key={exercise.title + i}
-                    backgroundColor={colors.t}
-                    scroll={isAllow => this.allowScroll(isAllow)}
-                    buttonWidth={sizes[5]}
-                    right={[
-                      {
-                        onPress: () => onRemoveExercise(i),
-                        component: (
-                          <RN.View style={[s.w5, s.bg_orange, s.jcc, s.flx_i]}>
-                            <Icon name="md-trash" style={[s.white, s.f3, s.tc]} />
-                          </RN.View>
-                        )
-                      }
-                    ]}
-                  >
-                    <RN.TouchableOpacity onPress={() => onSetEditingExercise(exercise, i)}>
-                      <ExerciseListItem exercise={exercise} />
-                    </RN.TouchableOpacity>
-                  </Swipeout>
-                )}
-                <RN.TouchableOpacity style={[s.asc, s.h325, s.jcc, s.ph3]} onPress={onSelectExerciseToAdd}>
-                  <RN.View style={[s.flx_row, s.flx_i, s.aic]}>
-                    <Icon name="md-add" style={[s.green, s.f2, s.tc, s.mr05]} />
-                    <RN.Text style={[s.f4, s.green, s.tc, s.b, s.jcc, s.aic]}>Add Exercise</RN.Text>
-                  </RN.View>
-                </RN.TouchableOpacity>
-              </RN.ScrollView>
-              <RN.View style={s.pb175}>
-                <RN.TouchableOpacity
-                  style={[s.asc, s.bg_green, s.br2, s.h325, s.jcc, s.ph3, s.mt075]}
-                  onPress={onStartTraining}
+        {training.plannedExercises.length > 0 ? (
+          <RN.View style={[s.flx_i, s.jcsb]}>
+            <RN.ScrollView style={[s.flx_i]} scrollEnabled={isScrollEnabled}>
+              {training.plannedExercises.map((exercise, i) => (
+                <Swipeout
+                  autoClose={true}
+                  key={exercise.title + i}
+                  backgroundColor={colors.t}
+                  scroll={isAllow => this.allowScroll(isAllow)}
+                  buttonWidth={sizes[5]}
+                  right={[
+                    {
+                      onPress: () => onRemoveExercise(i),
+                      component: (
+                        <RN.View style={[s.w5, s.bg_orange, s.jcc, s.flx_i]}>
+                          <Icon name="md-trash" style={[s.white, s.f3, s.tc]} />
+                        </RN.View>
+                      )
+                    }
+                  ]}
                 >
-                  <RN.Text style={[s.f4, s.white, s.tc, s.b]}>Start Training</RN.Text>
-                </RN.TouchableOpacity>
-              </RN.View>
-            </RN.View>
-          : <RN.View style={[s.flx_i, s.aic, s.jcc]}>
-              <RN.Text style={[s.tc, s.f4, s.ph3, s.fw3, s.mb075, s.grey]}>
-                There is no Exercises in your training yet
-              </RN.Text>
+                  <RN.TouchableOpacity onPress={() => onSetEditingExercise(exercise, i)}>
+                    <ExerciseListItem exercise={exercise} />
+                  </RN.TouchableOpacity>
+                </Swipeout>
+              ))}
+              <RN.TouchableOpacity style={[s.asc, s.h325, s.jcc, s.ph3]} onPress={onSelectExerciseToAdd}>
+                <RN.View style={[s.flx_row, s.flx_i, s.aic]}>
+                  <Icon name="md-add" style={[s.green, s.f2, s.tc, s.mr05]} />
+                  <RN.Text style={[s.f4, s.green, s.tc, s.b, s.jcc, s.aic]}>Add Exercise</RN.Text>
+                </RN.View>
+              </RN.TouchableOpacity>
+            </RN.ScrollView>
+            <RN.View style={s.pb175}>
               <RN.TouchableOpacity
                 style={[s.asc, s.bg_green, s.br2, s.h325, s.jcc, s.ph3, s.mt075]}
-                onPress={onSelectExerciseToAdd}
+                onPress={onStartTraining}
               >
-                <RN.Text style={[s.f4, s.white, s.tc, s.b]}>Add First Exercise</RN.Text>
+                <RN.Text style={[s.f4, s.white, s.tc, s.b]}>Start Training</RN.Text>
               </RN.TouchableOpacity>
-            </RN.View>}
+            </RN.View>
+          </RN.View>
+        ) : (
+          <RN.View style={[s.flx_i, s.aic, s.jcc]}>
+            <RN.Text style={[s.tc, s.f4, s.ph3, s.fw3, s.mb075, s.grey]}>
+              There is no Exercises in your training yet
+            </RN.Text>
+            <RN.TouchableOpacity
+              style={[s.asc, s.bg_green, s.br2, s.h325, s.jcc, s.ph3, s.mt075]}
+              onPress={onSelectExerciseToAdd}
+            >
+              <RN.Text style={[s.f4, s.white, s.tc, s.b]}>Add First Exercise</RN.Text>
+            </RN.TouchableOpacity>
+          </RN.View>
+        )}
         <RN.Modal
           animationType="slide"
           transparent={false}
@@ -555,7 +559,7 @@ class OngoingTrainingScreen extends React.PureComponent<OngoingTrainingScreenPro
           <RN.Text style={[s.white, s.f5, s.mb05]}>Today</RN.Text>
         </RN.View>
         <RN.ScrollView style={[s.flx_i]} scrollEnabled={isScrollEnabled}>
-          {training.completedExercises.map((exercise, i) =>
+          {training.completedExercises.map((exercise, i) => (
             <Swipeout
               autoClose={true}
               key={exercise.title + i}
@@ -577,8 +581,8 @@ class OngoingTrainingScreen extends React.PureComponent<OngoingTrainingScreenPro
                 <CompletedExerciseListItem exercise={exercise} />
               </RN.TouchableOpacity>
             </Swipeout>
-          )}
-          {training.plannedExercises.map((exercise, i) =>
+          ))}
+          {training.plannedExercises.map((exercise, i) => (
             <Swipeout
               autoClose={true}
               key={exercise.title + i}
@@ -600,7 +604,7 @@ class OngoingTrainingScreen extends React.PureComponent<OngoingTrainingScreenPro
                 <ExerciseListItem exercise={exercise} />
               </RN.TouchableOpacity>
             </Swipeout>
-          )}
+          ))}
           <RN.TouchableOpacity style={[s.asc, s.h325, s.jcc, s.ph3]} onPress={onSelectExerciseToAdd}>
             <RN.View style={[s.flx_row, s.flx_i, s.aic]}>
               <Icon name="md-add" style={[s.green, s.f2, s.tc, s.mr05]} />
@@ -609,16 +613,18 @@ class OngoingTrainingScreen extends React.PureComponent<OngoingTrainingScreenPro
           </RN.TouchableOpacity>
         </RN.ScrollView>
         <RN.View style={s.pb175}>
-          {training.plannedExercises.length > 0
-            ? <RN.TouchableOpacity
-                style={[s.asc, s.bg_green, s.br2, s.h325, s.jcc, s.ph3, s.mt075]}
-                onPress={() => onStartExercise(0)}
-              >
-                <RN.Text style={[s.f4, s.white, s.tc, s.b]}>Start next Exercise</RN.Text>
-              </RN.TouchableOpacity>
-            : <RN.TouchableOpacity style={[s.asc, s.bg_green, s.br2, s.h325, s.jcc, s.ph3, s.mt075]} onPress={onFinish}>
-                <RN.Text style={[s.f4, s.white, s.tc, s.b]}>Finish Training</RN.Text>
-              </RN.TouchableOpacity>}
+          {training.plannedExercises.length > 0 ? (
+            <RN.TouchableOpacity
+              style={[s.asc, s.bg_green, s.br2, s.h325, s.jcc, s.ph3, s.mt075]}
+              onPress={() => onStartExercise(0)}
+            >
+              <RN.Text style={[s.f4, s.white, s.tc, s.b]}>Start next Exercise</RN.Text>
+            </RN.TouchableOpacity>
+          ) : (
+            <RN.TouchableOpacity style={[s.asc, s.bg_green, s.br2, s.h325, s.jcc, s.ph3, s.mt075]} onPress={onFinish}>
+              <RN.Text style={[s.f4, s.white, s.tc, s.b]}>Finish Training</RN.Text>
+            </RN.TouchableOpacity>
+          )}
         </RN.View>
         <RN.Modal
           animationType="slide"
@@ -627,27 +633,25 @@ class OngoingTrainingScreen extends React.PureComponent<OngoingTrainingScreenPro
           onRequestClose={() => onStartExercise(null)}
         >
           {startCountDown > 0 &&
-            currentExercise &&
-            <RN.View style={[s.flx_i, s.jcc, s.bg_blue, s.aic, s.ph4]}>
-              <RN.Text style={[s.fw3, s.f5, s.tc, s.white, s.mb1]}>Starting training in</RN.Text>
-              <RN.Text style={[s.fw2, s.f1, s.tc, s.white]}>
-                {startCountDown}
-              </RN.Text>
-              <RN.View style={[s.btw1, s.b_white_10, s.mt2, s.pt2]}>
-                <RN.Text style={[s.fw3, s.f6, s.white, s.tc, s.mb05]}>First exercise</RN.Text>
-                <RN.Text style={[s.fw3, s.f4, s.white, s.tc]}>
-                  {currentExercise.title}
-                </RN.Text>
+            currentExercise && (
+              <RN.View style={[s.flx_i, s.jcc, s.bg_blue, s.aic, s.ph4]}>
+                <RN.Text style={[s.fw3, s.f5, s.tc, s.white, s.mb1]}>Starting training in</RN.Text>
+                <RN.Text style={[s.fw2, s.f1, s.tc, s.white]}>{startCountDown}</RN.Text>
+                <RN.View style={[s.btw1, s.b_white_10, s.mt2, s.pt2]}>
+                  <RN.Text style={[s.fw3, s.f6, s.white, s.tc, s.mb05]}>First exercise</RN.Text>
+                  <RN.Text style={[s.fw3, s.f4, s.white, s.tc]}>{currentExercise.title}</RN.Text>
+                </RN.View>
               </RN.View>
-            </RN.View>}
+            )}
           {startCountDown <= 0 &&
-            currentExercise &&
-            <RunningExercise
-              onUpdate={(exercise: Model.Exercise) => onUpdateCurrentExercise(exercise)}
-              onClose={() => onStartExercise(null)}
-              onDone={onCompleteExercise}
-              exercise={currentExercise}
-            />}
+            currentExercise && (
+              <RunningExercise
+                onUpdate={(exercise: Model.Exercise) => onUpdateCurrentExercise(exercise)}
+                onClose={() => onStartExercise(null)}
+                onDone={onCompleteExercise}
+                exercise={currentExercise}
+              />
+            )}
         </RN.Modal>
         <RN.Modal
           animationType="slide"
@@ -716,12 +720,10 @@ class FinishedTrainingScreen extends React.PureComponent<FinishedTrainingScreenP
               {training.title}
             </RN.Text>
           </RN.TouchableOpacity>
-          <RN.Text style={[s.white, s.f5, s.mb05]}>
-            {moment(training.finishedAt).fromNow()}
-          </RN.Text>
+          <RN.Text style={[s.white, s.f5, s.mb05]}>{moment(training.finishedAt).fromNow()}</RN.Text>
         </RN.View>
         <RN.ScrollView style={[s.flx_i]} scrollEnabled={isScrollEnabled}>
-          {training.completedExercises.map((exercise, i) =>
+          {training.completedExercises.map((exercise, i) => (
             <Swipeout
               autoClose={true}
               key={exercise.title + i}
@@ -743,7 +745,7 @@ class FinishedTrainingScreen extends React.PureComponent<FinishedTrainingScreenP
                 <CompletedExerciseListItem exercise={exercise} />
               </RN.View>
             </Swipeout>
-          )}
+          ))}
           <RN.TouchableOpacity style={[s.asc, s.h325, s.jcc, s.ph3]} onPress={onSelectExerciseToAdd}>
             <RN.View style={[s.flx_row, s.flx_i, s.aic]}>
               <Icon name="md-add" style={[s.green, s.f2, s.tc, s.mr05]} />
@@ -778,12 +780,8 @@ class FinishedTrainingScreen extends React.PureComponent<FinishedTrainingScreenP
 const ExerciseListItem = ({ exercise }: { exercise: Model.Exercise }) => {
   return (
     <RN.View style={[s.pv1, s.bbw1, s.b_black_5, s.pr1, s.ml125]}>
-      <RN.Text style={[s.f4, s.fw2, s.bg_t, s.blue, s.flx_i, s.mb025, s.lh125]}>
-        {exercise.title}
-      </RN.Text>
-      <RN.Text style={[s.f6, s.fw3]}>
-        {exercise.targetMuscles.map(({ title }) => title).join(', ')}
-      </RN.Text>
+      <RN.Text style={[s.f4, s.fw2, s.bg_t, s.blue, s.flx_i, s.mb025, s.lh125]}>{exercise.title}</RN.Text>
+      <RN.Text style={[s.f6, s.fw3]}>{exercise.targetMuscles.map(({ title }) => title).join(', ')}</RN.Text>
     </RN.View>
   )
 }
@@ -796,12 +794,8 @@ const CompletedExerciseListItem = ({ exercise }: { exercise: Model.Exercise }) =
 
   return (
     <RN.View style={[s.pv1, s.bbw1, s.b_black_5, s.pr1, s.ml125]}>
-      <RN.Text style={[s.f4, s.fw2, s.bg_t, s.blue, s.flx_i, s.mb025, s.lh125]}>
-        {exercise.title}
-      </RN.Text>
-      <RN.Text style={[s.f6, s.fw3]}>
-        {exercise.targetMuscles.map(({ title }) => title).join(', ')}
-      </RN.Text>
+      <RN.Text style={[s.f4, s.fw2, s.bg_t, s.blue, s.flx_i, s.mb025, s.lh125]}>{exercise.title}</RN.Text>
+      <RN.Text style={[s.f6, s.fw3]}>{exercise.targetMuscles.map(({ title }) => title).join(', ')}</RN.Text>
       <RN.View style={[s.mt05, s.flx_row, s.aic, s.mt0125]}>
         <RN.Text style={[s.f5, s.fw3]}>
           {attempts.length} <RN.Text style={[s.f7, s.black_40]}>{attempts.length > 1 ? 'ATTEMPTS' : 'ATTEMPT'}</RN.Text>

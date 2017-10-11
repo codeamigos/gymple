@@ -2,8 +2,8 @@ import * as React from 'react'
 import * as RN from 'react-native'
 import Icon from 'react-native-vector-icons/Ionicons'
 
-import * as Util from '../Util'
-import * as Model from '../Model'
+import * as Util from '../Utils'
+import * as Model from '../Models'
 import * as ExerciseData from '../ExercisesData'
 
 import { s, sizes, colors } from 'react-native-better-styles'
@@ -61,20 +61,16 @@ export default class ExerciseListScreen extends React.PureComponent<ExerciseList
           </RN.View>
         </RN.View>
         <RN.ScrollView style={[s.flx_i]}>
-          {exercises.filter(exercise => (filter ? exercise.title.includes(filter) : true)).map(exercise =>
+          {exercises.filter(exercise => (filter ? exercise.title.includes(filter) : true)).map(exercise => (
             <RN.TouchableOpacity key={exercise.title} onPress={() => onSelect(exercise)}>
               <RN.View style={[s.pv1, s.bbw1, s.b_black_5, s.pr1, s.ml125]}>
                 <RN.View style={[s.flx_row, s.jcsb, s.aifs]}>
-                  <RN.Text style={[s.f4, s.fw3, s.bg_t, s.blue, s.flx_i, s.mb025, s.lh125]}>
-                    {exercise.title}
-                  </RN.Text>
+                  <RN.Text style={[s.f4, s.fw3, s.bg_t, s.blue, s.flx_i, s.mb025, s.lh125]}>{exercise.title}</RN.Text>
                 </RN.View>
-                <RN.Text style={[s.f7, s.fw3]}>
-                  {exercise.targetMuscles.map(({ title }) => title).join(', ')}
-                </RN.Text>
+                <RN.Text style={[s.f7, s.fw3]}>{exercise.targetMuscles.map(({ title }) => title).join(', ')}</RN.Text>
               </RN.View>
             </RN.TouchableOpacity>
-          )}
+          ))}
         </RN.ScrollView>
       </RN.View>
     )
@@ -86,13 +82,16 @@ const generateDefaultExersices = (
   musclesData: ExerciseData.MuscleData[]
 ): Model.ExerciseTemplate[] => {
   return exerscsesData.map(({ title, targetMusclesIds, additionalMusclesIds }) => {
-    const targetMuscles = [...targetMusclesIds, ...additionalMusclesIds].reduce((acc, muscleId) => {
-      const muscleData = musclesData.find(muscle => muscle.id === muscleId)
-      if (muscleData) {
-        return [...acc, muscleData]
-      }
-      return acc
-    }, [] as ExerciseData.MuscleData[])
+    const targetMuscles = [...targetMusclesIds, ...additionalMusclesIds].reduce(
+      (acc, muscleId) => {
+        const muscleData = musclesData.find(muscle => muscle.id === muscleId)
+        if (muscleData) {
+          return [...acc, muscleData]
+        }
+        return acc
+      },
+      [] as ExerciseData.MuscleData[]
+    )
 
     return {
       kind: 'ExerciseTemplate',

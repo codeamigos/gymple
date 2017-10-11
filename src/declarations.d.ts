@@ -12,6 +12,33 @@ declare module 'react-native-vector-icons/Ionicons' {
   export default class Icon extends R.Component<Props> {}
 }
 
+declare module 'react-native-keyboard-spacer' {
+  import * as React from 'react'
+  import * as RN from 'react-native'
+
+  export interface KeyboardSpacerProps {
+    topSpacing?: number
+    onToggle?: () => void
+  }
+  export default class KeyboardSpacer extends React.Component<KeyboardSpacerProps> {}
+}
+
+declare module 'react-native-linear-gradient' {
+  import * as R from 'react'
+  import * as RN from 'react-native'
+
+  export interface Props {
+    children?: React.ReactNode
+    start?: { x: number; y: number }
+    end?: { x: number; y: number }
+    locations?: number[]
+    colors: string[]
+    style?: RN.StyleProp<RN.ViewStyle>
+  }
+
+  export default class LinearGradient extends R.Component<Props> {}
+}
+
 declare module 'react-native-swipeout' {
   import * as R from 'react'
   import * as RN from 'react-native'

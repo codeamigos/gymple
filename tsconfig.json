@@ -10,16 +10,10 @@
     "noUnusedParameters": true,
     "noUnusedLocals": true,
     "allowJs": true,
+    "suppressImplicitAnyIndexErrors": true,
+    "experimentalDecorators": true,
     "sourceMap": false
   },
-  "include": [
-    "src/**/*.ts",
-    "src/**/*.tsx"
-  ],
-  "exclude": [
-    "android",
-    "build",
-    "ios",
-    "node_modules"
-  ]
+  "include": ["src/**/*.ts", "src/**/*.tsx"],
+  "exclude": ["android", "build", "ios", "node_modules"]
 }
