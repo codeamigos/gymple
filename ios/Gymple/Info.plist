@@ -43,6 +43,16 @@
 	<key>UIAppFonts</key>
 	<array>
 		<string>Ionicons.ttf</string>
+		<string>ProximaNova-Light.ttf</string>
+		<string>ProximaNova-LightIt.ttf</string>
+		<string>ProximaNova-Bold.ttf</string>
+		<string>ProximaNova-Regular.ttf</string>
+		<string>ProximaNova-RegularIt.ttf</string>
+		<string>ProximaNova-BoldIt.ttf</string>
+		<string>ProximaNova-Semibold.ttf</string>
+		<string>ProximaNova-Extrabld.ttf</string>
+		<string>ProximaNova-Thin.ttf</string>
+		<string>SimpleLineIcons.ttf</string>
 	</array>
 	<key>NSAppTransportSecurity</key>
 	<dict>

@@ -4,7 +4,21 @@ declare module 'react-native-vector-icons/Ionicons' {
 
   export interface Props {
     size?: number
-    name?: string
+    name: string
+    color?: string
+    style?: RN.StyleProp<RN.TextStyle>
+  }
+
+  export default class Icon extends R.Component<Props> {}
+}
+
+declare module 'react-native-vector-icons/SimpleLineIcons' {
+  import * as R from 'react'
+  import * as RN from 'react-native'
+
+  export interface Props {
+    size?: number
+    name: string
     color?: string
     style?: RN.StyleProp<RN.TextStyle>
   }

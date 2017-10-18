@@ -42,3 +42,16 @@ export function randomInteger(min: number, max: number) {
   rand = Math.floor(rand)
   return rand
 }
+
+export function secondsToMinutes(seconds: number, format: 'mm:ss' | 'm s' = 'mm:ss') {
+  const min = String(Math.floor(seconds / 60))
+  const sec = String(seconds % 60)
+
+  if (format === 'mm:ss') {
+    const ss = sec.length < 2 ? '0' + sec : sec
+    const mm = min.length < 2 ? '0' + min : min
+    return mm + ':' + ss
+  }
+
+  return (min !== '0' ? min + 'm ' : '') + (sec !== '0' ? sec + 's' : '')
+}

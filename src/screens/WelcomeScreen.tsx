@@ -2,10 +2,10 @@ import * as React from 'react'
 import * as RN from 'react-native'
 import * as MobxReact from 'mobx-react/native'
 import { s } from 'react-native-better-styles'
-
-// import { Link, Redirect } from '../components/Router'
+import { Link } from '../components/Router'
 import ScreenContainer from '../components/ScreenContainer'
 import { stores } from '../store'
+import { Set } from '../store/dataStore'
 
 type WelcomeScreenProps = {
   dataStore: typeof stores.dataStore
@@ -15,24 +15,23 @@ type WelcomeScreenProps = {
 @MobxReact.observer
 export default class WelcomeScreen extends React.Component<WelcomeScreenProps> {
   render() {
+    const set = new Set({
+      id: '1',
+      attemptsAmount: 1,
+      recoverSec: 90,
+      exercises: []
+    })
+
     return (
       <ScreenContainer
         statusbar={{
           barStyle: 'dark-content'
         }}
-        style={[s.bg_white, s.jcc, s.ph2]}
+        style={[s.jcc, s.ph3]}
       >
-        <RN.Text style={[s.f_ps, s.f1, s.black, s.tc, s.mb05]}>Welcome</RN.Text>
-        <RN.Text style={[s.f_ps, s.f4, s.black, s.tc, s.mb4]}>
-          Select from below to create your account or log in
-        </RN.Text>
-
-        {/* <Link to={{ path: '/signup' }} style={[s.mb05, s.h3, s.br025, s.bg_deepSkyBlue, s.ass, s.jcc]}>
-          <RN.Text style={[s.f_ps, s.f4, s.white, s.tc, s.mb, s.bg_t]}>Create an Account</RN.Text>
+        <Link to={{ path: '/set', props: { set } }} style={[s.mb05, s.h3, s.br025, s.b_blueDark, s.bw1, s.ass, s.jcc]}>
+          <RN.Text style={[s.f_pn, s.f4, s.blueDark, s.tc, s.mb, s.bg_t]}>Edit Set</RN.Text>
         </Link>
-        <Link to={{ path: '/login' }} style={[s.mb05, s.h3, s.br025, s.b_deepSkyBlue, s.bw1, s.ass, s.jcc]}>
-          <RN.Text style={[s.f_ps, s.f4, s.deepSkyBlue, s.tc, s.mb, s.bg_t]}>I Already Have an Account</RN.Text>
-        </Link> */}
       </ScreenContainer>
     )
   }

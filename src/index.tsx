@@ -404,6 +404,8 @@ import { AnimatedChildRoute, Route, Redirect } from './components/Router'
 import screenWrapper from './components/ScreenWrapper'
 
 import WelcomeScreen from './screens/WelcomeScreen'
+import SetScreen from './screens/SetScreen'
+import SelectExerciseScreen from './screens/SelectExerciseScreen'
 
 const { width, height } = RN.Dimensions.get('window')
 
@@ -422,15 +424,21 @@ BS.build({
   fonts
 })
 
+// fill dataStore with initial data
+stores.dataStore.generateInitialData()
+
+@MobxReact.observer
 class App extends React.Component<{}> {
   render() {
     return (
       <MobxReact.Provider {...stores}>
         <ReactRouterNative.Router history={stores.routing.history}>
-          <AnimatedChildRoute history={stores.routing.history}>
+          <AnimatedChildRoute pathname={stores.routing.location.pathname}>
             <ReactRouterNative.Switch>
               <Route exact path="/" render={() => <Redirect to={{ path: '/welcome' }} />} />
               <Route exact path="/welcome" component={screenWrapper(WelcomeScreen)} />
+              <Route exact path="/set" component={screenWrapper(SetScreen)} />
+              <Route exact path="/selectexercise" component={screenWrapper(SelectExerciseScreen)} />
               {/* <Route exact path="/login" component={screenWrapper(LoginScreen)} />
               <Route exact path="/signup" component={screenWrapper(SignupScreen)} />
               <Route exact authRequired path="/carsList" component={screenWrapper(CarsListScreen)} />
