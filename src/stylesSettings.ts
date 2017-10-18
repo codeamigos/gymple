@@ -4,32 +4,28 @@ import * as BS from 'react-native-better-styles'
 export const palette: BS.Palette = {
   white:          '#ffffff',
   black:          '#000000',
-  deepSkyBlue:    '#188af5',
-  darkGrey:       '#262628',
-  slateGrey:      '#5d5d6b',
-  marine:         '#032f49',
-  slate:          '#5b697a',
-  steel:          '#88889c',
-  darkKnight:     '#56545a',
-  asphalt:        '#322f37',
-  red:            'rgb(255,144,144)',
-  green:          'rgb(42,188,109)',
-  almostBlack:    'rgb(12,21,32)',
-  gunmetal:       'rgb(81,92,97)',
-  aquaMarine:     'rgb(56,213,227)',
-  pinkishOrange:  'rgb(255,100,51)',
-  golden:         'rgb(241,197,0)',
-  waterBlue:      'rgb(14,131,189)',
+  greyDarkest:    '#2e333d',
+  greyDarker:     '#434b55',
+  greyDark:       '#555b65',
+  grey:           '#8a949d',
+  greyLight:      '#d2dadd',
+  greyLighter:    '#e5eaee',
+  greyLightest:   '#fafafa',
+  blueDark:       '#2b55e4',
+  blue:           '#2c5cff',
+  blueLight:      '#587eff',
+  bluePurple:     '#5c14e3',
+  blueBright:     '#0075fd',
+  blueBrighter:   '#00a2fd',
+  red:            '#ff2b71',
+  orange:         '#ff605e',
+  yellow:         '#fbcf00',
+  tealLight:      '#85e3d1',  
+  green:          '#0cddae',
+  greenCyan:      '#33ffad',
+  greenBaby:      '#7cff94',
   t:              'rgba(255,255,255,0)',
-  tb:             'rgba(0,0,0,0)',
-  paleGrey:       'rgb(227,227,233)',
-  coolGrey:       'rgb(172, 180, 190)',
-  weirdGreen:     '#55e797',
-  topaz:          '#11cdb6',
-  orangeyRed:     'rgb(249,95,53)',
-  redPink:        'rgb(246,43,101)',
-  skyBlue:        'rgb(106,202,255)',
-  charcoalGrey:        'rgb(56,56,64)',
+  tb:             'rgba(0,0,0,0)'
 }
 
 // prettier-ignore
@@ -51,6 +47,7 @@ export const multipliers: BS.Multipliers = {
   '2':        2,
   '225':      2.25,
   '25':       2.5,
+  '265':      2.65,
   '275':      2.75,
   '3':        3,
   '325':      3.25,
@@ -82,7 +79,7 @@ export const headings: BS.Multipliers = {
 
 // prettier-ignore
 export const fonts: BS.Palette = {
-  // ps:        RN.Platform.OS === 'ios' ? 'Product Sans' : 'Product Sans Regular',
+  pn:        'Proxima Nova',
 }
 
 export interface Shadow {
@@ -100,11 +97,11 @@ export const shadows: {
 } = {
   sm: {
     shadowColor: palette.black,
-    shadowRadius: 4,
-    shadowOpacity: 0.15,
+    shadowRadius: 8,
+    shadowOpacity: 0.05,
     shadowOffset: {
       width: 0,
-      height: 2
+      height: 1
     }
   }
 }

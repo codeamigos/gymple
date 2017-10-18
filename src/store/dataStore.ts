@@ -2,7 +2,7 @@ import * as Mobx from 'mobx'
 import * as Model from '../models'
 import * as Util from '../utils'
 import { stores } from './index'
-import * as ExerciseData from '../ExercisesData'
+import * as ExerciseData from '../exerciseData'
 
 export default class DataStore {
   @Mobx.observable
@@ -16,7 +16,8 @@ export default class DataStore {
   @Mobx.observable muscles: Mobx.IObservableArray<Muscle> = Mobx.observable([])
   @Mobx.observable exercises: Mobx.IObservableArray<Exercise> = Mobx.observable([])
 
-  constructor() {
+  @Mobx.action
+  generateInitialData() {
     this.replaceMuscles(ExerciseData.muscles.map(muscle => new Muscle(muscle)))
     this.replaceExercises(ExerciseData.exercises.map(exercise => new Exercise(exercise)))
   }
@@ -95,10 +96,10 @@ export class FinishedTraining extends GenericTraining {
   }
 }
 
-class Set {
+export class Set {
   @Mobx.observable id: string = Util.uuid()
   @Mobx.observable attempsAmount: number = 1
-  @Mobx.observable recoverSec: number = 60
+  @Mobx.observable recoverSec: number = 90
   @Mobx.observable exercises: Mobx.IObservableArray<Exercise> = Mobx.observable([])
   constructor(data: Model.RemoteDataSet) {
     this.id = data.id
@@ -123,9 +124,19 @@ class Set {
   replaceExercises(exercises: Exercise[]) {
     this.exercises.replace(exercises)
   }
+
+  @Mobx.action
+  addExercise(exercise: Exercise) {
+    this.exercises.push(exercise)
+  }
+
+  @Mobx.action
+  removeExercise(exercise: Exercise) {
+    this.exercises.remove(exercise)
+  }
 }
 
-class Exercise {
+export class Exercise {
   @Mobx.observable id: string = Util.uuid()
   @Mobx.observable imgSrc: string = ''
   @Mobx.observable weight: number = 0
@@ -156,6 +167,7 @@ class Exercise {
   }
   @Mobx.action
   setWeight(weight: number) {
+    if (isNaN(weight)) this.weight = 0
     this.weight = weight
   }
 
@@ -190,7 +202,7 @@ class Exercise {
   }
 }
 
-class Muscle {
+export class Muscle {
   @Mobx.observable id: string = Util.uuid()
   @Mobx.observable title: string = ''
   @Mobx.observable bodyPart: 'upper' | 'lower' = 'upper'
