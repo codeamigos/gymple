@@ -12,6 +12,7 @@ import * as Route from '../routes'
 
 type EditExerciseScreenProps = {
   dataStore: typeof stores.dataStore
+  uiStore: typeof stores.uiStore
   routing: typeof stores.routing
 } & Route.EditExerciseRouteProps
 
@@ -21,7 +22,7 @@ type EditExerciseScreenState = {
   secondaryMusclesIds: string[]
 }
 
-@MobxReact.inject('dataStore', 'routing')
+@MobxReact.inject('dataStore', 'routing', 'uiStore')
 @MobxReact.observer
 export default class EditExerciseScreen extends React.Component<EditExerciseScreenProps, EditExerciseScreenState> {
   constructor(props: EditExerciseScreenProps) {
@@ -66,7 +67,7 @@ export default class EditExerciseScreen extends React.Component<EditExerciseScre
   }
 
   render() {
-    const { routing, dataStore } = this.props
+    const { routing, dataStore, exercise, uiStore, setToAdd } = this.props
     const { title, primaryMusclesIds, secondaryMusclesIds } = this.state
     const upperMuscles = dataStore.muscles.filter(m => m.bodyPart === 'upper')
     const lowerMuscles = dataStore.muscles.filter(m => m.bodyPart === 'lower')
@@ -80,6 +81,21 @@ export default class EditExerciseScreen extends React.Component<EditExerciseScre
         <Navbar
           title={'Edit Exercise'}
           leftAction={routing.goBack}
+          rightAction={() => {
+            if (title !== '' && primaryMusclesIds.length > 0) {
+              exercise.setTitle(title)
+              exercise.updatePrimaryMusclesByIds(primaryMusclesIds)
+              exercise.updateSecondaryMusclesByIds(secondaryMusclesIds)
+              exercise.save()
+              if (setToAdd) setToAdd.addExercise(exercise)
+              routing.goBack()
+            } else {
+              uiStore.createNotification({
+                message: 'Exercise must have a title and al least one primary affected muscle',
+                type: 'ERROR'
+              })
+            }
+          }}
           rightBtn={<RN.Text style={[s.f_pn, s.f4, s.blueDark, { letterSpacing: -0.5 }]}>Done</RN.Text>}
         />
         <RN.View style={[s.m1, s.h55, s.br025, s.bg_greyLighter, s.ph125, s.pv05, s.jcc]}>

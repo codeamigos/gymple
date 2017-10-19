@@ -1,4 +1,7 @@
+import * as RN from 'react-native'
 import * as Mobx from 'mobx'
+import * as t from 'io-ts'
+
 import * as Model from '../models'
 import * as Util from '../utils'
 import { stores } from './index'
@@ -14,12 +17,29 @@ export default class DataStore {
     foreground: 0
   }
   @Mobx.observable muscles: Mobx.IObservableArray<Muscle> = Mobx.observable([])
-  @Mobx.observable exercises: Mobx.IObservableArray<Exercise> = Mobx.observable([])
+  @Mobx.observable exerciseTemplates: Mobx.IObservableArray<Exercise> = Mobx.observable([])
 
-  @Mobx.action
-  generateInitialData() {
+  async generateInitialData() {
     this.replaceMuscles(ExerciseData.muscles.map(muscle => new Muscle(muscle)))
-    this.replaceExercises(ExerciseData.exercises.map(exercise => new Exercise(exercise)))
+    await this.fetchExercises()
+  }
+
+  async fetchExercises() {
+    this.startFetching()
+    try {
+      const exercisesJSON = await RN.AsyncStorage.getItem('@Gymple:exercises')
+      if (exercisesJSON !== null) {
+        const exercises = await Util.decode(JSON.parse(exercisesJSON), t.array(Model.TRemoteDataExercise))
+        this.replaceExerciseTemplateds(exercises.map(exercise => new Exercise(exercise)))
+      } else {
+        await RN.AsyncStorage.setItem('@Gymple:exercises', JSON.stringify(ExerciseData.exercises))
+        this.replaceExerciseTemplateds(ExerciseData.exercises.map(exercise => new Exercise(exercise)))
+      }
+    } catch (error) {
+      await RN.AsyncStorage.removeItem('@Gymple:exercises')
+      throw new Error(error)
+    }
+    this.stopFetching()
   }
 
   @Mobx.action
@@ -46,8 +66,13 @@ export default class DataStore {
   }
 
   @Mobx.action
-  replaceExercises(exercises: Exercise[]) {
-    this.exercises.replace(exercises)
+  replaceExerciseTemplateds(exercises: Exercise[]) {
+    this.exerciseTemplates.replace(exercises)
+  }
+
+  @Mobx.action
+  addExerciseTemplate(exercise: Exercise) {
+    this.exerciseTemplates.push(exercise)
   }
 
   @Mobx.computed
@@ -164,14 +189,21 @@ export class Exercise {
     this.setImgSrc(data.imgSrc)
     this.setType(data.type)
     this.replaceInventoryIds(data.inventoryIds)
-    data.primaryMusclesIds.map(id => {
-      const relatedMuscle = stores.dataStore.muscles.find(m => m.id === id)
-      if (relatedMuscle) this.pushPrimaryMuscle(relatedMuscle)
-    })
-    data.secondaryMusclesIds.map(id => {
-      const relatedMuscle = stores.dataStore.muscles.find(m => m.id === id)
-      if (relatedMuscle) this.pushSecondaryMuscle(relatedMuscle)
-    })
+    this.updatePrimaryMusclesByIds(data.primaryMusclesIds)
+    this.updateSecondaryMusclesByIds(data.secondaryMusclesIds)
+  }
+
+  async save() {
+    stores.dataStore.startFetching({ inBackground: true })
+    const storedExercise = stores.dataStore.exerciseTemplates.find(e => e.id === this.id)
+    if (!storedExercise) {
+      stores.dataStore.addExerciseTemplate(this)
+    }
+    await RN.AsyncStorage.setItem(
+      '@Gymple:exercises',
+      JSON.stringify(stores.dataStore.exerciseTemplates.map(e => e.remoteDataModel))
+    )
+    stores.dataStore.stopFetching({ inBackground: true })
   }
 
   @Mobx.action
@@ -216,6 +248,26 @@ export class Exercise {
   @Mobx.action
   pushSecondaryMuscle(muscle: Muscle) {
     this.secondaryMuscles.push(muscle)
+  }
+
+  @Mobx.action
+  updatePrimaryMusclesByIds(ids: string[]) {
+    this.replacePrimaryMuscles(
+      ids.reduce((acc, id) => {
+        const relatedMuscle = stores.dataStore.muscles.find(m => m.id === id)
+        return relatedMuscle ? [...acc, relatedMuscle] : acc
+      }, [])
+    )
+  }
+
+  @Mobx.action
+  updateSecondaryMusclesByIds(ids: string[]) {
+    this.replaceSecondaryMuscles(
+      ids.reduce((acc, id) => {
+        const relatedMuscle = stores.dataStore.muscles.find(m => m.id === id)
+        return relatedMuscle ? [...acc, relatedMuscle] : acc
+      }, [])
+    )
   }
 
   @Mobx.computed

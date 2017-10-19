@@ -10,6 +10,8 @@ import { TabButton } from '../components/Buttons'
 import Navbar from '../components/Navbar'
 import { stores } from '../store'
 import * as Route from '../routes'
+import * as Util from '../utils'
+import { Exercise } from '../store/dataStore'
 
 type SelectExerciseScreenProps = {
   dataStore: typeof stores.dataStore
@@ -36,8 +38,20 @@ export default class SelectExerciseScreen extends React.Component<
   render() {
     const { filter } = this.state
     const { dataStore, set, routing } = this.props
-
-    const exercises = dataStore.exercises.filter(e => e.title.toLowerCase().includes(filter.toLowerCase()))
+    const exercise = new Exercise({
+      id: Util.uuid(),
+      title: '',
+      imgSrc: '',
+      inventoryIds: [],
+      primaryMusclesIds: [],
+      secondaryMusclesIds: [],
+      weight: 0,
+      type: {
+        kind: 'repetitions',
+        count: 10
+      }
+    })
+    const exercises = dataStore.exerciseTemplates.filter(e => e.title.toLowerCase().includes(filter.toLowerCase()))
 
     return (
       <ScreenContainer
@@ -48,7 +62,18 @@ export default class SelectExerciseScreen extends React.Component<
         <Navbar
           title={'Select Exercise'}
           leftAction={routing.goBack}
-          rightBtn={<Icon name="options" style={[s.blueDark, s.f4]} />}
+          rightAction={() => {
+            routing.replace({
+              route: {
+                path: '/editexercise',
+                props: {
+                  exercise,
+                  setToAdd: set
+                }
+              }
+            })
+          }}
+          rightBtn={<RN.Text style={[s.f_pn, s.f4, s.blueDark, { letterSpacing: -0.5 }]}>Create</RN.Text>}
         />
         <RN.View style={[s.mh05, s.flx_row, s.h265, s.br025, s.bg_greyLighter, s.ph075, s.aic]}>
           <Icon name="magnifier" style={[s.grey, s.f6, s.mr05]} />
