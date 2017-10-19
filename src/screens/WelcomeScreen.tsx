@@ -2,10 +2,12 @@ import * as React from 'react'
 import * as RN from 'react-native'
 import * as MobxReact from 'mobx-react/native'
 import { s } from 'react-native-better-styles'
+
 import { Link } from '../components/Router'
 import ScreenContainer from '../components/ScreenContainer'
 import { stores } from '../store'
 import { Set, Exercise } from '../store/dataStore'
+import * as Util from '../utils'
 
 type WelcomeScreenProps = {
   dataStore: typeof stores.dataStore
@@ -16,13 +18,13 @@ type WelcomeScreenProps = {
 export default class WelcomeScreen extends React.Component<WelcomeScreenProps> {
   render() {
     const set = new Set({
-      id: '1',
+      id: Util.uuid(),
       attemptsAmount: 1,
       recoverSec: 90,
       exercises: []
     })
     const exercise = new Exercise({
-      id: '1',
+      id: Util.uuid(),
       title: '',
       imgSrc: '',
       inventoryIds: [],

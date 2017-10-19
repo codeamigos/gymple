@@ -2,9 +2,10 @@ import * as React from 'react'
 import * as RN from 'react-native'
 import * as MobxReact from 'mobx-react/native'
 
-import { shadows } from '../stylesSettings'
+import LinearGradient from 'react-native-linear-gradient'
 import { Notification, Alert } from '../store/uiStore'
 import { stores } from '../store'
+import { shadows } from '../stylesSettings'
 import { s, sizes, colors } from 'react-native-better-styles'
 
 import * as Utils from '../utils'
@@ -37,7 +38,7 @@ export default function wrapper(Component: React.ReactNode) {
           {this.renderLoader()}
 
           {notifications.length > 0 && (
-            <RN.View style={[s.absolute, s.l0, s.r0, s.t0]}>
+            <RN.View style={[s.absolute, s.l0, s.r0, s.t3]}>
               {notifications.map(notification => (
                 <NotificationView key={notification.id} notification={notification} />
               ))}
@@ -152,9 +153,9 @@ export class NotificationView extends React.PureComponent<NotificationViewProps,
   getNotificationColor = (notification: Notification) => {
     switch (notification.type) {
       case 'ERROR':
-        return colors.red
+        return [colors.red, colors.orange]
       case 'SUCCESS':
-        return colors.green
+        return [colors.green, colors.greenCyan]
       default:
         return Utils.shouldNeverHappen(notification.type)
     }
@@ -176,18 +177,21 @@ export class NotificationView extends React.PureComponent<NotificationViewProps,
     const { notification } = this.props
     return (
       <RN.Animated.View
-        style={[
-          s.ph1,
-          s.pt125,
-          s.pb085,
-          {
-            backgroundColor: this.getNotificationColor(notification),
-            transform: [{ translateY: this.state.transformValue }]
-          }
-        ]}
+        style={{
+          transform: [{ translateY: this.state.transformValue }]
+        }}
       >
-        {!!notification.title && <RN.Text style={[s.bg_t, s.white, s.f_ps, s.fw6, s.f4]}>{notification.title}</RN.Text>}
-        <RN.Text style={[s.bg_t, s.white, s.f_ps, s.f5]}>{notification.message}</RN.Text>
+        <LinearGradient
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 0 }}
+          colors={this.getNotificationColor(notification)}
+          style={[s.ph15, s.mh2, s.mb05, s.pv075, s.br2, shadows.sm]}
+        >
+          {!!notification.title && (
+            <RN.Text style={[s.bg_t, s.white, s.f_pn, s.fw6, s.f5]}>{notification.title}</RN.Text>
+          )}
+          <RN.Text style={[s.bg_t, s.white, s.f_pn, s.f6]}>{notification.message}</RN.Text>
+        </LinearGradient>
       </RN.Animated.View>
     )
   }
