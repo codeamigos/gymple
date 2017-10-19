@@ -100,19 +100,19 @@ export default class SetScreen extends React.Component<SetScreenProps, SetScreen
             <RN.Text style={[s.f_pn, s.fw7, s.f7, s.grey, s.tc, { letterSpacing: 1.5 }]}>ATTEMPTS</RN.Text>
             <RN.View style={[s.flx_row, s.aic, s.mt025]}>
               <RN.TouchableOpacity
-                disabled={set.attempsAmount === 1}
+                disabled={set.attemptsAmount === 1}
                 style={s.p05}
-                onPress={() => set.setAttempsAmount(set.attempsAmount - 1)}
+                onPress={() => set.setattemptsAmount(set.attemptsAmount - 1)}
               >
                 <Icon name="minus" style={[s.blueDark, s.f3]} />
               </RN.TouchableOpacity>
               <RN.Text style={[s.f_pn, s.w2, s.fw3, s.f2, s.blueDark, s.tc, { letterSpacing: -0.5 }]}>
-                {set.attempsAmount}
+                {set.attemptsAmount}
               </RN.Text>
               <RN.TouchableOpacity
-                disabled={set.attempsAmount === 99}
+                disabled={set.attemptsAmount === 99}
                 style={s.p05}
-                onPress={() => set.setAttempsAmount(set.attempsAmount + 1)}
+                onPress={() => set.setattemptsAmount(set.attemptsAmount + 1)}
               >
                 <Icon name="plus" style={[s.blueDark, s.f3]} />
               </RN.TouchableOpacity>

@@ -77,7 +77,7 @@ export class FinishedTraining extends GenericTraining {
     this.setTitle(data.title)
     this.setStartedAt(data.startedAt)
     this.setFinishedAt(data.finishedAt)
-    this.replacecompletedSetsSets(data.completedSets.map(set => new Set(set)))
+    this.replaceCompletedSets(data.completedSets.map(set => new Set(set)))
   }
 
   @Mobx.action
@@ -91,27 +91,27 @@ export class FinishedTraining extends GenericTraining {
   }
 
   @Mobx.action
-  replacecompletedSetsSets(exercises: Set[]) {
+  replaceCompletedSets(exercises: Set[]) {
     this.completedSets.replace(exercises)
   }
 }
 
 export class Set {
   @Mobx.observable id: string = Util.uuid()
-  @Mobx.observable attempsAmount: number = 1
+  @Mobx.observable attemptsAmount: number = 1
   @Mobx.observable recoverSec: number = 90
   @Mobx.observable exercises: Mobx.IObservableArray<Exercise> = Mobx.observable([])
   constructor(data: Model.RemoteDataSet) {
     this.id = data.id
-    this.setAttempsAmount(data.attemptsAmount)
+    this.setattemptsAmount(data.attemptsAmount)
     this.setRecoverSec(data.recoverSec)
     this.replaceExercises(data.exercises.map(e => new Exercise(e)))
   }
 
   @Mobx.action
-  setAttempsAmount(amount: number) {
-    if (amount > 0) this.attempsAmount = amount
-    else this.attempsAmount = 0
+  setattemptsAmount(amount: number) {
+    if (amount > 0) this.attemptsAmount = amount
+    else this.attemptsAmount = 0
   }
 
   @Mobx.action
@@ -134,6 +134,17 @@ export class Set {
   removeExercise(exercise: Exercise) {
     this.exercises.remove(exercise)
   }
+
+  @Mobx.computed
+  get remoteDataModel(): Model.RemoteDataSet {
+    const { id, attemptsAmount, recoverSec, exercises } = this
+    return {
+      id,
+      attemptsAmount,
+      recoverSec,
+      exercises: exercises.map(e => e.remoteDataModel)
+    }
+  }
 }
 
 export class Exercise {
@@ -144,6 +155,7 @@ export class Exercise {
   @Mobx.observable type: Model.ExerciseType = { kind: 'repetitions', count: 10 }
   @Mobx.observable primaryMuscles: Mobx.IObservableArray<Muscle> = Mobx.observable([])
   @Mobx.observable secondaryMuscles: Mobx.IObservableArray<Muscle> = Mobx.observable([])
+  @Mobx.observable inventoryIds: Mobx.IObservableArray<string> = Mobx.observable([])
 
   constructor(data: Model.RemoteDataExercise) {
     this.id = data.id
@@ -151,6 +163,7 @@ export class Exercise {
     this.setWeight(data.weight)
     this.setImgSrc(data.imgSrc)
     this.setType(data.type)
+    this.replaceInventoryIds(data.inventoryIds)
     data.primaryMusclesIds.map(id => {
       const relatedMuscle = stores.dataStore.muscles.find(m => m.id === id)
       if (relatedMuscle) this.pushPrimaryMuscle(relatedMuscle)
@@ -182,6 +195,10 @@ export class Exercise {
   }
 
   @Mobx.action
+  replaceInventoryIds(ids: string[]) {
+    this.inventoryIds.replace(ids)
+  }
+  @Mobx.action
   replacePrimaryMuscles(muscles: Muscle[]) {
     this.primaryMuscles.replace(muscles)
   }
@@ -200,6 +217,21 @@ export class Exercise {
   pushSecondaryMuscle(muscle: Muscle) {
     this.secondaryMuscles.push(muscle)
   }
+
+  @Mobx.computed
+  get remoteDataModel(): Model.RemoteDataExercise {
+    const { id, title, imgSrc, inventoryIds, primaryMuscles, secondaryMuscles, weight, type } = this
+    return {
+      id,
+      title,
+      imgSrc,
+      weight,
+      type,
+      inventoryIds: inventoryIds.peek(),
+      primaryMusclesIds: primaryMuscles.map(m => m.id),
+      secondaryMusclesIds: secondaryMuscles.map(m => m.id)
+    }
+  }
 }
 
 export class Muscle {
@@ -211,5 +243,10 @@ export class Muscle {
     this.id = data.id
     this.title = data.title
     this.bodyPart = data.bodyPart
+  }
+
+  @Mobx.computed
+  get remoteDataModel(): Model.RemoteDataMuscle {
+    return Mobx.toJS(this)
   }
 }

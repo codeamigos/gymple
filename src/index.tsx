@@ -406,6 +406,7 @@ import screenWrapper from './components/ScreenWrapper'
 import WelcomeScreen from './screens/WelcomeScreen'
 import SetScreen from './screens/SetScreen'
 import SelectExerciseScreen from './screens/SelectExerciseScreen'
+import EditExerciseScreen from './screens/EditExerciseScreen'
 
 const { width, height } = RN.Dimensions.get('window')
 
@@ -439,6 +440,7 @@ class App extends React.Component<{}> {
               <Route exact path="/welcome" component={screenWrapper(WelcomeScreen)} />
               <Route exact path="/set" component={screenWrapper(SetScreen)} />
               <Route exact path="/selectexercise" component={screenWrapper(SelectExerciseScreen)} />
+              <Route exact path="/editexercise" component={screenWrapper(EditExerciseScreen)} />
               {/* <Route exact path="/login" component={screenWrapper(LoginScreen)} />
               <Route exact path="/signup" component={screenWrapper(SignupScreen)} />
               <Route exact authRequired path="/carsList" component={screenWrapper(CarsListScreen)} />
