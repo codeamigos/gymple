@@ -6,6 +6,7 @@ import Icon from 'react-native-vector-icons/SimpleLineIcons'
 import LinearGradient from 'react-native-linear-gradient'
 
 import ScreenContainer from '../components/ScreenContainer'
+import { TabButton } from '../components/Buttons'
 import Navbar from '../components/Navbar'
 import { stores } from '../store'
 import * as Route from '../routes'
@@ -56,6 +57,7 @@ export default class SelectExerciseScreen extends React.Component<
             placeholderTextColor={colors.grey}
             style={[s.bg_t, s.f4, s.f_pn, s.fw3, s.flx_i, s.black, s.h25, { letterSpacing: -0.75 }]}
             placeholder="Search through exercises"
+            onChangeText={filter => this.setState({ filter })}
           />
         </RN.View>
         <RN.View style={[s.flx_row, s.jcsa, s.p075]}>
@@ -81,35 +83,12 @@ export default class SelectExerciseScreen extends React.Component<
               </RN.TouchableOpacity>
             ))}
           </RN.ScrollView>
-          <LinearGradient style={[s.h075, s.absolute, s.l0, s.r0, s.t0]} colors={[colors.black_10, colors.tb]} />
+          <LinearGradient
+            style={[s.h075, s.absolute, s.l0, s.r0, s.t0]}
+            colors={[colors.greyLighter, colors.greyLighter_10]}
+          />
         </RN.View>
       </ScreenContainer>
-    )
-  }
-}
-
-type TabButtonProps = {
-  isActive?: boolean
-  label: string
-  style?: RN.StyleProp<RN.ViewStyle>
-}
-
-class TabButton extends React.Component<TabButtonProps> {
-  render() {
-    const { isActive, label, style } = this.props
-    return (
-      <RN.TouchableOpacity style={s.flx_row}>
-        <LinearGradient
-          style={[s.h175, s.br085, s.ph15, style, s.aic, s.jcc]}
-          start={{ x: 0, y: 0 }}
-          end={{ x: 1, y: 0 }}
-          colors={isActive ? [colors.blueDark, colors.blueBright] : [colors.t, colors.t]}
-        >
-          <RN.Text style={[s.f_pn, s.f7, s.fw7, s.bg_t, s.tc, isActive ? s.white : s.blueDark, { letterSpacing: 1.5 }]}>
-            {label.toLocaleUpperCase()}
-          </RN.Text>
-        </LinearGradient>
-      </RN.TouchableOpacity>
     )
   }
 }
