@@ -407,6 +407,7 @@ import WelcomeScreen from './screens/WelcomeScreen'
 import SetScreen from './screens/SetScreen'
 import SelectExerciseScreen from './screens/SelectExerciseScreen'
 import EditExerciseScreen from './screens/EditExerciseScreen'
+import TrainingScreen from './screens/TrainingScreen'
 
 const { width, height } = RN.Dimensions.get('window')
 
@@ -441,6 +442,7 @@ class App extends React.Component<{}> {
               <Route exact path="/set" component={screenWrapper(SetScreen)} />
               <Route exact path="/selectexercise" component={screenWrapper(SelectExerciseScreen)} />
               <Route exact path="/editexercise" component={screenWrapper(EditExerciseScreen)} />
+              <Route exact path="/training" component={screenWrapper(TrainingScreen)} />
               {/* <Route exact path="/login" component={screenWrapper(LoginScreen)} />
               <Route exact path="/signup" component={screenWrapper(SignupScreen)} />
               <Route exact authRequired path="/carsList" component={screenWrapper(CarsListScreen)} />

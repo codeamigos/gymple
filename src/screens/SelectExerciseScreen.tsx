@@ -10,8 +10,7 @@ import { TabButton } from '../components/Buttons'
 import Navbar from '../components/Navbar'
 import { stores } from '../store'
 import * as Route from '../routes'
-import * as Util from '../utils'
-import { Exercise } from '../store/dataStore'
+import { ExerciseTemplate, Exercise } from '../store/dataStore'
 
 type SelectExerciseScreenProps = {
   dataStore: typeof stores.dataStore
@@ -38,20 +37,10 @@ export default class SelectExerciseScreen extends React.Component<
   render() {
     const { filter } = this.state
     const { dataStore, set, routing } = this.props
-    const exercise = new Exercise({
-      id: Util.uuid(),
-      title: '',
-      imgSrc: '',
-      inventoryIds: [],
-      primaryMusclesIds: [],
-      secondaryMusclesIds: [],
-      weight: 0,
-      type: {
-        kind: 'repetitions',
-        count: 10
-      }
-    })
-    const exercises = dataStore.exerciseTemplates.filter(e => e.title.toLowerCase().includes(filter.toLowerCase()))
+    const exerciseTemplate = new ExerciseTemplate()
+    const exerciseTemplates = dataStore.exerciseTemplates.filter(e =>
+      e.title.toLowerCase().includes(filter.toLowerCase())
+    )
 
     return (
       <ScreenContainer
@@ -67,7 +56,7 @@ export default class SelectExerciseScreen extends React.Component<
               route: {
                 path: '/editexercise',
                 props: {
-                  exercise,
+                  exerciseTemplate,
                   setToAdd: set
                 }
               }
@@ -92,18 +81,22 @@ export default class SelectExerciseScreen extends React.Component<
         </RN.View>
         <RN.View style={s.flx_i}>
           <RN.ScrollView style={s.flx_i} contentContainerStyle={[s.pl125]}>
-            {exercises.map(e => (
+            {exerciseTemplates.map(exerciseTemplate => (
               <RN.TouchableOpacity
                 onPress={() => {
-                  set.addExercise(e)
+                  set.addExercise(new Exercise(exerciseTemplate))
                   routing.goBack()
                 }}
-                key={e.id}
+                key={exerciseTemplate.id}
                 style={[s.bbw1, s.b_greyLighter_70, s.pv1, s.pr15]}
               >
-                <RN.Text style={[s.f_pn, s.f4, s.fw3, s.black, { letterSpacing: -0.5 }]}>{e.title}</RN.Text>
+                <RN.Text style={[s.f_pn, s.f4, s.fw3, s.black, { letterSpacing: -0.5 }]}>
+                  {exerciseTemplate.title}
+                </RN.Text>
                 <RN.Text style={[s.f_pn, s.f7, s.fw3, s.grey, { letterSpacing: -0.5 }]}>
-                  {[...e.primaryMuscles, ...e.secondaryMuscles].map(m => m.title).join(', ')}
+                  {[...exerciseTemplate.primaryMuscles, ...exerciseTemplate.secondaryMuscles]
+                    .map(m => m.title)
+                    .join(', ')}
                 </RN.Text>
               </RN.TouchableOpacity>
             ))}

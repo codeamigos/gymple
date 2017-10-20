@@ -80,7 +80,7 @@ export default class SetScreen extends React.Component<SetScreenProps, SetScreen
   }
 
   render() {
-    const { set, routing } = this.props
+    const { set, routing, trainingToAdd } = this.props
     const { showEditRecoverPopup, editingExercise } = this.state
     return (
       <ScreenContainer
@@ -92,8 +92,12 @@ export default class SetScreen extends React.Component<SetScreenProps, SetScreen
       >
         <Navbar
           title={'Edit Set'}
-          leftAction={routing.goBack}
-          rightBtn={<Icon name="options" style={[s.blueDark, s.f4]} />}
+          leftAction={() => {
+            if (trainingToAdd && set.exercises.length > 0) {
+              trainingToAdd.addCompletedSet(set)
+            }
+            routing.goBack()
+          }}
         />
         <RN.View style={[s.flx_row, s.m1]}>
           <RN.View style={[s.flx_i, s.aic]}>
@@ -160,7 +164,7 @@ export default class SetScreen extends React.Component<SetScreenProps, SetScreen
               style={[s.h3, s.br025, s.b_blueDark, s.bw1, s.ass, s.jcc]}
             >
               <RN.Text style={[s.f_pn, s.f4, s.blueDark, s.tc, s.mb, s.bg_t, { letterSpacing: -0.5 }]}>
-                Add First Exercise
+                Select Exercise
               </RN.Text>
             </Link>
           </RN.View>

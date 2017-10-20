@@ -53,6 +53,7 @@ export const TExerciseType = t.union([
 export type ExerciseType = t.TypeOf<typeof TExerciseType>
 
 export const TRemoteDataExercise = t.interface({
+  kind: t.literal('exercise'),
   id: t.string,
   title: t.string,
   imgSrc: t.string,
@@ -63,6 +64,16 @@ export const TRemoteDataExercise = t.interface({
   type: TExerciseType
 })
 export type RemoteDataExercise = t.TypeOf<typeof TRemoteDataExercise>
+
+export const TRemoteDataExerciseTemplate = t.interface({
+  kind: t.literal('exerciseTemplate'),
+  title: t.string,
+  imgSrc: t.string,
+  inventoryIds: t.array(t.string),
+  primaryMusclesIds: t.array(t.string),
+  secondaryMusclesIds: t.array(t.string)
+})
+export type RemoteDataExerciseTemplate = t.TypeOf<typeof TRemoteDataExerciseTemplate>
 
 export const TRemoteDataSet = t.interface({
   id: t.string,

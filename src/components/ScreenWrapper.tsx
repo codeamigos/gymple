@@ -82,7 +82,7 @@ class ForegroundLoader extends React.PureComponent<
   render() {
     return (
       <RN.Animated.View
-        style={[s.absolute, s.absolute__fill, s.bg_steel_80, s.jcc, { opacity: this.state.animatedOpacity }]}
+        style={[s.absolute, s.absolute__fill, s.bg_black_80, s.jcc, { opacity: this.state.animatedOpacity }]}
       >
         <RN.ActivityIndicator animating={true} style={[s.asc, { height: 80 }]} color={colors.white} size="large" />
       </RN.Animated.View>
