@@ -8,6 +8,7 @@ import ScreenContainer from '../components/ScreenContainer'
 import { RoundButtonSm } from '../components/Buttons'
 import Navbar from '../components/Navbar'
 import { stores } from '../store'
+import { Exercise } from '../store/dataStore'
 import * as Route from '../routes'
 
 type EditExerciseScreenProps = {
@@ -28,9 +29,9 @@ export default class EditExerciseScreen extends React.Component<EditExerciseScre
   constructor(props: EditExerciseScreenProps) {
     super(props)
     this.state = {
-      title: props.exercise.title,
-      primaryMusclesIds: props.exercise.primaryMuscles.map(m => m.id),
-      secondaryMusclesIds: props.exercise.secondaryMuscles.map(m => m.id)
+      title: props.exerciseTemplate.title,
+      primaryMusclesIds: props.exerciseTemplate.primaryMuscles.map(m => m.id),
+      secondaryMusclesIds: props.exerciseTemplate.secondaryMuscles.map(m => m.id)
     }
   }
 
@@ -67,7 +68,7 @@ export default class EditExerciseScreen extends React.Component<EditExerciseScre
   }
 
   render() {
-    const { routing, dataStore, exercise, uiStore, setToAdd } = this.props
+    const { routing, dataStore, exerciseTemplate, uiStore, setToAdd } = this.props
     const { title, primaryMusclesIds, secondaryMusclesIds } = this.state
     const upperMuscles = dataStore.muscles.filter(m => m.bodyPart === 'upper')
     const lowerMuscles = dataStore.muscles.filter(m => m.bodyPart === 'lower')
@@ -83,11 +84,11 @@ export default class EditExerciseScreen extends React.Component<EditExerciseScre
           leftAction={routing.goBack}
           rightAction={() => {
             if (title !== '' && primaryMusclesIds.length > 0) {
-              exercise.setTitle(title)
-              exercise.updatePrimaryMusclesByIds(primaryMusclesIds)
-              exercise.updateSecondaryMusclesByIds(secondaryMusclesIds)
-              exercise.save()
-              if (setToAdd) setToAdd.addExercise(exercise)
+              exerciseTemplate.setTitle(title)
+              exerciseTemplate.updatePrimaryMusclesByIds(primaryMusclesIds)
+              exerciseTemplate.updateSecondaryMusclesByIds(secondaryMusclesIds)
+              exerciseTemplate.save()
+              if (setToAdd) setToAdd.addExercise(new Exercise(exerciseTemplate))
               routing.goBack()
             } else {
               uiStore.createNotification({

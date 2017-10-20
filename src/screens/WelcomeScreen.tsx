@@ -6,8 +6,7 @@ import { s } from 'react-native-better-styles'
 import { Link } from '../components/Router'
 import ScreenContainer from '../components/ScreenContainer'
 import { stores } from '../store'
-import { Set, Exercise } from '../store/dataStore'
-import * as Util from '../utils'
+import { FinishedTraining } from '../store/dataStore'
 
 type WelcomeScreenProps = {
   dataStore: typeof stores.dataStore
@@ -17,25 +16,7 @@ type WelcomeScreenProps = {
 @MobxReact.observer
 export default class WelcomeScreen extends React.Component<WelcomeScreenProps> {
   render() {
-    const set = new Set({
-      id: Util.uuid(),
-      attemptsAmount: 1,
-      recoverSec: 90,
-      exercises: []
-    })
-    const exercise = new Exercise({
-      id: Util.uuid(),
-      title: '',
-      imgSrc: '',
-      inventoryIds: [],
-      primaryMusclesIds: [],
-      secondaryMusclesIds: [],
-      weight: 0,
-      type: {
-        kind: 'repetitions',
-        count: 10
-      }
-    })
+    const training = new FinishedTraining()
 
     return (
       <ScreenContainer
@@ -44,14 +25,11 @@ export default class WelcomeScreen extends React.Component<WelcomeScreenProps> {
         }}
         style={[s.jcc, s.ph3]}
       >
-        <Link to={{ path: '/set', props: { set } }} style={[s.mb05, s.h3, s.br025, s.b_blueDark, s.bw1, s.ass, s.jcc]}>
-          <RN.Text style={[s.f_pn, s.f4, s.blueDark, s.tc, s.mb, s.bg_t]}>Edit Set</RN.Text>
-        </Link>
         <Link
-          to={{ path: '/editexercise', props: { exercise } }}
+          to={{ path: '/training', props: { training } }}
           style={[s.mb05, s.h3, s.br025, s.b_blueDark, s.bw1, s.ass, s.jcc]}
         >
-          <RN.Text style={[s.f_pn, s.f4, s.blueDark, s.tc, s.mb, s.bg_t]}>Edit Set</RN.Text>
+          <RN.Text style={[s.f_pn, s.f4, s.blueDark, s.tc, s.mb, s.bg_t]}>New training</RN.Text>
         </Link>
       </ScreenContainer>
     )
