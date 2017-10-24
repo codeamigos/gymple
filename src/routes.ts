@@ -17,6 +17,7 @@ type SelectExerciseRoutePath = '/selectexercise'
 type EditExerciseRoutePath = '/editexercise'
 type SetRoutePath = '/set'
 type TrainingRoutePath = '/training'
+type TrainingsListRoutePath = '/trainingslist'
 
 export type SelectExerciseRouteProps = {
   set: Set
@@ -42,12 +43,21 @@ type SelectExerciseRoute = RouteWithProps<SelectExerciseRoutePath, SelectExercis
 type EditExerciseRoute = RouteWithProps<EditExerciseRoutePath, EditExerciseRouteProps>
 type SetRoute = RouteWithProps<SetRoutePath, SetRouteProps>
 type TrainingRoute = RouteWithProps<TrainingRoutePath, TrainingRouteProps>
+type TrainingsListRoute = RouteWithoutProps<TrainingsListRoutePath>
 
-export type Route = InitialRoute | WelcomeRoute | SelectExerciseRoute | EditExerciseRoute | SetRoute | TrainingRoute
+export type Route =
+  | InitialRoute
+  | WelcomeRoute
+  | SelectExerciseRoute
+  | EditExerciseRoute
+  | SetRoute
+  | TrainingRoute
+  | TrainingsListRoute
 export type RoutePath =
   | InitialRoutePath
   | WelcomeRoutePath
   | SelectExerciseRoutePath
   | SetRoutePath
   | TrainingRoutePath
+  | TrainingsListRoutePath
   | EditExerciseRoutePath

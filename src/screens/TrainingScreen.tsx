@@ -44,6 +44,7 @@ export default class TrainingScreen extends React.Component<TrainingScreenProps,
         statusbar={{
           barStyle: 'dark-content'
         }}
+        style={s.bg_greyLightest}
         avoidKeyboard
       >
         <Navbar
@@ -53,58 +54,52 @@ export default class TrainingScreen extends React.Component<TrainingScreenProps,
         />
         <RN.View style={[s.flx_row, s.jcsa, s.p075]}>
           <TabButton label="Sets / exercises" isActive />
-          <TabButton label="statistics" />
+          <TabButton label="overview" />
         </RN.View>
-        <RN.View style={[s.flx_i, s.bg_greyLightest]}>
-          {training.completedSets.length > 0 ? (
-            <RN.ScrollView style={s.flx_i} contentContainerStyle={[s.ph125, s.pb2, s.pt1]}>
-              {training.completedSets.map((set, i) => (
-                <SetView
-                  key={set.id}
-                  onRemove={() => training.removeCompletedSet(set)}
-                  onEditType={() => {
-                    this.setState({ editingSet: set })
-                  }}
-                  set={set}
-                  index={i}
-                />
-              ))}
-              <RN.TouchableOpacity
-                onPress={() => {
-                  const set = new Set()
-                  routing.push({ route: { path: '/set', props: { set, trainingToAdd: training } } })
-                  routing.push({ route: { path: '/selectexercise', props: { set } } })
+        {training.completedSets.length > 0 ? (
+          <RN.ScrollView style={s.flx_i} contentContainerStyle={[s.ph125, s.pb2, s.pt1]}>
+            {training.completedSets.map((set, i) => (
+              <SetView
+                key={set.id}
+                onRemove={() => training.removeCompletedSet(set)}
+                onEditType={() => {
+                  this.setState({ editingSet: set })
                 }}
-                style={[s.h3, s.br025, s.b_blueDark, s.bw1, s.ass, s.jcc]}
-              >
-                <RN.Text style={[s.f_pn, s.f4, s.blueDark, s.tc, s.bg_t, { letterSpacing: -0.5 }]}>Add Set</RN.Text>
-              </RN.TouchableOpacity>
-            </RN.ScrollView>
-          ) : (
-            <RN.View style={[s.flx_i, s.jcc, s.aic, s.ph3, s.pb3]}>
-              <IonIcon name="ios-clipboard-outline" style={[s.greyLighter, s.fs4, s.tc]} />
-              <RN.Text style={[s.f_pn, s.f3, s.tc, s.greyLighter, s.mb3, { letterSpacing: -0.5 }]}>
-                Sets list is empty
+                set={set}
+                index={i}
+              />
+            ))}
+            <RN.TouchableOpacity
+              onPress={() => {
+                const set = new Set()
+                routing.push({ route: { path: '/set', props: { set, trainingToAdd: training } } })
+                routing.push({ route: { path: '/selectexercise', props: { set } } })
+              }}
+              style={[s.h3, s.br025, s.b_blueDark, s.bw1, s.ass, s.jcc]}
+            >
+              <RN.Text style={[s.f_pn, s.f4, s.blueDark, s.tc, s.bg_t, { letterSpacing: -0.5 }]}>Add Set</RN.Text>
+            </RN.TouchableOpacity>
+          </RN.ScrollView>
+        ) : (
+          <RN.View style={[s.flx_i, s.jcc, s.aic, s.ph3, s.pb3]}>
+            <IonIcon name="ios-clipboard-outline" style={[s.greyLighter, s.fs4, s.tc]} />
+            <RN.Text style={[s.f_pn, s.f3, s.tc, s.greyLighter, s.mb3, { letterSpacing: -0.5 }]}>
+              Sets list is empty
+            </RN.Text>
+            <RN.TouchableOpacity
+              onPress={() => {
+                const set = new Set()
+                routing.push({ route: { path: '/set', props: { set, trainingToAdd: training } } })
+                routing.push({ route: { path: '/selectexercise', props: { set } } })
+              }}
+              style={[s.h3, s.br025, s.b_blueDark, s.bw1, s.ass, s.jcc]}
+            >
+              <RN.Text style={[s.f_pn, s.f4, s.blueDark, s.tc, s.mb, s.bg_t, { letterSpacing: -0.5 }]}>
+                Create First Set
               </RN.Text>
-              <RN.TouchableOpacity
-                onPress={() => {
-                  const set = new Set()
-                  routing.push({ route: { path: '/set', props: { set, trainingToAdd: training } } })
-                  routing.push({ route: { path: '/selectexercise', props: { set } } })
-                }}
-                style={[s.h3, s.br025, s.b_blueDark, s.bw1, s.ass, s.jcc]}
-              >
-                <RN.Text style={[s.f_pn, s.f4, s.blueDark, s.tc, s.mb, s.bg_t, { letterSpacing: -0.5 }]}>
-                  Create First Set
-                </RN.Text>
-              </RN.TouchableOpacity>
-            </RN.View>
-          )}
-          <LinearGradient
-            style={[s.h075, s.absolute, s.l0, s.r0, s.t0]}
-            colors={[colors.greyLighter, colors.greyLighter_10]}
-          />
-        </RN.View>
+            </RN.TouchableOpacity>
+          </RN.View>
+        )}
         <Popup isExpanded={!!editingSet} style={s.bg_black_40} contentContainerStyle={[s.jcc, s.aic]}>
           <RN.View style={[s.mh3, s.bg_white, s.br05, shadows.sm, s.ass]}>
             <RN.TouchableOpacity style={[s.pb15]} onPress={() => this.setState({ editingSet: null })}>
