@@ -165,39 +165,54 @@ class FinishedTrainingView extends React.Component<FinishedTrainingViewProps> {
             <Icon name="options" style={[s.blueDark, s.f5]} />
           </RN.TouchableOpacity>
         </RN.View>
-        <RN.View style={[s.flx_row, s.jcsa, s.pv025, s.bg_greyLightest, s.aic]}>
-          <RN.View style={[s.flx_i, s.pv05]}>
-            <RN.Text style={[s.f_pn, s.fw7, s.mb025, s.f7, s.grey, s.tc, { letterSpacing: 1.5 }]}>SETS</RN.Text>
-            <RN.Text style={[s.f_pn, s.f4, s.tc, s.fw3, s.black, { letterSpacing: -0.5 }]}>
-              {training.completedSets.length}
+        {training.completedSets.length > 0 ? (
+          <RN.View>
+            <RN.View style={[s.flx_row, s.jcsa, s.pv025, s.bg_greyLightest, s.aic]}>
+              <RN.View style={[s.flx_i, s.pv05]}>
+                <RN.Text style={[s.f_pn, s.fw7, s.mb025, s.f7, s.grey, s.tc, { letterSpacing: 1.5 }]}>SETS</RN.Text>
+                <RN.Text style={[s.f_pn, s.f4, s.tc, s.fw3, s.black, { letterSpacing: -0.5 }]}>
+                  {training.completedSets.length}
+                </RN.Text>
+              </RN.View>
+              <RN.View style={[s.w05, s.h05, s.br025, s.bg_greyLighter]} />
+              <RN.View style={[s.flx_i, s.pv05]}>
+                <RN.Text style={[s.f_pn, s.fw7, s.mb025, s.f7, s.grey, s.tc, { letterSpacing: 1.5 }]}>
+                  EXERCISES
+                </RN.Text>
+                <RN.Text style={[s.f_pn, s.f4, s.tc, s.fw3, s.black, { letterSpacing: -0.5 }]}>
+                  {exercises.length}
+                </RN.Text>
+              </RN.View>
+              <RN.View style={[s.w05, s.h05, s.br025, s.bg_greyLighter]} />
+              <RN.View style={[s.flx_i, s.pv05]}>
+                <RN.Text style={[s.f_pn, s.fw7, s.mb025, s.f7, s.grey, s.tc, { letterSpacing: 1.5 }]}>DURATION</RN.Text>
+                <RN.Text style={[s.f_pn, s.f4, s.tc, s.fw3, s.black, { letterSpacing: -0.5 }]}>{duration}m</RN.Text>
+              </RN.View>
+            </RN.View>
+            <RN.View style={[s.pv075, s.ph1]}>
+              <RN.Text style={[s.f_pn, s.fw7, s.mb025, s.f7, s.grey, { letterSpacing: 1.5 }]}>
+                MOST AFFECTED MUSCLES
+              </RN.Text>
+              <RN.Text style={[s.f_pn, s.f6, s.fw3, s.greyDark, { letterSpacing: -0.5 }]}>
+                {Object.keys(muscleUsing)
+                  .sort()
+                  .slice(0, 3)
+                  .map(muscleTitle => {
+                    const percUsing = Math.round(muscleUsing[muscleTitle] / affectedMuscles.length * 100)
+                    return muscleTitle + ' ' + percUsing + '%'
+                  })
+                  .join(', ')}
+              </RN.Text>
+            </RN.View>
+          </RN.View>
+        ) : (
+          <RN.View style={[s.jcc, s.aic, s.flx_row, s.ph2, s.pb075]}>
+            <IonIcon name="ios-clipboard-outline" style={[s.greyLighter, s.f1, s.mr1, s.tc]} />
+            <RN.Text style={[s.f_pn, s.f4, s.greyLighter, { letterSpacing: -0.5 }]}>
+              There is no sets/exercises in this training
             </RN.Text>
           </RN.View>
-          <RN.View style={[s.w05, s.h05, s.br025, s.bg_greyLighter]} />
-          <RN.View style={[s.flx_i, s.pv05]}>
-            <RN.Text style={[s.f_pn, s.fw7, s.mb025, s.f7, s.grey, s.tc, { letterSpacing: 1.5 }]}>EXERCISES</RN.Text>
-            <RN.Text style={[s.f_pn, s.f4, s.tc, s.fw3, s.black, { letterSpacing: -0.5 }]}>{exercises.length}</RN.Text>
-          </RN.View>
-          <RN.View style={[s.w05, s.h05, s.br025, s.bg_greyLighter]} />
-          <RN.View style={[s.flx_i, s.pv05]}>
-            <RN.Text style={[s.f_pn, s.fw7, s.mb025, s.f7, s.grey, s.tc, { letterSpacing: 1.5 }]}>DURATION</RN.Text>
-            <RN.Text style={[s.f_pn, s.f4, s.tc, s.fw3, s.black, { letterSpacing: -0.5 }]}>{duration}m</RN.Text>
-          </RN.View>
-        </RN.View>
-        <RN.View style={[s.pv075, s.ph1]}>
-          <RN.Text style={[s.f_pn, s.fw7, s.mb025, s.f7, s.grey, { letterSpacing: 1.5 }]}>
-            MOST AFFECTED MUSCLES
-          </RN.Text>
-          <RN.Text style={[s.f_pn, s.f6, s.fw3, s.greyDark, { letterSpacing: -0.5 }]}>
-            {Object.keys(muscleUsing)
-              .sort()
-              .slice(0, 3)
-              .map(muscleTitle => {
-                const percUsing = Math.round(muscleUsing[muscleTitle] / affectedMuscles.length * 100)
-                return muscleTitle + ' ' + percUsing + '%'
-              })
-              .join(', ')}
-          </RN.Text>
-        </RN.View>
+        )}
       </RN.Animated.View>
     )
   }
