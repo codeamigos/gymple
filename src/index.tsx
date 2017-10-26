@@ -403,11 +403,11 @@ import { AnimatedChildRoute, Route, Redirect } from './components/Router'
 
 import screenWrapper from './components/ScreenWrapper'
 
-import WelcomeScreen from './screens/WelcomeScreen'
 import SetScreen from './screens/SetScreen'
 import SelectExerciseScreen from './screens/SelectExerciseScreen'
 import EditExerciseScreen from './screens/EditExerciseScreen'
 import TrainingScreen from './screens/TrainingScreen'
+import TrainingsListScreen from './screens/TrainingsListScreen'
 
 const { width, height } = RN.Dimensions.get('window')
 
@@ -437,12 +437,12 @@ class App extends React.Component<{}> {
         <ReactRouterNative.Router history={stores.routing.history}>
           <AnimatedChildRoute pathname={stores.routing.location.pathname}>
             <ReactRouterNative.Switch>
-              <Route exact path="/" render={() => <Redirect to={{ path: '/welcome' }} />} />
-              <Route exact path="/welcome" component={screenWrapper(WelcomeScreen)} />
+              <Route exact path="/" render={() => <Redirect to={{ path: '/trainingslist' }} />} />
               <Route exact path="/set" component={screenWrapper(SetScreen)} />
               <Route exact path="/selectexercise" component={screenWrapper(SelectExerciseScreen)} />
               <Route exact path="/editexercise" component={screenWrapper(EditExerciseScreen)} />
               <Route exact path="/training" component={screenWrapper(TrainingScreen)} />
+              <Route exact path="/trainingslist" component={screenWrapper(TrainingsListScreen)} />
               {/* <Route exact path="/login" component={screenWrapper(LoginScreen)} />
               <Route exact path="/signup" component={screenWrapper(SignupScreen)} />
               <Route exact authRequired path="/carsList" component={screenWrapper(CarsListScreen)} />

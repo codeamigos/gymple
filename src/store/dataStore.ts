@@ -19,6 +19,7 @@ export default class DataStore {
   }
   @Mobx.observable muscles: Mobx.IObservableArray<Muscle> = Mobx.observable([])
   @Mobx.observable exerciseTemplates: Mobx.IObservableArray<ExerciseTemplate> = Mobx.observable([])
+  @Mobx.observable finishedTrainings: Mobx.IObservableArray<FinishedTraining> = Mobx.observable([])
 
   async generateInitialData() {
     this.replaceMuscles(ExerciseData.muscles.map(muscle => new Muscle(muscle)))
@@ -79,6 +80,11 @@ export default class DataStore {
     this.exerciseTemplates.push(exercise)
   }
 
+  @Mobx.action
+  addFinishedTraining(training: FinishedTraining) {
+    this.finishedTrainings.push(training)
+  }
+
   @Mobx.computed
   get isFetching() {
     return this.fetching.foreground > 0 || this.fetching.background > 0
@@ -134,6 +140,15 @@ export class FinishedTraining extends GenericTraining {
   @Mobx.action
   removeCompletedSet(set: Set) {
     this.completedSets.remove(set)
+  }
+
+  @Mobx.action
+  switchCompletedSetPosition(index1: number, index2: number) {
+    const set1 = this.completedSets[index1]
+    const set2 = this.completedSets[index2]
+    if (set1 && set2) {
+      this.replaceCompletedSets(this.completedSets.map((set, i) => (i === index1 ? set2 : i === index2 ? set1 : set)))
+    }
   }
 }
 
