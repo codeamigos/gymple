@@ -9,7 +9,6 @@ import LinearGradient from 'react-native-linear-gradient'
 import { TabButton } from '../components/Buttons'
 import ScreenContainer from '../components/ScreenContainer'
 import { shadows } from '../stylesSettings'
-import Popup from '../components/Popup'
 import Navbar from '../components/Navbar'
 import { Set } from '../store/dataStore'
 import { stores } from '../store'
@@ -21,23 +20,11 @@ type TrainingScreenProps = {
   routing: typeof stores.routing
 } & Route.TrainingRouteProps
 
-type TrainingScreenState = {
-  editingSet: Set | null
-}
-
 @MobxReact.inject('dataStore', 'routing')
 @MobxReact.observer
-export default class TrainingScreen extends React.Component<TrainingScreenProps, TrainingScreenState> {
-  constructor() {
-    super()
-    this.state = {
-      editingSet: null
-    }
-  }
-
+export default class TrainingScreen extends React.Component<TrainingScreenProps> {
   render() {
     const { training, routing } = this.props
-    const { editingSet } = this.state
 
     return (
       <ScreenContainer
@@ -62,9 +49,13 @@ export default class TrainingScreen extends React.Component<TrainingScreenProps,
               <SetView
                 key={set.id}
                 onRemove={() => training.removeCompletedSet(set)}
-                onEditType={() => {
-                  this.setState({ editingSet: set })
-                }}
+                onPress={() => routing.push({ route: { path: '/set', props: { set } } })}
+                onMoveDown={
+                  i !== training.completedSets.length - 1
+                    ? () => training.switchCompletedSetPosition(i, i + 1)
+                    : undefined
+                }
+                onMoveUp={i !== 0 ? () => training.switchCompletedSetPosition(i, i - 1) : undefined}
                 set={set}
                 index={i}
               />
@@ -84,7 +75,7 @@ export default class TrainingScreen extends React.Component<TrainingScreenProps,
           <RN.View style={[s.flx_i, s.jcc, s.aic, s.ph3, s.pb3]}>
             <IonIcon name="ios-clipboard-outline" style={[s.greyLighter, s.fs4, s.tc]} />
             <RN.Text style={[s.f_pn, s.f3, s.tc, s.greyLighter, s.mb3, { letterSpacing: -0.5 }]}>
-              Sets list is empty
+              There is no sets/exercises in this training
             </RN.Text>
             <RN.TouchableOpacity
               onPress={() => {
@@ -100,28 +91,35 @@ export default class TrainingScreen extends React.Component<TrainingScreenProps,
             </RN.TouchableOpacity>
           </RN.View>
         )}
-        <Popup isExpanded={!!editingSet} style={s.bg_black_40} contentContainerStyle={[s.jcc, s.aic]}>
-          <RN.View style={[s.mh3, s.bg_white, s.br05, shadows.sm, s.ass]}>
-            <RN.TouchableOpacity style={[s.pb15]} onPress={() => this.setState({ editingSet: null })}>
-              <RN.Text style={[s.f_pn, s.f4, s.tc, s.blueDark]}>Done</RN.Text>
-            </RN.TouchableOpacity>
-          </RN.View>
-        </Popup>
       </ScreenContainer>
     )
   }
 }
 
 type SetViewProps = {
-  onEditType: () => void
+  onPress: () => void
   onRemove: () => void
+  onMoveUp?: () => void
+  onMoveDown?: () => void
   set: Set
   index: number
 }
 
+type SetViewState = {
+  isOptionsVisible: boolean
+}
+
 @MobxReact.observer
-class SetView extends React.Component<SetViewProps> {
+class SetView extends React.Component<SetViewProps, SetViewState> {
+  constructor() {
+    super()
+    this.state = {
+      isOptionsVisible: false
+    }
+  }
+
   private animatedValue: RN.Animated.Value = new RN.Animated.Value(0)
+  private optionsAnimatedValue: RN.Animated.Value = new RN.Animated.Value(0)
 
   componentDidMount() {
     const { index } = this.props
@@ -137,8 +135,29 @@ class SetView extends React.Component<SetViewProps> {
       .start()
   }
 
+  onRemove = () => {
+    const { onRemove } = this.props
+    RN.Animated
+      .timing(this.animatedValue, {
+        toValue: 200,
+        duration: 200
+      })
+      .start(onRemove)
+  }
+
+  toggleOptions = () => {
+    const { isOptionsVisible } = this.state
+    this.optionsAnimatedValue.stopAnimation()
+    RN.Animated
+      .timing(this.optionsAnimatedValue, {
+        toValue: isOptionsVisible ? 0 : 100,
+        duration: 200
+      })
+      .start(() => this.setState({ isOptionsVisible: !isOptionsVisible }))
+  }
+
   render() {
-    const { set, index } = this.props
+    const { set, index, onPress, onMoveUp, onMoveDown } = this.props
     return (
       <RN.Animated.View
         style={[
@@ -177,25 +196,38 @@ class SetView extends React.Component<SetViewProps> {
               <RN.Text style={[s.fw6, s.black]}>{Util.secondsToMinutes(set.recoverSec, 'm s')}</RN.Text> recover
             </RN.Text>
           </RN.View>
-          <RN.TouchableOpacity style={[s.pv05, s.jcc]}>
-            <Icon name="options" style={[s.blueDark, s.f5]} />
-          </RN.TouchableOpacity>
+          <RN.Animated.View
+            style={{
+              transform: [
+                {
+                  translateX: this.optionsAnimatedValue.interpolate({
+                    inputRange: [0, 100],
+                    outputRange: [0, -sizes['25']]
+                  })
+                }
+              ]
+            }}
+          >
+            <RN.TouchableOpacity style={[s.pv05, s.jcc]} onPress={this.toggleOptions}>
+              <Icon name="options" style={[s.blueDark, s.f5]} />
+            </RN.TouchableOpacity>
+          </RN.Animated.View>
         </RN.View>
         {set.exercises.map((e, i) => (
-          <RN.View
+          <RN.TouchableOpacity
+            onPress={onPress}
             key={e.id}
             style={[
-              s.ml1,
+              s.pl1,
               i !== set.exercises.length - 1 ? s.bbw1 : null,
               s.b_greyLighter_70,
               s.pv1,
               s.pr075,
               s.flx_row,
-              s.jcsb,
-              s.ass
+              s.jcsb
             ]}
           >
-            <RN.View style={[s.pr15]}>
+            <RN.View style={s.flx_i}>
               <RN.Text style={[s.f_pn, s.f4, s.fw3, s.black, { letterSpacing: -0.5 }]}>
                 {e.title}
                 {e.weight > 0 ? ' ' + e.weight + 'kg' : ''}
@@ -204,9 +236,51 @@ class SetView extends React.Component<SetViewProps> {
                 {[...e.primaryMuscles, ...e.secondaryMuscles].map(m => m.title).join(', ')}
               </RN.Text>
             </RN.View>
+
             <RN.Text style={[s.f_pn, s.f4, s.fw3, s.black, s.tr, { letterSpacing: -0.5 }]}>{e.weight}m</RN.Text>
-          </RN.View>
+          </RN.TouchableOpacity>
         ))}
+        <RN.Animated.View
+          style={[
+            s.absolute,
+            s.r0,
+            s.t0,
+            s.b0,
+            s.p05,
+            s.pl15,
+            s.jcc,
+            s.aic,
+            {
+              opacity: this.optionsAnimatedValue.interpolate({ inputRange: [0, 100], outputRange: [0, 1] }),
+              transform: [
+                {
+                  translateX: this.optionsAnimatedValue.interpolate({
+                    inputRange: [0, 1, 100],
+                    outputRange: [1000, 0, 0]
+                  })
+                }
+              ]
+            }
+          ]}
+        >
+          <LinearGradient
+            colors={[colors.greyLighter_5, colors.greyLighter, colors.greyLighter]}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 0 }}
+            style={[s.absolute, s.absolute__fill]}
+          />
+          <RN.TouchableOpacity style={[s.p025, s.jcc]} disabled={!onMoveUp} onPress={onMoveUp}>
+            <Icon name="arrow-up" style={[!!onMoveUp ? s.blueDark : s.greyLight, s.f5, s.bg_t]} />
+          </RN.TouchableOpacity>
+
+          <RN.TouchableOpacity style={[s.p025, s.jcc]} onPress={this.onRemove}>
+            <Icon name="trash" style={[s.blueDark, s.f5, s.bg_t]} />
+          </RN.TouchableOpacity>
+
+          <RN.TouchableOpacity style={[s.p025, s.jcc]} disabled={!onMoveDown} onPress={onMoveDown}>
+            <Icon name="arrow-down" style={[!!onMoveDown ? s.blueDark : s.greyLight, s.f5, s.bg_t]} />
+          </RN.TouchableOpacity>
+        </RN.Animated.View>
       </RN.Animated.View>
     )
   }
