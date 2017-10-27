@@ -60,18 +60,21 @@ export default class SetScreen extends React.Component<SetScreenProps, SetScreen
             kind: 'distance',
             meters: getTypeAmount(editingExercise)
           })
+          editingExercise.save()
           break
         case 'time':
           editingExercise.setType({
             kind: 'time',
             seconds: getTypeAmount(editingExercise)
           })
+          editingExercise.save()
           break
         case 'repetitions':
           editingExercise.setType({
             kind: 'repetitions',
             count: getTypeAmount(editingExercise)
           })
+          editingExercise.save()
           break
         default:
           Util.shouldNeverHappen(kind)
@@ -95,6 +98,7 @@ export default class SetScreen extends React.Component<SetScreenProps, SetScreen
           leftAction={() => {
             if (trainingToAdd && set.exercises.length > 0) {
               trainingToAdd.addCompletedSet(set)
+              trainingToAdd.save()
             }
             routing.goBack()
           }}
@@ -106,7 +110,10 @@ export default class SetScreen extends React.Component<SetScreenProps, SetScreen
               <RN.TouchableOpacity
                 disabled={set.attemptsAmount === 1}
                 style={s.p05}
-                onPress={() => set.setattemptsAmount(set.attemptsAmount - 1)}
+                onPress={() => {
+                  set.setAttemptsAmount(set.attemptsAmount - 1)
+                  set.save()
+                }}
               >
                 <Icon name="minus" style={[s.blueDark, s.f3]} />
               </RN.TouchableOpacity>
@@ -116,7 +123,10 @@ export default class SetScreen extends React.Component<SetScreenProps, SetScreen
               <RN.TouchableOpacity
                 disabled={set.attemptsAmount === 99}
                 style={s.p05}
-                onPress={() => set.setattemptsAmount(set.attemptsAmount + 1)}
+                onPress={() => {
+                  set.setAttemptsAmount(set.attemptsAmount + 1)
+                  set.save()
+                }}
               >
                 <Icon name="plus" style={[s.blueDark, s.f3]} />
               </RN.TouchableOpacity>
@@ -136,7 +146,10 @@ export default class SetScreen extends React.Component<SetScreenProps, SetScreen
             {set.exercises.map((e, i) => (
               <ExerciseView
                 key={e.id}
-                onRemove={() => set.removeExercise(e)}
+                onRemove={() => {
+                  set.removeExercise(e)
+                  set.save()
+                }}
                 onEditType={() => {
                   this.setState({ editingExercise: e })
                 }}
@@ -198,7 +211,10 @@ export default class SetScreen extends React.Component<SetScreenProps, SetScreen
             </RN.View>
             <RN.Picker
               selectedValue={set.recoverSec}
-              onValueChange={(itemValue: number) => set.setRecoverSec(itemValue)}
+              onValueChange={(itemValue: number) => {
+                set.setRecoverSec(itemValue)
+                set.save()
+              }}
             >
               <RN.Picker.Item label="30 sec" value={30} />
               <RN.Picker.Item label="45 sec" value={45} />
@@ -272,6 +288,7 @@ class ExerciseView extends React.Component<ExerciseViewProps> {
             onChangeText={value => {
               const numValue = parseInt(value)
               e.setType({ kind: 'distance', meters: isNaN(numValue) || value === '' ? 0 : numValue })
+              e.save()
             }}
             keyboardType="numeric"
             style={[s.m0, s.p0, s.f_pn, s.fw3, s.f2, s.ass, s.blueDark, s.tc, { letterSpacing: -0.5 }]}
@@ -291,6 +308,7 @@ class ExerciseView extends React.Component<ExerciseViewProps> {
             onChangeText={value => {
               const numValue = parseInt(value)
               e.setType({ kind: 'time', seconds: isNaN(numValue) || value === '' ? 0 : numValue })
+              e.save()
             }}
             keyboardType="numeric"
             style={[s.m0, s.p0, s.f_pn, s.fw3, s.f2, s.ass, s.blueDark, s.tc, { letterSpacing: -0.5 }]}
@@ -310,6 +328,7 @@ class ExerciseView extends React.Component<ExerciseViewProps> {
             onChangeText={value => {
               const numValue = parseInt(value)
               e.setType({ kind: 'repetitions', count: isNaN(numValue) || value === '' ? 0 : numValue })
+              e.save()
             }}
             keyboardType="numeric"
             style={[s.m0, s.p0, s.f_pn, s.fw3, s.f2, s.ass, s.blueDark, s.tc, { letterSpacing: -0.5 }]}
@@ -376,6 +395,7 @@ class ExerciseView extends React.Component<ExerciseViewProps> {
                 const numValue = parseInt(value)
                 if (isNaN(numValue) || value === '') exercise.setWeight(0)
                 else exercise.setWeight(numValue)
+                exercise.save()
               }}
               keyboardType="numeric"
               style={[s.m0, s.p0, s.f_pn, s.fw3, s.f2, s.ass, s.blueDark, s.tc, { letterSpacing: -0.5 }]}
@@ -440,55 +460,3 @@ class NumberEdit extends React.Component<NumberEditProps, NumberEditState> {
     )
   }
 }
-
-// type SelectPopUpProps = {}
-// type SelectPopUpState = {
-//   width: number,
-//   height: number,
-//   layoutKnown: boolean
-// }
-
-// class SelectPopUp extends React.Component<SelectPopUpProps, SelectPopUpState> {
-
-//   constructor() {
-//     super()
-//     this.state = {
-//       width: 0,
-//       height: 0,
-//       layoutKnown: false
-//     }
-//   }
-
-//   private animatedValue: RN.Animated.Value = new RN.Animated.Value(0)
-
-//   onLayout = (e: RN.LayoutChangeEvent) => {
-//     const { width, height } = e.nativeEvent.layout
-//     this.setState({
-//       width,
-//       height,
-//       layoutKnown: true
-//     })
-//   }
-
-//   fadeIn = () => {
-//     RN.Animated.timing(this.animatedValue, {
-//       toValue: 100,
-//       duration: 400
-//     }).start()
-//   }
-
-//   fadeOut = () => {
-//     RN.Animated.timing(this.animatedValue, {
-//       toValue: 0,
-//       duration: 200
-//     }).start()
-//   }
-
-//   render() {
-//     return(
-//       <RN.Animated.View on>
-//       </RN.Animated.View>
-//     )
-//   }
-
-// }

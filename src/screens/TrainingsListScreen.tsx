@@ -29,6 +29,7 @@ export default class TrainingsListScreen extends React.Component<TrainingsListSc
     const finishedTraining = new FinishedTraining()
     routing.push({ route: { path: '/training', props: { training: finishedTraining } } })
     dataStore.addFinishedTraining(finishedTraining)
+    dataStore.saveFinishedTrainings()
   }
 
   render() {
@@ -58,7 +59,10 @@ export default class TrainingsListScreen extends React.Component<TrainingsListSc
               {finishedTrainings.map((training, i) => (
                 <FinishedTrainingView
                   key={training.id}
-                  onRemove={() => {}}
+                  onRemove={() => {
+                    dataStore.removeFinishedTraining(training)
+                    dataStore.saveFinishedTrainings()
+                  }}
                   onPress={() => routing.push({ route: { path: '/training', props: { training } } })}
                   training={training}
                   index={i}

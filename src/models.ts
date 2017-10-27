@@ -83,11 +83,12 @@ export const TRemoteDataSet = t.interface({
 })
 export type RemoteDataSet = t.TypeOf<typeof TRemoteDataSet>
 
-export const TFinishedTraining = t.interface({
+export const TRemoteDataFinishedTraining = t.interface({
   kind: t.literal('FinishedTraining'),
+  id: t.string,
   title: t.string,
   startedAt: DateFromString,
   finishedAt: DateFromString,
   completedSets: t.array(TRemoteDataSet)
 })
-export type FinishedTraining = t.TypeOf<typeof TFinishedTraining>
+export type RemoteDataFinishedTraining = t.TypeOf<typeof TRemoteDataFinishedTraining>

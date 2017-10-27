@@ -88,7 +88,10 @@ export default class EditExerciseScreen extends React.Component<EditExerciseScre
               exerciseTemplate.updatePrimaryMusclesByIds(primaryMusclesIds)
               exerciseTemplate.updateSecondaryMusclesByIds(secondaryMusclesIds)
               exerciseTemplate.save()
-              if (setToAdd) setToAdd.addExercise(new Exercise(exerciseTemplate))
+              if (setToAdd) {
+                setToAdd.addExercise(new Exercise(exerciseTemplate))
+                setToAdd.save()
+              }
               routing.goBack()
             } else {
               uiStore.createNotification({
