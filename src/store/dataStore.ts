@@ -7,6 +7,7 @@ import * as Model from '../models'
 import * as Util from '../utils'
 import { stores } from './index'
 import * as ExerciseData from '../exerciseData'
+import * as Const from '../constants'
 
 export default class DataStore {
   @Mobx.observable
@@ -24,12 +25,13 @@ export default class DataStore {
   async generateInitialData() {
     this.replaceMuscles(ExerciseData.muscles.map(muscle => new Muscle(muscle)))
     await this.fetchExercises()
+    await this.fetchFinishedTrainings()
   }
 
   async fetchExercises() {
     this.startFetching()
     try {
-      const exercisesJSON = await RN.AsyncStorage.getItem('@Gymple:exercises')
+      const exercisesJSON = await RN.AsyncStorage.getItem(Const.EXERCISES_STORAGE_KEY)
       if (exercisesJSON !== null) {
         const exerciseTemplates = await Util.decode(
           JSON.parse(exercisesJSON),
@@ -37,14 +39,40 @@ export default class DataStore {
         )
         this.replaceExerciseTemplates(exerciseTemplates.map(exercise => new ExerciseTemplate(exercise)))
       } else {
-        await RN.AsyncStorage.setItem('@Gymple:exercises', JSON.stringify(ExerciseData.exerciseTeamplates))
+        await RN.AsyncStorage.setItem(Const.EXERCISES_STORAGE_KEY, JSON.stringify(ExerciseData.exerciseTeamplates))
         this.replaceExerciseTemplates(ExerciseData.exerciseTeamplates.map(exercise => new ExerciseTemplate(exercise)))
       }
     } catch (error) {
-      await RN.AsyncStorage.removeItem('@Gymple:exercises')
+      await RN.AsyncStorage.removeItem(Const.EXERCISES_STORAGE_KEY)
       throw new Error(error)
     }
     this.stopFetching()
+  }
+
+  async fetchFinishedTrainings() {
+    this.startFetching()
+    try {
+      const finishedTrainingsJSON = await RN.AsyncStorage.getItem(Const.FINISHED_TRAININGS_STORAGE_KEY)
+      if (finishedTrainingsJSON !== null) {
+        const exerciseTemplates = await Util.decode(
+          JSON.parse(finishedTrainingsJSON),
+          t.array(Model.TRemoteDataFinishedTraining)
+        )
+        this.replaceFinishedTrainings(exerciseTemplates.map(training => new FinishedTraining(training)))
+      }
+    } catch (error) {
+      throw new Error(error)
+    }
+    this.stopFetching()
+  }
+
+  async saveFinishedTrainings() {
+    stores.dataStore.startFetching({ inBackground: true })
+    await RN.AsyncStorage.setItem(
+      Const.FINISHED_TRAININGS_STORAGE_KEY,
+      JSON.stringify(this.finishedTrainings.map(t => t.remoteDataModel))
+    )
+    stores.dataStore.stopFetching({ inBackground: true })
   }
 
   @Mobx.action
@@ -83,6 +111,18 @@ export default class DataStore {
   @Mobx.action
   addFinishedTraining(training: FinishedTraining) {
     this.finishedTrainings.push(training)
+    this.saveFinishedTrainings()
+  }
+
+  @Mobx.action
+  replaceFinishedTrainings(trainings: FinishedTraining[]) {
+    this.finishedTrainings.replace(trainings)
+  }
+
+  @Mobx.action
+  removeFinishedTraining(training: FinishedTraining) {
+    this.finishedTrainings.remove(training)
+    this.saveFinishedTrainings()
   }
 
   @Mobx.computed
@@ -98,6 +138,10 @@ class GenericTraining {
   setTitle(title: string) {
     this.title = title
   }
+
+  async save() {
+    await stores.dataStore.saveFinishedTrainings()
+  }
 }
 
 export class FinishedTraining extends GenericTraining {
@@ -107,9 +151,10 @@ export class FinishedTraining extends GenericTraining {
   @Mobx.observable finishedAt: Date = new Date()
   @Mobx.observable completedSets: Mobx.IObservableArray<Set> = Mobx.observable([])
 
-  constructor(data?: Model.FinishedTraining) {
+  constructor(data?: Model.RemoteDataFinishedTraining) {
     super()
     if (data) {
+      this.id = data.id
       this.setTitle(data.title)
       this.setStartedAt(data.startedAt)
       this.setFinishedAt(data.finishedAt)
@@ -129,16 +174,19 @@ export class FinishedTraining extends GenericTraining {
 
   @Mobx.action
   replaceCompletedSets(sets: Set[]) {
+    sets.map(set => set.setRelatedTraining(this))
     this.completedSets.replace(sets)
   }
 
   @Mobx.action
   addCompletedSet(set: Set) {
+    set.setRelatedTraining(this)
     this.completedSets.push(set)
   }
 
   @Mobx.action
   removeCompletedSet(set: Set) {
+    set.setRelatedTraining(null)
     this.completedSets.remove(set)
   }
 
@@ -150,6 +198,19 @@ export class FinishedTraining extends GenericTraining {
       this.replaceCompletedSets(this.completedSets.map((set, i) => (i === index1 ? set2 : i === index2 ? set1 : set)))
     }
   }
+
+  @Mobx.computed
+  get remoteDataModel(): Model.RemoteDataFinishedTraining {
+    const { id, startedAt, title, finishedAt, completedSets } = this
+    return {
+      kind: 'FinishedTraining',
+      title,
+      id,
+      startedAt,
+      finishedAt,
+      completedSets: completedSets.map(set => set.remoteDataModel)
+    }
+  }
 }
 
 export type Training = FinishedTraining
@@ -159,17 +220,27 @@ export class Set {
   @Mobx.observable attemptsAmount: number = 1
   @Mobx.observable recoverSec: number = 90
   @Mobx.observable exercises: Mobx.IObservableArray<Exercise> = Mobx.observable([])
+  @Mobx.observable relatedTraining: Training | null = null
   constructor(data?: Model.RemoteDataSet) {
     if (data) {
       this.id = data.id
-      this.setattemptsAmount(data.attemptsAmount)
+      this.setAttemptsAmount(data.attemptsAmount)
       this.setRecoverSec(data.recoverSec)
       this.replaceExercises(data.exercises.map(e => new Exercise(e)))
     }
   }
 
+  async save() {
+    if (this.relatedTraining) await this.relatedTraining.save()
+  }
+
   @Mobx.action
-  setattemptsAmount(amount: number) {
+  setRelatedTraining(training: Training | null) {
+    this.relatedTraining = training
+  }
+
+  @Mobx.action
+  setAttemptsAmount(amount: number) {
     if (amount > 0) this.attemptsAmount = amount
     else this.attemptsAmount = 0
   }
@@ -182,16 +253,19 @@ export class Set {
 
   @Mobx.action
   replaceExercises(exercises: Exercise[]) {
+    exercises.map(exercise => exercise.setRelatedSet(this))
     this.exercises.replace(exercises)
   }
 
   @Mobx.action
   addExercise(exercise: Exercise) {
+    exercise.setRelatedSet(this)
     this.exercises.push(exercise)
   }
 
   @Mobx.action
   removeExercise(exercise: Exercise) {
+    exercise.setRelatedSet(null)
     this.exercises.remove(exercise)
   }
 
@@ -233,7 +307,7 @@ export class ExerciseTemplate {
       stores.dataStore.addExerciseTemplate(this)
     }
     await RN.AsyncStorage.setItem(
-      '@Gymple:exercises',
+      Const.EXERCISES_STORAGE_KEY,
       JSON.stringify(stores.dataStore.exerciseTemplates.map(e => e.remoteDataModel))
     )
     stores.dataStore.stopFetching({ inBackground: true })
@@ -316,13 +390,14 @@ export class Exercise {
   @Mobx.observable primaryMuscles: Mobx.IObservableArray<Muscle> = Mobx.observable([])
   @Mobx.observable secondaryMuscles: Mobx.IObservableArray<Muscle> = Mobx.observable([])
   @Mobx.observable inventoryIds: Mobx.IObservableArray<string> = Mobx.observable([])
+  @Mobx.observable realtedSet: Set | null = null
 
   constructor(data: Model.RemoteDataExercise | ExerciseTemplate) {
     switch (data.kind) {
       case 'exercise':
         this.id = data.id
-        this.setType(data.type)
-        this.setWeight(data.weight)
+        this.type = data.type
+        this.weight = data.weight
         this.updatePrimaryMusclesByIds(data.primaryMusclesIds)
         this.updateSecondaryMusclesByIds(data.secondaryMusclesIds)
         break
@@ -338,6 +413,10 @@ export class Exercise {
     this.replaceInventoryIds(data.inventoryIds)
   }
 
+  async save() {
+    if (this.realtedSet) await this.realtedSet.save()
+  }
+
   @Mobx.action
   setTitle(title: string) {
     this.title = title
@@ -346,6 +425,11 @@ export class Exercise {
   setWeight(weight: number) {
     if (isNaN(weight)) this.weight = 0
     this.weight = weight
+  }
+
+  @Mobx.action
+  setRelatedSet(set: Set | null) {
+    this.realtedSet = set
   }
 
   @Mobx.action

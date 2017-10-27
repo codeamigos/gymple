@@ -85,6 +85,7 @@ export default class SelectExerciseScreen extends React.Component<
               <RN.TouchableOpacity
                 onPress={() => {
                   set.addExercise(new Exercise(exerciseTemplate))
+                  set.save()
                   routing.goBack()
                 }}
                 key={exerciseTemplate.id}

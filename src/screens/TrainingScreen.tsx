@@ -48,14 +48,27 @@ export default class TrainingScreen extends React.Component<TrainingScreenProps>
             {training.completedSets.map((set, i) => (
               <SetView
                 key={set.id}
-                onRemove={() => training.removeCompletedSet(set)}
+                onRemove={() => {
+                  training.removeCompletedSet(set)
+                  training.save()
+                }}
                 onPress={() => routing.push({ route: { path: '/set', props: { set } } })}
                 onMoveDown={
                   i !== training.completedSets.length - 1
-                    ? () => training.switchCompletedSetPosition(i, i + 1)
+                    ? () => {
+                        training.switchCompletedSetPosition(i, i + 1)
+                        training.save()
+                      }
                     : undefined
                 }
-                onMoveUp={i !== 0 ? () => training.switchCompletedSetPosition(i, i - 1) : undefined}
+                onMoveUp={
+                  i !== 0
+                    ? () => {
+                        training.switchCompletedSetPosition(i, i - 1)
+                        training.save()
+                      }
+                    : undefined
+                }
                 set={set}
                 index={i}
               />
