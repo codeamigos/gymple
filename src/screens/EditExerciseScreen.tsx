@@ -81,7 +81,11 @@ export default class EditExerciseScreen extends React.Component<EditExerciseScre
       >
         <Navbar
           title={'Edit Exercise'}
-          leftAction={routing.goBack}
+          leftAction={() => {
+            if (setToAdd && setToAdd.exercises.length === 0)
+              routing.go(-2) //skip empty set if you cancel adding exercise
+            else routing.goBack()
+          }}
           rightAction={() => {
             if (title !== '' && primaryMusclesIds.length > 0) {
               exerciseTemplate.setTitle(title)

@@ -387,7 +387,7 @@ class ExerciseView extends React.Component<ExerciseViewProps> {
               enablesReturnKeyAutomatically
               underlineColorAndroid={colors.t}
               maxLength={7}
-              placeholder="20kg"
+              placeholder="0kg"
               selectionColor={colors.blue_20}
               placeholderTextColor={colors.greyLighter}
               value={exercise.weight === 0 ? '' : String(exercise.weight)}
