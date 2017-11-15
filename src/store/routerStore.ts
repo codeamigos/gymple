@@ -77,7 +77,10 @@ export const syncHistoryWithStore = (history: History.History, store: RouterStor
     store._updateLocation(location)
   }
 
-  const unsubscribeFromHistory = history.listen(handleLocationChange)
+  const unsubscribeFromHistory = history.listen(updatedLocation => {
+    console.log('updated Location from unsubscribeFromHistory', updatedLocation)
+    handleLocationChange(updatedLocation as Location)
+  })
   handleLocationChange(history.location as any)
 
   const subscribe = (listener: History.LocationListener) => {

@@ -1,8 +1,10 @@
 export default {
   en: {
-    'test': 'test',
+    test: 'test',
+    startNew: 'Start Nu'
   },
   ru: {
-    'test': 'тест',
-  },
-};
+    test: 'тест',
+    startNew: 'Новая'
+  }
+}

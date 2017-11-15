@@ -12,7 +12,8 @@
     "allowJs": true,
     "suppressImplicitAnyIndexErrors": true,
     "experimentalDecorators": true,
-    "sourceMap": false
+    "sourceMap": false,
+    "strictFunctionTypes": false
   },
   "include": ["src/**/*.ts", "src/**/*.tsx"],
   "exclude": ["android", "build", "ios", "node_modules"]
