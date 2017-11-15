@@ -13,17 +13,29 @@ import { shadows } from '../stylesSettings'
 // import Popup from '../components/Popup'
 import Navbar from '../components/Navbar'
 import { stores } from '../store'
-import { FinishedTraining } from '../store/dataStore'
-// import * as Util from '../utils'
+import { FinishedTraining, Exercise, Muscle } from '../store/dataStore'
+import * as ReactIntl from 'react-intl'
+import Trans from '../translation'
+
+const messages = Trans.defineMessages({
+  startNew: {
+    id: 'startNew',
+    defaultMessage: 'Start New'
+  },
+  fuckYou: {
+    id: 'fuckYou',
+    defaultMessage: 'Fuck you'
+  }
+})
 
 type TrainingsListScreenProps = {
   dataStore: typeof stores.dataStore
   routing: typeof stores.routing
-}
+} & ReactIntl.InjectedIntlProps
 
 @MobxReact.inject('dataStore', 'routing')
 @MobxReact.observer
-export default class TrainingsListScreen extends React.Component<TrainingsListScreenProps> {
+class TrainingsListScreen extends React.Component<TrainingsListScreenProps> {
   createNewTraining = () => {
     const { dataStore, routing } = this.props
     const finishedTraining = new FinishedTraining()
@@ -33,7 +45,7 @@ export default class TrainingsListScreen extends React.Component<TrainingsListSc
   }
 
   render() {
-    const { dataStore, routing } = this.props
+    const { dataStore, routing, intl } = this.props
     const { finishedTrainings } = dataStore
 
     return (
@@ -46,7 +58,11 @@ export default class TrainingsListScreen extends React.Component<TrainingsListSc
         <Navbar
           title="My trainings"
           rightAction={this.createNewTraining}
-          rightBtn={<RN.Text style={[s.f_pn, s.f4, s.blueDark, { letterSpacing: -0.5 }]}>Start new</RN.Text>}
+          rightBtn={
+            <RN.Text style={[s.f_pn, s.f4, s.blueDark, { letterSpacing: -0.5 }]}>
+              {intl.formatMessage(messages.startNew)}
+            </RN.Text>
+          }
         />
         <RN.View style={[s.flx_row, s.jcsa, s.p075]}>
           <TabButton label="History" isActive />
@@ -95,6 +111,8 @@ export default class TrainingsListScreen extends React.Component<TrainingsListSc
   }
 }
 
+export default ReactIntl.injectIntl(TrainingsListScreen)
+
 type FinishedTrainingViewProps = {
   onRemove: () => void
   onPress: () => void
@@ -104,6 +122,9 @@ type FinishedTrainingViewProps = {
 
 @MobxReact.observer
 class FinishedTrainingView extends React.Component<FinishedTrainingViewProps> {
+  constructor() {
+    super()
+  }
   private animatedValue: RN.Animated.Value = new RN.Animated.Value(0)
 
   componentDidMount() {
@@ -123,10 +144,10 @@ class FinishedTrainingView extends React.Component<FinishedTrainingViewProps> {
   render() {
     const { training, onPress } = this.props
 
-    const exercises = training.completedSets.reduce((acc, set) => [...acc, ...set.exercises], [])
+    const exercises = training.completedSets.reduce((acc, set) => [...acc, ...set.exercises], [] as Exercise[])
     const duration = moment(training.finishedAt).diff(moment(training.startedAt), 'minutes')
 
-    const affectedMuscles = exercises.reduce((acc, exercise) => [...acc, ...exercise.primaryMuscles], [])
+    const affectedMuscles = exercises.reduce((acc, exercise) => [...acc, ...exercise.primaryMuscles], [] as Muscle[])
 
     const muscleUsing: { [key: string]: number } = affectedMuscles.map(m => m.title).reduce(function(acc, curr) {
       if (typeof acc[curr] == 'undefined') {

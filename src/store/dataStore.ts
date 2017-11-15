@@ -350,20 +350,26 @@ export class ExerciseTemplate {
   @Mobx.action
   updatePrimaryMusclesByIds(ids: string[]) {
     this.replacePrimaryMuscles(
-      ids.reduce((acc, id) => {
-        const relatedMuscle = stores.dataStore.muscles.find(m => m.id === id)
-        return relatedMuscle ? [...acc, relatedMuscle] : acc
-      }, [])
+      ids.reduce(
+        (acc, id) => {
+          const relatedMuscle = stores.dataStore.muscles.find(m => m.id === id)
+          return relatedMuscle ? [...acc, relatedMuscle] : acc
+        },
+        [] as Muscle[]
+      )
     )
   }
 
   @Mobx.action
   updateSecondaryMusclesByIds(ids: string[]) {
     this.replaceSecondaryMuscles(
-      ids.reduce((acc, id) => {
-        const relatedMuscle = stores.dataStore.muscles.find(m => m.id === id)
-        return relatedMuscle ? [...acc, relatedMuscle] : acc
-      }, [])
+      ids.reduce(
+        (acc, id) => {
+          const relatedMuscle = stores.dataStore.muscles.find(m => m.id === id)
+          return relatedMuscle ? [...acc, relatedMuscle] : acc
+        },
+        [] as Muscle[]
+      )
     )
   }
 
@@ -469,20 +475,26 @@ export class Exercise {
   @Mobx.action
   updatePrimaryMusclesByIds(ids: string[]) {
     this.replacePrimaryMuscles(
-      ids.reduce((acc, id) => {
-        const relatedMuscle = stores.dataStore.muscles.find(m => m.id === id)
-        return relatedMuscle ? [...acc, relatedMuscle] : acc
-      }, [])
+      ids.reduce(
+        (acc, id) => {
+          const relatedMuscle = stores.dataStore.muscles.find(m => m.id === id)
+          return relatedMuscle ? [...acc, relatedMuscle] : acc
+        },
+        [] as Muscle[]
+      )
     )
   }
 
   @Mobx.action
   updateSecondaryMusclesByIds(ids: string[]) {
     this.replaceSecondaryMuscles(
-      ids.reduce((acc, id) => {
-        const relatedMuscle = stores.dataStore.muscles.find(m => m.id === id)
-        return relatedMuscle ? [...acc, relatedMuscle] : acc
-      }, [])
+      ids.reduce(
+        (acc, id) => {
+          const relatedMuscle = stores.dataStore.muscles.find(m => m.id === id)
+          return relatedMuscle ? [...acc, relatedMuscle] : acc
+        },
+        [] as Muscle[]
+      )
     )
   }
 
